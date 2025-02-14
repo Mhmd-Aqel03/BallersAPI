@@ -7,12 +7,14 @@ import lombok.NoArgsConstructor;
 @Entity
 @Data
 @NoArgsConstructor
-public class Chat {
+public class CourtImage {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    private String photoUrl;
+
     @ManyToOne
-    @JoinColumn(name = "sessionId")
-    private Session session;
+    @JoinColumn(name = "court_id")
+    private Court court;
 }
