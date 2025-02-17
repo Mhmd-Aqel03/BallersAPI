@@ -1,0 +1,11 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/ballers_db
+    username: postgres
+    password: jallad2442003
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: create-drop  # Use 'create', 'update', 'validate', or 'none' as needed
+    show-sql: true  # Enables logging of SQL statements
