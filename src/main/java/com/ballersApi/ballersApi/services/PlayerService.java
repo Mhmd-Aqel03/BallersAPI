@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class PlayerService {
 
@@ -47,14 +49,20 @@ public class PlayerService {
         userService.addUser(newUser);
     }
 
-    private void checkUserInput(PlayerDTO playerDTO){
-        // Check if UserName is already in use
-        UserDetails user =  userService.loadUserByUsername(playerDTO.getUsername());
-
-        if(user != null){
-            throw new UserCreationErrorException("User Name already exists");
+    private void checkUserInput(PlayerDTO playerDTO) {
+        // Validate username format
+        String username = playerDTO.getUsername();
+        // ChatGPT wrote this regex, hopefully it works.
+        if (!username.matches("^[a-zA-Z][a-zA-Z0-9_]*$")) {
+            throw new UserCreationErrorException("Username must start with a letter and contain only letters, numbers, or underscores.");
         }
 
+        // Check if UserName is already in use
+        Optional<User> user = userService.getUsersByUsername(username);
 
+        // Basically "!= null"
+        if (user.isPresent()) {
+            throw new UserCreationErrorException("Username already Taken");
+        }
     }
 }

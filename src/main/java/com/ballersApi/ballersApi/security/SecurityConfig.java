@@ -1,5 +1,6 @@
 package com.ballersApi.ballersApi.security;
 
+import com.ballersApi.ballersApi.services.AppUserDetailsService;
 import com.ballersApi.ballersApi.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -26,8 +27,8 @@ public class SecurityConfig {
     private JwtAuthFilter authFilter;
 
     @Bean
-    public UserDetailsService userDetailsService() {
-        return new UserService();
+    public AppUserDetailsService userDetailsService() {
+        return new AppUserDetailsService();
     }
 
     @Bean
