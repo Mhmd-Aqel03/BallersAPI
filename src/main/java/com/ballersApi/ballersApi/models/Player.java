@@ -1,8 +1,11 @@
 package com.ballersApi.ballersApi.models;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.antlr.v4.runtime.misc.NotNull;
 
 import java.util.List;
 @Entity
@@ -13,25 +16,31 @@ public class Player {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    @NotBlank(message = "Position Can't be empty")
     private String postion;
 
+    @NotBlank(message = "Phone Number Can't be empty")
     private String phoneNumber;
 
     private String photoUrl;
 
-    private int teamPlayerCommendations;
+    private int teamPlayerCommendations = 0;
 
-    private int goodLeaderCommendations;
+    private int goodLeaderCommendations = 0;
 
-    private int positiveAttitudeCommendations;
+    private int positiveAttitudeCommendations = 0;
 
-    private int sessionsPlayed;
+    private int sessionsPlayed = 0;
 
-    private int sessionsWon;
+    private int sessionsWon = 0;
 
-    private int sessionsLost;
+    private int sessionsLost = 0;
 
-    private int MVPs;
+    private int MVPs = 0;
+
+    private String verificationCode;
+
+    private boolean isVerified = false;
 
 //  Session Team relationship
     @ManyToMany
