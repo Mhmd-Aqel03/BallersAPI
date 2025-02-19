@@ -23,4 +23,8 @@ public class Court {
     private String city;
 
     private boolean hasParking;
+
+    private boolean hasBathroom;
+
+    private boolean hasCafeteria;
 }
