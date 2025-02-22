@@ -7,25 +7,27 @@ import com.ballersApi.ballersApi.models.Player;
 import com.ballersApi.ballersApi.models.Role;
 import com.ballersApi.ballersApi.models.User;
 import com.ballersApi.ballersApi.repositories.PlayerRepository;
+import jakarta.transaction.Transactional;
+import jdk.jfr.TransitionTo;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
-
+@AllArgsConstructor
 @Service
 public class PlayerService {
 
-    @Autowired
-    private PlayerRepository playerRepository;
+    private final PlayerRepository playerRepository;
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
+    @Transactional
     public void addPlayer(PlayerDTO playerDTO){
         User newUser = new User();
 
-        checkUserInput(playerDTO);
+        userService.checkUserInput(playerDTO.getUsername(),playerDTO.getPassword());
 
         // Create User
         newUser.setUsername(playerDTO.getUsername());
@@ -43,26 +45,9 @@ public class PlayerService {
         newUser.setPlayer(newPlayer);
 
         // Save Player
-        playerRepository.save(newPlayer);
+//        playerRepository.save(newPlayer);
 
         // Save User
         userService.addUser(newUser);
-    }
-
-    private void checkUserInput(PlayerDTO playerDTO) {
-        // Validate username format
-        String username = playerDTO.getUsername();
-        // ChatGPT wrote this regex, hopefully it works.
-        if (!username.matches("^[a-zA-Z][a-zA-Z0-9_]*$")) {
-            throw new UserCreationErrorException("Username must start with a letter and contain only letters, numbers, or underscores.");
-        }
-
-        // Check if UserName is already in use
-        Optional<User> user = userService.getUsersByUsername(username);
-
-        // Basically "!= null"
-        if (user.isPresent()) {
-            throw new UserCreationErrorException("Username already Taken");
-        }
     }
 }

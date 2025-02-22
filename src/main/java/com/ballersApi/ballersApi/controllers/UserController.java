@@ -2,8 +2,11 @@ package com.ballersApi.ballersApi.controllers;
 
 import com.ballersApi.ballersApi.JsonWebTokens.JwtService;
 import com.ballersApi.ballersApi.dataTransferObjects.PlayerDTO;
+import com.ballersApi.ballersApi.models.Player;
 import com.ballersApi.ballersApi.services.PlayerService;
 import com.ballersApi.ballersApi.services.UserService;
+import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -12,28 +15,38 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@AllArgsConstructor
 @RestController
 @RequestMapping("/auth")
 public class UserController {
-    @Autowired
-    private UserService userService;
 
-    @Autowired
-    private JwtService jwtService;
+    private final UserService userService;
 
-    @Autowired
-    private PlayerService playerService;
+    private final JwtService jwtService;
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
+    private final PlayerService playerService;
+
+    private final AuthenticationManager authenticationManager;
 
     @PostMapping("/register")
-    public ResponseEntity<String> registerPlayer(@RequestBody PlayerDTO playerDTO) {
+    public ResponseEntity<String> registerPlayer(@Valid @RequestBody PlayerDTO playerDTO) {
+        // Add the player
+        playerService.addPlayer(playerDTO);
 
+        // Generate JWT Token
+        String token = jwtService.generateToken(playerDTO.getUsername());
+
+        // Return JWT
+        return ResponseEntity.ok(token);
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<String> loginUser() {
+//    @PostMapping("/login")
+//    public ResponseEntity<String> loginUser() {
+//
+//    }
+//    @PostMapping("/refreshToken")
+//    public ResponseEntity<String> refreshToken() {
+//
+//    }
 
-    }
 }

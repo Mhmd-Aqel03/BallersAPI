@@ -1,11 +1,16 @@
 package com.ballersApi.ballersApi.JsonWebTokens;
 
+import com.ballersApi.ballersApi.services.AppUserDetailsService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
@@ -14,20 +19,37 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Component
+@RequiredArgsConstructor
 public class JwtService {
 
-    @Value("${JWT.secret}")
-    public static String secret;
+    private final AppUserDetailsService appUserDetailsService;
+    private String secret;
 
-    // Generate token with given user name
+    // This a setter injection
+    @Value("${JWT.secret}")
+    public void setSecret(String secret) {
+        this.secret = secret;
+    }
+
+    // Generate token with given username
     public String generateToken(String userName) {
         Map<String, Object> claims = new HashMap<>();
+
+        UserDetails userDetails = appUserDetailsService.loadUserByUsername(userName);
+
+        claims.put("roles", userDetails.getAuthorities()
+                .stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toList()));
+
+
         return createToken(claims, userName);
     }
 
-    // Create a JWT token with specified claims and subject (user name)
+    // Create a JWT token with specified claims and subject (username)
     private String createToken(Map<String, Object> claims, String userName) {
         return Jwts.builder()
                 .setClaims(claims)
