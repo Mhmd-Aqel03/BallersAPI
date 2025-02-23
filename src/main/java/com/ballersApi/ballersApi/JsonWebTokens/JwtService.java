@@ -40,10 +40,11 @@ public class JwtService {
 
         UserDetails userDetails = appUserDetailsService.loadUserByUsername(userName);
 
-        claims.put("roles", userDetails.getAuthorities()
+        claims.put("role", userDetails.getAuthorities()
                 .stream()
                 .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.toList()));
+                .findFirst()
+                .orElse(null)); // So this is never supposed to be null because the UserService should throw a not found exception
 
 
         return createToken(claims, userName);

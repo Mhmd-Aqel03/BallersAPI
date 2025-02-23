@@ -17,7 +17,7 @@ public class AppUserDetails implements UserDetails {
     public AppUserDetails(User user) {
         this.username = username;
         this.password = password;
-        this.authorities = List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole()));
+        this.authorities = List.of(new SimpleGrantedAuthority(user.getRole().toString()));
     }
 
     @Override
