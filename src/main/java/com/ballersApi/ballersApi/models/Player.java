@@ -40,6 +40,8 @@ public class Player {
 
     private boolean isVerified = false;
 
+    private String refreshToken;
+
 //  Session Team relationship
     @ManyToMany
     @JoinTable(

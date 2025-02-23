@@ -57,8 +57,16 @@ public class UserService {
         }
     }
 
-    public Optional<User> getUsersByUsername(String username) {
-        return userRepository.findByUsername(username);
+    public User getUserByUsername(String username) {
+        try{
+            Optional<User> user = userRepository.findByUsername(username);
+
+            // orElseThrow will return the object if it exists, or throw and exception if it doesn't. So cool shout out to Java.
+            return user.orElseThrow(() -> new UserNotFoundException("User not found with username: " + username));
+        } catch (Exception e) {
+            throw new UserCreationErrorException("Something went wrong while creating user: " + e.getMessage());
+        }
+
     }
 
     public void checkUserInput(String username, String  password) {
@@ -69,7 +77,7 @@ public class UserService {
         }
 
         // Check if UserName is already in use
-        Optional<User> user = getUsersByUsername(username);
+        Optional<User> user = userRepository.findByUsername(username);
 
         // Basically "!= null"
         if (user.isPresent()) {

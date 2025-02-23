@@ -49,7 +49,7 @@ public class GlobalExceptionHandler {
 
         response.put("message", ex.getMessage());
 
-        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     // This Handles validation errors
@@ -64,5 +64,15 @@ public class GlobalExceptionHandler {
         });
 
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    // I'll use this exception as a "shit went wrong with the DB"
+    @ExceptionHandler(DatabaseConnectionErrorException.class)
+    public ResponseEntity<Map<String, Object>> handleDatabaseConnectionErrorException(Exception ex) {
+        Map<String, Object> response = new HashMap<>();
+
+        response.put("message", ex.getMessage());
+
+        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

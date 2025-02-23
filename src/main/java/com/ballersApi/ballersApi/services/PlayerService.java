@@ -1,20 +1,15 @@
 package com.ballersApi.ballersApi.services;
 
 import com.ballersApi.ballersApi.dataTransferObjects.PlayerDTO;
-import com.ballersApi.ballersApi.dataTransferObjects.UserDTO;
-import com.ballersApi.ballersApi.exceptions.UserCreationErrorException;
+import com.ballersApi.ballersApi.exceptions.DatabaseConnectionErrorException;
 import com.ballersApi.ballersApi.models.Player;
 import com.ballersApi.ballersApi.models.Role;
 import com.ballersApi.ballersApi.models.User;
 import com.ballersApi.ballersApi.repositories.PlayerRepository;
 import jakarta.transaction.Transactional;
-import jdk.jfr.TransitionTo;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
 @AllArgsConstructor
 @Service
 public class PlayerService {
@@ -24,10 +19,10 @@ public class PlayerService {
     private final UserService userService;
 
     @Transactional
-    public void addPlayer(PlayerDTO playerDTO){
+    public void addPlayer(PlayerDTO playerDTO) {
         User newUser = new User();
 
-        userService.checkUserInput(playerDTO.getUsername(),playerDTO.getPassword());
+        userService.checkUserInput(playerDTO.getUsername(), playerDTO.getPassword());
 
         // Create User
         newUser.setUsername(playerDTO.getUsername());
@@ -44,10 +39,26 @@ public class PlayerService {
         // Link User to player
         newUser.setPlayer(newPlayer);
 
-        // Save Player
-//        playerRepository.save(newPlayer);
-
         // Save User
         userService.addUser(newUser);
+    }
+
+    @Transactional
+    public void updateRefreshToken(String username, String refreshToken) {
+        try {
+            Player player = getPlayerByUsername(username);
+
+            player.setRefreshToken(refreshToken);
+
+            playerRepository.save(player);
+        } catch (Exception e) {
+            throw new DatabaseConnectionErrorException("Something went wrong while trying to persist to the Database: " + e.getMessage());
+        }
+    }
+
+    public Player getPlayerByUsername(String username) {
+        User user = userService.getUserByUsername(username);
+
+        return user.getPlayer();
     }
 }

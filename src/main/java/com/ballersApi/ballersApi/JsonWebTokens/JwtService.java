@@ -1,5 +1,6 @@
 package com.ballersApi.ballersApi.JsonWebTokens;
 
+import com.ballersApi.ballersApi.dataTransferObjects.TokenDTO;
 import com.ballersApi.ballersApi.services.AppUserDetailsService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -27,7 +28,8 @@ public class JwtService {
 
     private final AppUserDetailsService appUserDetailsService;
     private String secret;
-
+    private final Long accessExpiration = 1000L * 60 * 60 * 24;
+    private final Long refreshExpiration = 1000L * 60 * 60 * 24 * 30;
     // This a setter injection
     @Value("${JWT.secret}")
     public void setSecret(String secret) {
@@ -35,7 +37,8 @@ public class JwtService {
     }
 
     // Generate token with given username
-    public String generateToken(String userName) {
+    public TokenDTO generateToken(String userName) {
+        TokenDTO tokens = new TokenDTO();
         Map<String, Object> claims = new HashMap<>();
 
         UserDetails userDetails = appUserDetailsService.loadUserByUsername(userName);
@@ -46,17 +49,18 @@ public class JwtService {
                 .findFirst()
                 .orElse(null)); // So this is never supposed to be null because the UserService should throw a not found exception
 
-
-        return createToken(claims, userName);
+        tokens.setAccessToken(createToken(claims, userName, accessExpiration));
+        tokens.setRefreshToken(createToken(claims, userName, refreshExpiration));
+        return tokens;
     }
 
     // Create a JWT token with specified claims and subject (username)
-    private String createToken(Map<String, Object> claims, String userName) {
+    private String createToken(Map<String, Object> claims, String userName, Long expiration) {
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(userName)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 30)) // Token valid for 30 minutes
+                .setExpiration(new Date(System.currentTimeMillis() + expiration)) // Token valid for 30 minutes
                 .signWith(getSignKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
