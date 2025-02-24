@@ -1,7 +1,9 @@
 package com.ballersApi.ballersApi.services;
 
+import com.ballersApi.ballersApi.JsonWebTokens.JwtService;
 import com.ballersApi.ballersApi.dataTransferObjects.PlayerDTO;
 import com.ballersApi.ballersApi.exceptions.DatabaseConnectionErrorException;
+import com.ballersApi.ballersApi.exceptions.JwtTokenValidationException;
 import com.ballersApi.ballersApi.models.Player;
 import com.ballersApi.ballersApi.models.Role;
 import com.ballersApi.ballersApi.models.User;
@@ -17,6 +19,8 @@ public class PlayerService {
     private final PlayerRepository playerRepository;
 
     private final UserService userService;
+
+    private final JwtService jwtService;
 
     @Transactional
     public void addPlayer(PlayerDTO playerDTO) {
@@ -61,5 +65,34 @@ public class PlayerService {
         User user = userService.getUserByUsername(username);
 
         return user.getPlayer();
+    }
+
+    @Transactional
+    public String refreshToken(String token) {
+        try {
+            String newToken;
+            String username = jwtService.extractUsername(token);
+
+            // Validate token, should throw exceptions for invalid tokens.
+            jwtService.validateToken(token);
+
+            Player player = getPlayerByUsername(username);
+
+            if(player.getRefreshToken() ==  null || !player.getRefreshToken().equals(token)){
+                throw new JwtTokenValidationException("Refresh Token is either invalid or outDated");
+            }
+
+            // Generate new Refresh Token.
+            newToken = jwtService.generateRefreshToken(username);
+            // Update refresh token.
+            updateRefreshToken(username, newToken);
+
+            return newToken;
+        }catch (JwtTokenValidationException e){
+            throw new JwtTokenValidationException(e.getMessage());
+        }
+        catch (Exception e){
+            throw new DatabaseConnectionErrorException("Something went wrong while trying to persist to the Database: " + e.getMessage());
+        }
     }
 }

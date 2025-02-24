@@ -1,8 +1,10 @@
 package com.ballersApi.ballersApi.services;
 
+import com.ballersApi.ballersApi.JsonWebTokens.JwtService;
+import com.ballersApi.ballersApi.dataTransferObjects.LoginDTO;
 import com.ballersApi.ballersApi.dataTransferObjects.UserDTO;
-import com.ballersApi.ballersApi.exceptions.UserCreationErrorException;
-import com.ballersApi.ballersApi.exceptions.UserNotFoundException;
+import com.ballersApi.ballersApi.exceptions.*;
+import com.ballersApi.ballersApi.models.Player;
 import com.ballersApi.ballersApi.models.User;
 import com.ballersApi.ballersApi.repositories.UserRepository;
 import com.ballersApi.ballersApi.security.AppUserDetails;
@@ -26,6 +28,8 @@ public class UserService {
     private final UserRepository userRepository;
 
     private final PasswordEncoder passwordEncoder;
+
+    private final JwtService jwtService;
 
     public void addUser(UserDTO userDto) {
         try {
@@ -64,7 +68,7 @@ public class UserService {
             // orElseThrow will return the object if it exists, or throw and exception if it doesn't. So cool shout out to Java.
             return user.orElseThrow(() -> new UserNotFoundException("User not found with username: " + username));
         } catch (Exception e) {
-            throw new UserCreationErrorException("Something went wrong while creating user: " + e.getMessage());
+            throw new DatabaseConnectionErrorException("Something went wrong while trying to get a user: " + e.getMessage());
         }
 
     }
@@ -91,5 +95,19 @@ public class UserService {
             );
         }
 
+    }
+
+    public String login(LoginDTO loginDTO) {
+        String newToken;
+        // This throws an exception if no User is found.
+        User user = getUserByUsername(loginDTO.getUsername());
+
+        if(user.getUsername().equals(loginDTO.getUsername()) && passwordEncoder.matches(loginDTO.getPassword(), user.getPassword())) {
+            newToken = jwtService.generateAccessToken(loginDTO.getUsername());
+
+            return newToken;
+        }else{
+            throw new AuthenticationFailedException("Username or password are incorrect");
+        }
     }
 }
