@@ -4,6 +4,7 @@ import com.ballersApi.ballersApi.JsonWebTokens.JwtService;
 import com.ballersApi.ballersApi.dataTransferObjects.PlayerDTO;
 import com.ballersApi.ballersApi.dataTransferObjects.RefreshTokenDTO;
 import com.ballersApi.ballersApi.dataTransferObjects.TokenDTO;
+import com.ballersApi.ballersApi.exceptions.JwtTokenValidationException;
 import com.ballersApi.ballersApi.models.Player;
 import com.ballersApi.ballersApi.services.PlayerService;
 import com.ballersApi.ballersApi.services.UserService;
@@ -46,13 +47,14 @@ public class UserController {
 
         // Generate access and refresh JWT Tokens, and put them in the response.
         TokenDTO tokens = new TokenDTO();
-        tokens = jwtService.generateToken(playerDTO.getUsername());
+        tokens.setAccessToken(jwtService.generateAccessToken(playerDTO.getUsername()));
+        tokens.setRefreshToken(jwtService.generateRefreshToken(playerDTO.getUsername()));
 
         // Update refresh Token for player
         playerService.updateRefreshToken(playerDTO.getUsername(), tokens.getRefreshToken());
 
-        response.put("access Token", tokens.getAccessToken());
-        response.put("refresh Token", tokens.getRefreshToken());
+        response.put("accessToken", tokens.getAccessToken());
+        response.put("refreshToken", tokens.getRefreshToken());
 
         // Return JWT
         return new  ResponseEntity<>(response, HttpStatus.OK);
@@ -62,22 +64,36 @@ public class UserController {
 //    public ResponseEntity<String> loginUser() {
 //
 //    }
-//    @PostMapping("/refreshToken")
-//    public ResponseEntity<String> refreshToken() {
-//
-//    }
 
     @PostMapping("/refresh")
     public ResponseEntity<Map<String,Object>> refreshToken(@Valid @RequestBody RefreshTokenDTO refreshTokenDTO) {
-        // Create response object
+        String newToken;
+        boolean tokenValid;
+
+        // Create response object.
         Map<String, Object> response = new HashMap<>();
-        // Get token from POST Body, and username from security context
+        // Get token from POST Body.
         String token = refreshTokenDTO.getToken();
         String username = jwtService.extractUsername(token);
 
-        playerService.updateRefreshToken(username, token);
+        // Validate token, should throw exceptions for invalid tokens.
+        jwtService.validateToken(token);
 
-        response.put("token", token);
+        Player player = playerService.getPlayerByUsername(username);
+
+        if(player.getRefreshToken() ==  null) {
+            throw new JwtTokenValidationException("The User somehow doesn't have a refresh token set, how did we even get here?");
+        }
+
+        if(!player.getRefreshToken().equals(token)){
+            throw new JwtTokenValidationException("The Refresh Token doesn't match, Token is probably outdated");
+        }
+
+        newToken = jwtService.generateRefreshToken(username);
+
+        playerService.updateRefreshToken(username, newToken);
+
+        response.put("token", newToken);
 
         return new  ResponseEntity<>(response, HttpStatus.OK);
     }

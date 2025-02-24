@@ -51,6 +51,7 @@ public class PlayerService {
             player.setRefreshToken(refreshToken);
 
             playerRepository.save(player);
+
         } catch (Exception e) {
             throw new DatabaseConnectionErrorException("Something went wrong while trying to persist to the Database: " + e.getMessage());
         }

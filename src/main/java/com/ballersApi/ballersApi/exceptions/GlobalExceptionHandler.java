@@ -75,4 +75,13 @@ public class GlobalExceptionHandler {
 
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+    @ExceptionHandler(JwtTokenValidationException.class)
+    public ResponseEntity<Map<String, Object>> handleJwtTokenValidationException(Exception ex) {
+        Map<String, Object> response = new HashMap<>();
+
+        response.put("message","Invalid Token: " + ex.getMessage());
+
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
 }
