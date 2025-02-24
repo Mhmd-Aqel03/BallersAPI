@@ -14,7 +14,7 @@ public class CourtImage {
 
     private String photoUrl;
 
-    @ManyToOne
-    @JoinColumn(name = "court_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "court_id",nullable = false)
     private Court court;
 }

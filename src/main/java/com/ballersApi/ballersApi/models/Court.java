@@ -1,11 +1,10 @@
 package com.ballersApi.ballersApi.models;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Entity
 @Data
@@ -27,4 +26,6 @@ public class Court {
     private boolean hasBathroom;
 
     private boolean hasCafeteria;
+    @OneToMany(mappedBy="court",cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CourtImage> images;
 }
