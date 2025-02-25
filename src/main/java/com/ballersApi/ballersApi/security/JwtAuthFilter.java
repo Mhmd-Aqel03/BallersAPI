@@ -62,14 +62,17 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                         SecurityContextHolder.getContext().setAuthentication(authToken);
                     }
                 } catch (Exception e) {
-                    throw new UserNotFoundException("User not found: " + e.getMessage());
+                    throw new InvalidTokenException("User not found: " + e.getMessage());
                 }
             }
             // Continue the filter chain
             filterChain.doFilter(request, response);
         }
+        catch (InvalidTokenException e) {
+            throw new AuthorizationFailedException(e.getMessage());
+        }
         catch (Exception e) {
-            throw new AuthenticationFailedException("Something went wrong with Authentication: " + e.getMessage());
+            throw new AuthorizationFailedException("Something went wrong with Authorization: " + e.getMessage());
         }
     }
 }

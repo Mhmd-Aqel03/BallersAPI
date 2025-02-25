@@ -61,7 +61,7 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity<Map<String,Object>> loginUser(@Valid @RequestBody LoginDTO loginDTO) {
-        // The Jwt token that will be returned(Inshallah)
+        // The Jwt token that will be returned(Inshallah).
         String token = userService.login(loginDTO);
         Map<String, Object> response = new HashMap<>();
 
@@ -70,7 +70,22 @@ public class UserController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    // This is only for players, Admins and Referees will only get a 7 day access token and will need to login again for security(I ain't doing all dat)
+    // This is only for Players, Since you can't invalidate Access tokens (without persistence).
+    // You need to be already logged in (i.e have an access token in your auth header).
+    @GetMapping("/logout")
+    @PreAuthorize("hasAuthority('ROLE_PLAYER')")
+    public ResponseEntity<Map<String,Object>> login() {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        Map<String, Object> response = new HashMap<>();
+
+        playerService.logout(username);
+
+        response.put("message", "User logged Out Successfully");
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    // This is only for players, Admins and Referees will only get a 1 day access token and will need to login again for security(I ain't doing all dat)
     // Why isn't this in the /players controller? shut up nerd.
     @PostMapping("/refresh")
     public ResponseEntity<Map<String,Object>> refreshToken(@Valid @RequestBody RefreshTokenDTO refreshTokenDTO) {

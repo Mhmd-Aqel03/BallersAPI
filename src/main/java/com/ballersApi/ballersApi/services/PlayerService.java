@@ -95,4 +95,13 @@ public class PlayerService {
             throw new DatabaseConnectionErrorException("Something went wrong while trying to persist to the Database: " + e.getMessage());
         }
     }
+
+    @Transactional
+    public void logout(String username) {
+        Player player = getPlayerByUsername(username);
+
+        player.setRefreshToken(null);
+
+        playerRepository.save(player);
+    }
 }
