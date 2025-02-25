@@ -21,8 +21,8 @@ public class BallersApiApplication {
 		return args -> {
 			User user = new User();
 
-			user.setUsername("baller");
-			user.setPassword("pp");
+			//user.setUsername("baller");
+			//user.setPassword("pp");
 
 			userRepository.save(user);
 
