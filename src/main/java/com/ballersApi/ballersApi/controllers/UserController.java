@@ -8,6 +8,7 @@ import com.ballersApi.ballersApi.dataTransferObjects.TokenDTO;
 import com.ballersApi.ballersApi.exceptions.JwtTokenValidationException;
 import com.ballersApi.ballersApi.models.Player;
 import com.ballersApi.ballersApi.models.User;
+import com.ballersApi.ballersApi.services.EmailService;
 import com.ballersApi.ballersApi.services.PlayerService;
 import com.ballersApi.ballersApi.services.UserService;
 import jakarta.validation.Valid;
@@ -34,6 +35,7 @@ public class UserController {
 
     private final PlayerService playerService;
 
+    private final EmailService emailService;
 
     @PostMapping("/register")
     public ResponseEntity<Map<String,Object>> registerPlayer(@Valid @RequestBody PlayerDTO playerDTO) {
@@ -109,6 +111,17 @@ public class UserController {
         Map<String, Object> response = new HashMap<>();
 
         response.put("msg","secret");
+
+        return new  ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("/email")
+    public ResponseEntity<Map<String,Object>> email(String email) {
+        Map<String, Object> response = new HashMap<>();
+
+        response.put("msg","PLEASE WORK");
+
+        emailService.sendEmail("mhmdnabil154@gmail.com", "Code" , "SOme code");
 
         return new  ResponseEntity<>(response, HttpStatus.OK);
     }
