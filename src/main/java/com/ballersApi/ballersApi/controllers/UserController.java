@@ -89,7 +89,7 @@ public class UserController {
 
 
     @GetMapping("/secret")
-    @PreAuthorize("hasRole('ROLE_PLAYER')")
+    @PreAuthorize("hasAuthority('ROLE_PLAYER')")
     public ResponseEntity<Map<String,Object>> getSecret() {
         Map<String, Object> response = new HashMap<>();
 

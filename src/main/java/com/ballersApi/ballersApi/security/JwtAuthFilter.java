@@ -1,6 +1,8 @@
 package com.ballersApi.ballersApi.security;
 
 import com.ballersApi.ballersApi.JsonWebTokens.JwtService;
+import com.ballersApi.ballersApi.exceptions.AuthenticationFailedException;
+import com.ballersApi.ballersApi.exceptions.AuthorizationFailedException;
 import com.ballersApi.ballersApi.exceptions.InvalidTokenException;
 import com.ballersApi.ballersApi.exceptions.UserNotFoundException;
 import com.ballersApi.ballersApi.services.AppUserDetailsService;
@@ -63,12 +65,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                     throw new UserNotFoundException("User not found: " + e.getMessage());
                 }
             }
-
             // Continue the filter chain
             filterChain.doFilter(request, response);
         }
         catch (Exception e) {
-            throw new RuntimeException("Something went wrong with Authentication: " + e.getMessage());
+            throw new AuthenticationFailedException("Something went wrong with Authentication: " + e.getMessage());
         }
     }
 }

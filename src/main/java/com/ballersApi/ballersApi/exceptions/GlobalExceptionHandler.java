@@ -18,7 +18,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, Object>> handleGeneralException(Exception ex) {
         Map<String, Object> response = new HashMap<>();
 
-        response.put("message", "Something went wrong: " + ex.getMessage());
+        response.put("message", "Something went wrong: " + ex.getClass().getSimpleName() + " - " +ex.getMessage());
 
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -90,6 +90,15 @@ public class GlobalExceptionHandler {
         Map<String, Object> response = new HashMap<>();
 
         response.put("message","Something went wrong with authenticating the User: " + ex.getMessage());
+
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(AuthorizationFailedException.class)
+    public ResponseEntity<Map<String, Object>> handleAuthorizationFailedException(Exception ex) {
+        Map<String, Object> response = new HashMap<>();
+
+        response.put("message", "Something went wrong with authorization: " + ex.getMessage());
 
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }

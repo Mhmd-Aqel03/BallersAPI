@@ -15,8 +15,8 @@ public class AppUserDetails implements UserDetails {
     private List<GrantedAuthority> authorities;
 
     public AppUserDetails(User user) {
-        this.username = username;
-        this.password = password;
+        this.username = user.getUsername();
+        this.password = user.getPassword();
         this.authorities = List.of(new SimpleGrantedAuthority(user.getRole().toString()));
     }
 
