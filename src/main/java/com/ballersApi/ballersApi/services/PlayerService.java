@@ -8,6 +8,7 @@ import com.ballersApi.ballersApi.models.Player;
 import com.ballersApi.ballersApi.models.Role;
 import com.ballersApi.ballersApi.models.User;
 import com.ballersApi.ballersApi.repositories.PlayerRepository;
+import com.ballersApi.ballersApi.util.CodeGenerator;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,8 @@ public class PlayerService {
     private final UserService userService;
 
     private final JwtService jwtService;
+
+    private final EmailService emailService;
 
     @Transactional
     public void addPlayer(PlayerDTO playerDTO) {
@@ -103,5 +106,19 @@ public class PlayerService {
         player.setRefreshToken(null);
 
         playerRepository.save(player);
+    }
+
+    @Transactional
+    public void requestCode(String username) {
+        User user = userService.getUserByUsername(username);
+        String code = CodeGenerator.generateCode();
+
+        Player player = getPlayerByUsername(username);
+
+        player.setEmailVerificationCode(code);
+
+        playerRepository.save(player);
+
+        emailService.sendEmail(user.getEmail(),"Code",CodeGenerator.generateCode());
     }
 }

@@ -1,10 +1,7 @@
 package com.ballersApi.ballersApi.controllers;
 
 import com.ballersApi.ballersApi.JsonWebTokens.JwtService;
-import com.ballersApi.ballersApi.dataTransferObjects.LoginDTO;
-import com.ballersApi.ballersApi.dataTransferObjects.PlayerDTO;
-import com.ballersApi.ballersApi.dataTransferObjects.RefreshTokenDTO;
-import com.ballersApi.ballersApi.dataTransferObjects.TokenDTO;
+import com.ballersApi.ballersApi.dataTransferObjects.*;
 import com.ballersApi.ballersApi.exceptions.JwtTokenValidationException;
 import com.ballersApi.ballersApi.models.Player;
 import com.ballersApi.ballersApi.models.User;
@@ -39,23 +36,24 @@ public class UserController {
 
     @PostMapping("/register")
     public ResponseEntity<Map<String,Object>> registerPlayer(@Valid @RequestBody PlayerDTO playerDTO) {
-
         // Create response object
         Map<String, Object> response = new HashMap<>();
 
         // Add the player
         playerService.addPlayer(playerDTO);
 
-        // Generate access and refresh JWT Tokens, and put them in the response.
-        TokenDTO tokens = new TokenDTO();
-        tokens.setAccessToken(jwtService.generateAccessToken(playerDTO.getUsername()));
-        tokens.setRefreshToken(jwtService.generateRefreshToken(playerDTO.getUsername()));
+//        // Generate access and refresh JWT Tokens, and put them in the response.
+//        TokenDTO tokens = new TokenDTO();
+//        tokens.setAccessToken(jwtService.generateAccessToken(playerDTO.getUsername()));
+//        tokens.setRefreshToken(jwtService.generateRefreshToken(playerDTO.getUsername()));
+//
+//        // Update refresh Token for player
+//        playerService.updateRefreshToken(playerDTO.getUsername(), tokens.getRefreshToken());
+//
+//        response.put("accessToken", tokens.getAccessToken());
+//        response.put("refreshToken", tokens.getRefreshToken());
 
-        // Update refresh Token for player
-        playerService.updateRefreshToken(playerDTO.getUsername(), tokens.getRefreshToken());
-
-        response.put("accessToken", tokens.getAccessToken());
-        response.put("refreshToken", tokens.getRefreshToken());
+        response.put("message", "Player registered Successfully");
 
         // Return JWT
         return new  ResponseEntity<>(response, HttpStatus.OK);
@@ -115,6 +113,7 @@ public class UserController {
         return new  ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    // Test
     @GetMapping("/email")
     public ResponseEntity<Map<String,Object>> email(String email) {
         Map<String, Object> response = new HashMap<>();
@@ -122,6 +121,17 @@ public class UserController {
         response.put("msg","PLEASE WORK");
 
         emailService.sendEmail("mhmdnabil154@gmail.com", "Code" , "SOme code");
+
+        return new  ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @PostMapping("/requestCode")
+    public ResponseEntity<Map<String,Object>> requestCode(@RequestBody UsernameDTO usernameDTO) {
+        Map<String, Object> response = new HashMap<>();
+
+        playerService.requestCode(usernameDTO.getUsername());
+
+        response.put("message", "Request Code sent to User's email");
 
         return new  ResponseEntity<>(response, HttpStatus.OK);
     }
