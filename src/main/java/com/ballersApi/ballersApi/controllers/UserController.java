@@ -42,17 +42,6 @@ public class UserController {
         // Add the player
         playerService.addPlayer(playerDTO);
 
-//        // Generate access and refresh JWT Tokens, and put them in the response.
-//        TokenDTO tokens = new TokenDTO();
-//        tokens.setAccessToken(jwtService.generateAccessToken(playerDTO.getUsername()));
-//        tokens.setRefreshToken(jwtService.generateRefreshToken(playerDTO.getUsername()));
-//
-//        // Update refresh Token for player
-//        playerService.updateRefreshToken(playerDTO.getUsername(), tokens.getRefreshToken());
-//
-//        response.put("accessToken", tokens.getAccessToken());
-//        response.put("refreshToken", tokens.getRefreshToken());
-
         response.put("message", "Player registered Successfully");
 
         // Return JWT
@@ -62,10 +51,18 @@ public class UserController {
     @PostMapping("/login")
     public ResponseEntity<Map<String,Object>> loginUser(@Valid @RequestBody LoginDTO loginDTO) {
         // The Jwt token that will be returned(Inshallah).
-        String token = userService.login(loginDTO);
+        TokenDTO tokenDTO = playerService.login(loginDTO);
         Map<String, Object> response = new HashMap<>();
 
-        response.put("accessToken", token);
+        // Generate access and refresh JWT Tokens, and put them in the response.
+        TokenDTO tokens = new TokenDTO();
+        tokens.setAccessToken(jwtService.generateAccessToken(loginDTO.getUsername()));
+        tokens.setRefreshToken(jwtService.generateRefreshToken(loginDTO.getUsername()));
+
+        response.put("accessToken", tokens.getAccessToken());
+
+        if(tokenDTO.getRefreshToken() != null)
+            response.put("refreshToken", tokens.getRefreshToken());
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

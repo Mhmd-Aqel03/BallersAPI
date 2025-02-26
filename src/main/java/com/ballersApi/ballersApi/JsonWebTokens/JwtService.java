@@ -49,7 +49,7 @@ public class JwtService {
 
     // Generate refresh token with given username
     public String generateRefreshToken(String username) {
-        return createToken(new HashMap<>(), username, accessExpiration);
+        return createToken(new HashMap<>(), username, refreshExpiration);
     }
 
     // Extract the username from the token

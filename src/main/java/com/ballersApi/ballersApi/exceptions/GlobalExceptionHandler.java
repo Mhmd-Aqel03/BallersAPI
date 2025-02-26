@@ -100,7 +100,7 @@ public class GlobalExceptionHandler {
 
         response.put("message", "Something went wrong with authorization: " + ex.getMessage());
 
-        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
     }
 
     @ExceptionHandler(EmailCodeVerificitationException.class)

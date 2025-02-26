@@ -1,11 +1,10 @@
 package com.ballersApi.ballersApi.services;
 
 import com.ballersApi.ballersApi.JsonWebTokens.JwtService;
+import com.ballersApi.ballersApi.dataTransferObjects.LoginDTO;
 import com.ballersApi.ballersApi.dataTransferObjects.PlayerDTO;
-import com.ballersApi.ballersApi.exceptions.DatabaseConnectionErrorException;
-import com.ballersApi.ballersApi.exceptions.EmailCodeVerificitationException;
-import com.ballersApi.ballersApi.exceptions.JwtTokenValidationException;
-import com.ballersApi.ballersApi.exceptions.UserNotFoundException;
+import com.ballersApi.ballersApi.dataTransferObjects.TokenDTO;
+import com.ballersApi.ballersApi.exceptions.*;
 import com.ballersApi.ballersApi.models.Player;
 import com.ballersApi.ballersApi.models.Role;
 import com.ballersApi.ballersApi.models.User;
@@ -13,6 +12,7 @@ import com.ballersApi.ballersApi.repositories.PlayerRepository;
 import com.ballersApi.ballersApi.util.CodeGenerator;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @AllArgsConstructor
@@ -26,6 +26,8 @@ public class PlayerService {
     private final JwtService jwtService;
 
     private final EmailService emailService;
+
+    private final PasswordEncoder passwordEncoder;
 
     @Transactional
     public void addPlayer(PlayerDTO playerDTO) {
@@ -61,10 +63,9 @@ public class PlayerService {
 
             playerRepository.save(player);
 
-        }catch (UserNotFoundException e){
+        } catch (UserNotFoundException e) {
             throw new UserNotFoundException(e.getMessage());
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new DatabaseConnectionErrorException("Something went wrong while trying to persist to the Database: " + e.getMessage());
         }
     }
@@ -87,7 +88,7 @@ public class PlayerService {
 
             Player player = getPlayerByUsername(username);
 
-            if(player.getRefreshToken() ==  null || !player.getRefreshToken().equals(token)){
+            if (player.getRefreshToken() == null || !player.getRefreshToken().equals(token)) {
                 throw new JwtTokenValidationException("Refresh Token is either invalid or outDated");
             }
 
@@ -97,10 +98,9 @@ public class PlayerService {
             updateRefreshToken(username, newToken);
 
             return newToken;
-        }catch (JwtTokenValidationException e){
+        } catch (JwtTokenValidationException e) {
             throw new JwtTokenValidationException(e.getMessage());
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             throw new DatabaseConnectionErrorException("Something went wrong while trying to persist to the Database: " + e.getMessage());
         }
     }
@@ -113,10 +113,9 @@ public class PlayerService {
             player.setRefreshToken(null);
 
             playerRepository.save(player);
-        }catch (UserNotFoundException e){
+        } catch (UserNotFoundException e) {
             throw new UserNotFoundException(e.getMessage());
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new DatabaseConnectionErrorException("Something went wrong while trying to persist to the Database: " + e.getMessage());
         }
 
@@ -135,10 +134,9 @@ public class PlayerService {
             playerRepository.save(player);
 
             emailService.sendEmail(user.getEmail(), "Code", code);
-        } catch (UserNotFoundException e){
+        } catch (UserNotFoundException e) {
             throw new UserNotFoundException(e.getMessage());
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new DatabaseConnectionErrorException("Something went wrong while trying to persist to the Database: " + e.getMessage());
         }
     }
@@ -148,20 +146,57 @@ public class PlayerService {
         try {
             Player player = getPlayerByUsername(username);
 
-            if(player.getEmailVerificationCode() != null && player.getEmailVerificationCode().equals(code)){
+            if (player.getEmailVerificationCode() != null && player.getEmailVerificationCode().equals(code)) {
                 player.setVerified(true);
 
                 playerRepository.save(player);
-            }else{
+            } else {
                 throw new EmailCodeVerificitationException("Email verification code is invalid");
             }
-        }catch (UserNotFoundException e){
+        } catch (UserNotFoundException e) {
             throw new UserNotFoundException(e.getMessage());
-        }catch (EmailCodeVerificitationException e){
+        } catch (EmailCodeVerificitationException e) {
             throw new EmailCodeVerificitationException(e.getMessage());
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new DatabaseConnectionErrorException("Something went wrong while trying to persist to the Database: " + e.getMessage());
+        }
+    }
+
+    @Transactional
+    public TokenDTO login(LoginDTO loginDTO) {
+        TokenDTO tokenDTO = new TokenDTO();
+        // This throws an exception if no User is found.
+        User user = userService.getUserByUsername(loginDTO.getUsername());
+
+
+        if (user.getRole() == Role.ROLE_PLAYER) {
+
+            if (user.getUsername().equals(loginDTO.getUsername()) && passwordEncoder.matches(loginDTO.getPassword(), user.getPassword())) {
+
+                Player player = getPlayerByUsername(loginDTO.getUsername());
+
+                if (!player.isVerified()) {
+                    throw new AuthorizationFailedException("Player's Email is not verified");
+                }
+
+                tokenDTO.setAccessToken(jwtService.generateAccessToken(loginDTO.getUsername()));
+                tokenDTO.setRefreshToken(jwtService.generateRefreshToken(loginDTO.getUsername()));
+
+                // Update refresh Token for player
+                updateRefreshToken(loginDTO.getUsername(), tokenDTO.getRefreshToken());
+
+                return tokenDTO;
+            } else {
+                throw new AuthenticationFailedException("Username or password are incorrect");
+            }
+        } else{
+            if (user.getUsername().equals(loginDTO.getUsername()) && passwordEncoder.matches(loginDTO.getPassword(), user.getPassword())) {
+                tokenDTO.setAccessToken(jwtService.generateAccessToken(loginDTO.getUsername()));
+
+                return tokenDTO;
+            }else {
+                throw new AuthenticationFailedException("Username or password are incorrect");
+            }
         }
     }
 }
