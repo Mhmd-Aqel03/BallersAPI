@@ -102,4 +102,13 @@ public class GlobalExceptionHandler {
 
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(EmailCodeVerificitationException.class)
+    public ResponseEntity<Map<String, Object>> handleEmailCodeVerificitationException(Exception ex) {
+        Map<String, Object> response = new HashMap<>();
+
+        response.put("message", "Something went Verifying Email: " + ex.getMessage());
+
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
 }

@@ -3,7 +3,9 @@ package com.ballersApi.ballersApi.services;
 import com.ballersApi.ballersApi.JsonWebTokens.JwtService;
 import com.ballersApi.ballersApi.dataTransferObjects.PlayerDTO;
 import com.ballersApi.ballersApi.exceptions.DatabaseConnectionErrorException;
+import com.ballersApi.ballersApi.exceptions.EmailCodeVerificitationException;
 import com.ballersApi.ballersApi.exceptions.JwtTokenValidationException;
+import com.ballersApi.ballersApi.exceptions.UserNotFoundException;
 import com.ballersApi.ballersApi.models.Player;
 import com.ballersApi.ballersApi.models.Role;
 import com.ballersApi.ballersApi.models.User;
@@ -59,12 +61,16 @@ public class PlayerService {
 
             playerRepository.save(player);
 
-        } catch (Exception e) {
+        }catch (UserNotFoundException e){
+            throw new UserNotFoundException(e.getMessage());
+        }
+        catch (Exception e) {
             throw new DatabaseConnectionErrorException("Something went wrong while trying to persist to the Database: " + e.getMessage());
         }
     }
 
     public Player getPlayerByUsername(String username) {
+        // User Service should throw the not found here
         User user = userService.getUserByUsername(username);
 
         return user.getPlayer();
@@ -101,24 +107,61 @@ public class PlayerService {
 
     @Transactional
     public void logout(String username) {
-        Player player = getPlayerByUsername(username);
+        try {
+            Player player = getPlayerByUsername(username);
 
-        player.setRefreshToken(null);
+            player.setRefreshToken(null);
 
-        playerRepository.save(player);
+            playerRepository.save(player);
+        }catch (UserNotFoundException e){
+            throw new UserNotFoundException(e.getMessage());
+        }
+        catch (Exception e) {
+            throw new DatabaseConnectionErrorException("Something went wrong while trying to persist to the Database: " + e.getMessage());
+        }
+
     }
 
     @Transactional
     public void requestCode(String username) {
-        User user = userService.getUserByUsername(username);
-        String code = CodeGenerator.generateCode();
+        try {
+            User user = userService.getUserByUsername(username);
+            String code = CodeGenerator.generateCode();
 
-        Player player = getPlayerByUsername(username);
+            Player player = getPlayerByUsername(username);
 
-        player.setEmailVerificationCode(code);
+            player.setEmailVerificationCode(code);
 
-        playerRepository.save(player);
+            playerRepository.save(player);
 
-        emailService.sendEmail(user.getEmail(),"Code",CodeGenerator.generateCode());
+            emailService.sendEmail(user.getEmail(), "Code", code);
+        } catch (UserNotFoundException e){
+            throw new UserNotFoundException(e.getMessage());
+        }
+        catch (Exception e) {
+            throw new DatabaseConnectionErrorException("Something went wrong while trying to persist to the Database: " + e.getMessage());
+        }
+    }
+
+    @Transactional
+    public void verifyCode(String username, String code) {
+        try {
+            Player player = getPlayerByUsername(username);
+
+            if(player.getEmailVerificationCode() != null && player.getEmailVerificationCode().equals(code)){
+                player.setVerified(true);
+
+                playerRepository.save(player);
+            }else{
+                throw new EmailCodeVerificitationException("Email verification code is invalid");
+            }
+        }catch (UserNotFoundException e){
+            throw new UserNotFoundException(e.getMessage());
+        }catch (EmailCodeVerificitationException e){
+            throw new EmailCodeVerificitationException(e.getMessage());
+        }
+        catch (Exception e) {
+            throw new DatabaseConnectionErrorException("Something went wrong while trying to persist to the Database: " + e.getMessage());
+        }
     }
 }

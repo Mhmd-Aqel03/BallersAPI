@@ -113,25 +113,24 @@ public class UserController {
         return new  ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    // Test
-    @GetMapping("/email")
-    public ResponseEntity<Map<String,Object>> email(String email) {
-        Map<String, Object> response = new HashMap<>();
-
-        response.put("msg","PLEASE WORK");
-
-        emailService.sendEmail("mhmdnabil154@gmail.com", "Code" , "SOme code");
-
-        return new  ResponseEntity<>(response, HttpStatus.OK);
-    }
-
     @PostMapping("/requestCode")
-    public ResponseEntity<Map<String,Object>> requestCode(@RequestBody UsernameDTO usernameDTO) {
+    public ResponseEntity<Map<String,Object>> requestCode(@Valid @RequestBody UsernameDTO usernameDTO) {
         Map<String, Object> response = new HashMap<>();
 
         playerService.requestCode(usernameDTO.getUsername());
 
         response.put("message", "Request Code sent to User's email");
+
+        return new  ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @PostMapping("/verifyCode")
+    public ResponseEntity<Map<String,Object>> verifyCode(@Valid @RequestBody VerifyCodeDTO verifyCodeDTO){
+        Map<String, Object> response = new HashMap<>();
+
+        playerService.verifyCode(verifyCodeDTO.getUsername(), verifyCodeDTO.getCode());
+
+        response.put("message", "Player email verified Successfully");
 
         return new  ResponseEntity<>(response, HttpStatus.OK);
     }
