@@ -24,17 +24,22 @@ public class Session {
     private String type;
 
 
-    @NotNull
+    @NotNull(message = "matchDateTime can't be null")
     @Column(nullable = false)
     // Time stamp for the date and time
     private LocalDateTime matchDateTime;
 
 
-   @NotNull
+   @NotNull(message = "maxPlayers can't be null")
     @Column(nullable = false)
    @Min(value = 6, message = "Max players must be at least 2")
    @Max(value = 12, message = "Max players cannot exceed 12")
     private int maxPlayers;
+
+    @NotNull(message = "price can't be null")
+    private double price;
+    @Max(value = 12, message = "Max players cannot exceed 12")
+    private int playerCount;
 
     private int playerCount;
 
