@@ -10,7 +10,6 @@ import com.ballersApi.ballersApi.models.Player;
 import com.ballersApi.ballersApi.models.Role;
 import com.ballersApi.ballersApi.models.User;
 import com.ballersApi.ballersApi.repositories.PlayerRepository;
-import com.ballersApi.ballersApi.repositories.UserRepository;
 import com.ballersApi.ballersApi.util.CodeGenerator;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -31,7 +30,6 @@ public class PlayerService {
     private final EmailService emailService;
 
     private final PasswordEncoder passwordEncoder;
-    private final UserRepository userRepository;
 
     @Transactional
     public void addPlayer(PlayerDTO playerDTO) {
@@ -55,23 +53,25 @@ public class PlayerService {
         newUser.setPlayer(newPlayer);
 
         // Save User
-        userService.addUser(newUser);
+        try {
+            userService.addUser(newUser);
+        } catch (DataAccessException ex) {
+            throw new DatabaseConnectionErrorException("Something went wrong while trying to add user: " + ex.getMessage());
+        }
     }
 
     @Transactional
     public void updateRefreshToken(String username, String refreshToken) {
+
+        Player player = getPlayerByUsername(username);
+
+        player.setRefreshToken(refreshToken);
         try {
-            Player player = getPlayerByUsername(username);
-
-            player.setRefreshToken(refreshToken);
-
             playerRepository.save(player);
-
-        } catch (UserNotFoundException e) {
-            throw new UserNotFoundException(e.getMessage());
-        } catch (Exception e) {
-            throw new DatabaseConnectionErrorException("Something went wrong while trying to persist to the Database: " + e.getMessage());
+        } catch (DataAccessException ex) {
+            throw new DatabaseConnectionErrorException("Something went wrong while trying to update refresh token: " + ex.getMessage());
         }
+
     }
 
     public Player getPlayerByUsername(String username) {
@@ -83,86 +83,77 @@ public class PlayerService {
 
     @Transactional
     public String refreshToken(String token) {
-        try {
-            String newToken;
-            String username = jwtService.extractUsername(token);
 
-            // Validate token, should throw exceptions for invalid tokens.
-            jwtService.validateToken(token);
+        String newToken;
+        String username = jwtService.extractUsername(token);
 
-            Player player = getPlayerByUsername(username);
+        // Validate token, should throw exceptions for invalid tokens.
+        jwtService.validateToken(token);
 
-            if (player.getRefreshToken() == null || !player.getRefreshToken().equals(token)) {
-                throw new JwtTokenValidationException("Refresh Token is either invalid or outDated");
-            }
+        Player player = getPlayerByUsername(username);
 
-            // Generate new Refresh Token.
-            newToken = jwtService.generateRefreshToken(username);
-            // Update refresh token.
-            updateRefreshToken(username, newToken);
-
-            return newToken;
-        } catch (JwtTokenValidationException e) {
-            throw new JwtTokenValidationException(e.getMessage());
-        } catch (Exception e) {
-            throw new DatabaseConnectionErrorException("Something went wrong while trying to persist to the Database: " + e.getMessage());
+        if (player.getRefreshToken() == null || !player.getRefreshToken().equals(token)) {
+            throw new JwtTokenValidationException("Refresh Token is either invalid or outDated");
         }
+
+        // Generate new Refresh Token.
+        newToken = jwtService.generateRefreshToken(username);
+        // Update refresh token.
+        updateRefreshToken(username, newToken);
+
+        return newToken;
     }
 
     @Transactional
     public void logout(String username) {
+
+        Player player = getPlayerByUsername(username);
+
+        player.setRefreshToken(null);
+
         try {
-            Player player = getPlayerByUsername(username);
-
-            player.setRefreshToken(null);
-
             playerRepository.save(player);
-        } catch (UserNotFoundException e) {
-            throw new UserNotFoundException(e.getMessage());
-        } catch (Exception e) {
-            throw new DatabaseConnectionErrorException("Something went wrong while trying to persist to the Database: " + e.getMessage());
+        } catch (DataAccessException ex) {
+            throw new DatabaseConnectionErrorException("soemthing went wrong while trying to logout user: " + ex.getMessage());
         }
 
     }
 
     @Transactional
     public void requestCode(String username) {
+
+        User user = userService.getUserByUsername(username);
+        String code = CodeGenerator.generateCode();
+
+        Player player = getPlayerByUsername(username);
+
+        player.setEmailVerificationCode(code);
+
         try {
-            User user = userService.getUserByUsername(username);
-            String code = CodeGenerator.generateCode();
-
-            Player player = getPlayerByUsername(username);
-
-            player.setEmailVerificationCode(code);
-
             playerRepository.save(player);
-
-            emailService.sendEmail(user.getEmail(), "Code", code);
-        } catch (UserNotFoundException e) {
-            throw new UserNotFoundException(e.getMessage());
-        } catch (Exception e) {
-            throw new DatabaseConnectionErrorException("Something went wrong while trying to persist to the Database: " + e.getMessage());
+        } catch (DataAccessException ex) {
+            throw new DatabaseConnectionErrorException("something went wrong while trying to update player verification code: " + ex.getMessage());
         }
+        emailService.sendEmail(user.getEmail(), "Code", code);
+
     }
 
     @Transactional
     public void verifyCode(String username, String code) {
-        try {
-            Player player = getPlayerByUsername(username);
 
-            if (player.getEmailVerificationCode() != null && player.getEmailVerificationCode().equals(code)) {
-                player.setVerified(true);
+        Player player = getPlayerByUsername(username);
 
+        if (player.getEmailVerificationCode() != null && player.getEmailVerificationCode().equals(code)) {
+            player.setVerified(true);
+
+            try {
                 playerRepository.save(player);
-            } else {
-                throw new CodeVerificationException("Email verification code is invalid");
+            } catch (DataAccessException ex) {
+                throw new DatabaseConnectionErrorException("something went wrong while trying to update player verified status: " + ex.getMessage());
             }
-        } catch (UserNotFoundException e) {
-            throw new UserNotFoundException(e.getMessage());
-        } catch (CodeVerificationException e) {
-            throw new CodeVerificationException(e.getMessage());
-        } catch (Exception e) {
-            throw new DatabaseConnectionErrorException("Something went wrong while trying to persist to the Database: " + e.getMessage());
+        } else {
+            throw new CodeVerificationException("Email verification code is invalid");
+
         }
     }
 
@@ -206,22 +197,20 @@ public class PlayerService {
 
     @Transactional
     public void requestPassCode(String username) {
+
+        User user = userService.getUserByUsername(username);
+        String code = CodeGenerator.generateCode();
+
+        Player player = getPlayerByUsername(username);
+
+        player.setPasswordChangeCode(code);
         try {
-            User user = userService.getUserByUsername(username);
-            String code = CodeGenerator.generateCode();
-
-            Player player = getPlayerByUsername(username);
-
-            player.setPasswordChangeCode(code);
-
             playerRepository.save(player);
-
-            emailService.sendEmail(user.getEmail(), "Password Change Code", code);
-        } catch (UserNotFoundException e) {
-            throw new UserNotFoundException(e.getMessage());
-        } catch (Exception e) {
-            throw new DatabaseConnectionErrorException("Something went wrong while trying to persist to the Database: " + e.getMessage());
+        } catch (DataAccessException ex) {
+            throw new DatabaseConnectionErrorException("something went wrong while trying to update player's pass Code: " + ex.getMessage());
         }
+        emailService.sendEmail(user.getEmail(), "Password Change Code", code);
+
     }
 
 
@@ -248,10 +237,6 @@ public class PlayerService {
 
         user.setPassword(passwordEncoder.encode(changePasswordDTO.getNewPassword()));
 
-        try {
-            userRepository.save(user);
-        } catch (DataAccessException e){
-            throw new DatabaseConnectionErrorException("Can't Update user's password");
-        }
+        userService.updateUser(user);
     }
 }

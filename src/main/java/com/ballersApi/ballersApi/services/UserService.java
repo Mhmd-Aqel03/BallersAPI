@@ -10,10 +10,8 @@ import com.ballersApi.ballersApi.repositories.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.dao.DataAccessException;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.TransactionSystemException;
 
 import java.util.Optional;
 
@@ -28,30 +26,25 @@ public class UserService {
     private final JwtService jwtService;
 
     public void addUser(UserDTO userDto) {
-        try {
-            User newUser = new User();
-            newUser.setUsername(userDto.getUsername());
-            newUser.setPassword(userDto.getPassword());
-            newUser.setEmail(userDto.getEmail());
 
+        User newUser = new User();
+        newUser.setUsername(userDto.getUsername());
+        newUser.setPassword(userDto.getPassword());
+        newUser.setEmail(userDto.getEmail());
+        try {
             userRepository.save(newUser);
-        } catch (Exception e) {
-            throw new UserCreationErrorException("Something went wrong while creating the user: " + e.getMessage());
+        } catch (DataAccessException e) {
+            throw new DatabaseConnectionErrorException("Could not save user to database: " + e.getMessage());
         }
     }
 
     @Transactional
     public void addUser(User user) {
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         try {
-            user.setPassword(passwordEncoder.encode(user.getPassword()));
             userRepository.save(user);
-        } catch (TransactionSystemException e) {
-            Throwable rootCause = e.getRootCause(); // Get the actual database error
-            throw new UserCreationErrorException("Transaction error: " + (rootCause != null ? rootCause.getMessage() : e.getMessage()));
-        } catch (DataIntegrityViolationException e) {
-            throw new UserCreationErrorException("Something went wrong while creating user: " + e.getMostSpecificCause().getMessage());
-        } catch (Exception e) {
-            throw new UserCreationErrorException("Something went wrong while creating user: " + e.getMessage());
+        } catch (DataAccessException e) {
+            throw new DatabaseConnectionErrorException("Could not save user to database:  " + e.getMessage());
         }
     }
 
@@ -59,15 +52,20 @@ public class UserService {
         Optional<User> user;
         try {
             user = userRepository.findByUsername(username);
-        } catch (DataAccessException e){
+        } catch (DataAccessException e) {
             throw new DatabaseConnectionErrorException("Something went wrong while trying to access user" + e.getMessage());
         }
 
-
         // orElseThrow will return the object if it exists, or throw and exception if it doesn't. So cool shout out to Java.
         return user.orElseThrow(() -> new UserNotFoundException("User not found with username: " + username));
+    }
 
-
+    public void updateUser(User user) {
+        try {
+            userRepository.save(user);
+        } catch (DataAccessException e) {
+            throw new DatabaseConnectionErrorException("Something went wrong while trying to access user: " + e.getMessage());
+        }
     }
 
     public void checkUserInput(String username, String password) {
