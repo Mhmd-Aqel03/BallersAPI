@@ -1,5 +1,6 @@
 package com.ballersApi.ballersApi.exceptions;
 
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -103,8 +104,8 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
     }
 
-    @ExceptionHandler(EmailCodeVerificitationException.class)
-    public ResponseEntity<Map<String, Object>> handleEmailCodeVerificitationException(Exception ex) {
+    @ExceptionHandler(CodeVerificationException.class)
+    public ResponseEntity<Map<String, Object>> handleEmailCodeVerificationException(Exception ex) {
         Map<String, Object> response = new HashMap<>();
 
         response.put("message", "Something went Verifying Email: " + ex.getMessage());

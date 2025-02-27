@@ -1,21 +1,16 @@
 package com.ballersApi.ballersApi.services;
 
 import com.ballersApi.ballersApi.JsonWebTokens.JwtService;
-import com.ballersApi.ballersApi.dataTransferObjects.LoginDTO;
-import com.ballersApi.ballersApi.dataTransferObjects.TokenDTO;
 import com.ballersApi.ballersApi.dataTransferObjects.UserDTO;
-import com.ballersApi.ballersApi.exceptions.*;
-import com.ballersApi.ballersApi.models.Player;
+import com.ballersApi.ballersApi.exceptions.DatabaseConnectionErrorException;
+import com.ballersApi.ballersApi.exceptions.UserCreationErrorException;
+import com.ballersApi.ballersApi.exceptions.UserNotFoundException;
 import com.ballersApi.ballersApi.models.User;
 import com.ballersApi.ballersApi.repositories.UserRepository;
-import com.ballersApi.ballersApi.security.AppUserDetails;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.TransactionSystemException;
@@ -50,31 +45,32 @@ public class UserService {
         try {
             user.setPassword(passwordEncoder.encode(user.getPassword()));
             userRepository.save(user);
-        }catch (TransactionSystemException e) {
+        } catch (TransactionSystemException e) {
             Throwable rootCause = e.getRootCause(); // Get the actual database error
             throw new UserCreationErrorException("Transaction error: " + (rootCause != null ? rootCause.getMessage() : e.getMessage()));
-        }
-        catch (DataIntegrityViolationException e){
+        } catch (DataIntegrityViolationException e) {
             throw new UserCreationErrorException("Something went wrong while creating user: " + e.getMostSpecificCause().getMessage());
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new UserCreationErrorException("Something went wrong while creating user: " + e.getMessage());
         }
     }
 
     public User getUserByUsername(String username) {
-        try{
-            Optional<User> user = userRepository.findByUsername(username);
-
-            // orElseThrow will return the object if it exists, or throw and exception if it doesn't. So cool shout out to Java.
-            return user.orElseThrow(() -> new UserNotFoundException("User not found with username: " + username));
-        } catch (Exception e) {
-            throw new DatabaseConnectionErrorException("Something went wrong while trying to get a user: " + e.getMessage());
+        Optional<User> user;
+        try {
+            user = userRepository.findByUsername(username);
+        } catch (DataAccessException e){
+            throw new DatabaseConnectionErrorException("Something went wrong while trying to access user" + e.getMessage());
         }
+
+
+        // orElseThrow will return the object if it exists, or throw and exception if it doesn't. So cool shout out to Java.
+        return user.orElseThrow(() -> new UserNotFoundException("User not found with username: " + username));
+
 
     }
 
-    public void checkUserInput(String username, String  password) {
+    public void checkUserInput(String username, String password) {
         // Validate username format
         // ChatGPT wrote this regex, hopefully it works lol.
         if (!username.matches("^[a-zA-Z][a-zA-Z0-9_]*$")) {

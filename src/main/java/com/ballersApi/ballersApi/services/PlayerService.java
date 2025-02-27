@@ -1,6 +1,7 @@
 package com.ballersApi.ballersApi.services;
 
 import com.ballersApi.ballersApi.JsonWebTokens.JwtService;
+import com.ballersApi.ballersApi.dataTransferObjects.ChangePasswordDTO;
 import com.ballersApi.ballersApi.dataTransferObjects.LoginDTO;
 import com.ballersApi.ballersApi.dataTransferObjects.PlayerDTO;
 import com.ballersApi.ballersApi.dataTransferObjects.TokenDTO;
@@ -9,9 +10,11 @@ import com.ballersApi.ballersApi.models.Player;
 import com.ballersApi.ballersApi.models.Role;
 import com.ballersApi.ballersApi.models.User;
 import com.ballersApi.ballersApi.repositories.PlayerRepository;
+import com.ballersApi.ballersApi.repositories.UserRepository;
 import com.ballersApi.ballersApi.util.CodeGenerator;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import org.springframework.dao.DataAccessException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +31,7 @@ public class PlayerService {
     private final EmailService emailService;
 
     private final PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
 
     @Transactional
     public void addPlayer(PlayerDTO playerDTO) {
@@ -151,12 +155,12 @@ public class PlayerService {
 
                 playerRepository.save(player);
             } else {
-                throw new EmailCodeVerificitationException("Email verification code is invalid");
+                throw new CodeVerificationException("Email verification code is invalid");
             }
         } catch (UserNotFoundException e) {
             throw new UserNotFoundException(e.getMessage());
-        } catch (EmailCodeVerificitationException e) {
-            throw new EmailCodeVerificitationException(e.getMessage());
+        } catch (CodeVerificationException e) {
+            throw new CodeVerificationException(e.getMessage());
         } catch (Exception e) {
             throw new DatabaseConnectionErrorException("Something went wrong while trying to persist to the Database: " + e.getMessage());
         }
@@ -189,14 +193,65 @@ public class PlayerService {
             } else {
                 throw new AuthenticationFailedException("Username or password are incorrect");
             }
-        } else{
+        } else {
             if (user.getUsername().equals(loginDTO.getUsername()) && passwordEncoder.matches(loginDTO.getPassword(), user.getPassword())) {
                 tokenDTO.setAccessToken(jwtService.generateAccessToken(loginDTO.getUsername()));
 
                 return tokenDTO;
-            }else {
+            } else {
                 throw new AuthenticationFailedException("Username or password are incorrect");
             }
+        }
+    }
+
+    @Transactional
+    public void requestPassCode(String username) {
+        try {
+            User user = userService.getUserByUsername(username);
+            String code = CodeGenerator.generateCode();
+
+            Player player = getPlayerByUsername(username);
+
+            player.setPasswordChangeCode(code);
+
+            playerRepository.save(player);
+
+            emailService.sendEmail(user.getEmail(), "Password Change Code", code);
+        } catch (UserNotFoundException e) {
+            throw new UserNotFoundException(e.getMessage());
+        } catch (Exception e) {
+            throw new DatabaseConnectionErrorException("Something went wrong while trying to persist to the Database: " + e.getMessage());
+        }
+    }
+
+
+    public void verifyPassCode(String username, String code) {
+        Player player = getPlayerByUsername(username);
+
+        if (!(player.getPasswordChangeCode() != null && player.getPasswordChangeCode().equals(code)))
+            throw new CodeVerificationException("Password verification code is invalid");
+
+    }
+
+    @Transactional
+    public void changePassword(ChangePasswordDTO changePasswordDTO) {
+        User user = userService.getUserByUsername(changePasswordDTO.getUsername());
+
+        verifyPassCode(changePasswordDTO.getUsername(), changePasswordDTO.getCode());
+
+        //Check password
+        if (!changePasswordDTO.getNewPassword().matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]*$")) {
+            throw new UserCreationErrorException(
+                    "Password must include at least one lowercase letter, one uppercase letter, one number, and one special character."
+            );
+        }
+
+        user.setPassword(passwordEncoder.encode(changePasswordDTO.getNewPassword()));
+
+        try {
+            userRepository.save(user);
+        } catch (DataAccessException e){
+            throw new DatabaseConnectionErrorException("Can't Update user's password");
         }
     }
 }
