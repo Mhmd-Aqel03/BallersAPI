@@ -33,6 +33,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             String authHeader = request.getHeader("Authorization");
             String token = null;
             String username = null;
+            String type = null;
 
             // Check if the header starts with "Bearer "
             if (authHeader != null && authHeader.startsWith("Bearer ")) {
@@ -40,10 +41,17 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 try {
                     // Extract username from token
                     username = jwtService.extractUsername(token);
+                    type = jwtService.extractType(token);
                 } catch (Exception e) {
+                    System.out.println("JWT token is invalid : " + e.getMessage());
                     throw new InvalidTokenException("JWT token is invalid : " + e.getMessage());
                 }
+            }
 
+            // Check type of token
+            if(type != null && !type.equals("access")){
+                System.out.println("Refresh token can't be used as access token");
+                throw new InvalidTokenException("Refresh token can't be used as access token");
             }
 
             // If the token is valid and no authentication is set in the context
@@ -62,6 +70,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                         SecurityContextHolder.getContext().setAuthentication(authToken);
                     }
                 } catch (Exception e) {
+                    System.out.println("User not found: " + e.getMessage());
                     throw new InvalidTokenException("User not found: " + e.getMessage());
                 }
             }
@@ -72,6 +81,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             throw new AuthorizationFailedException(e.getMessage());
         }
         catch (Exception e) {
+            System.out.println("Something went wrong with Authorization: " + e.getMessage());
             throw new AuthorizationFailedException("Something went wrong with Authorization: " + e.getMessage());
         }
     }

@@ -44,12 +44,18 @@ public class JwtService {
                 .findFirst()
                 .orElse(null)); // So this is never supposed to be null because the UserService should throw a not found exception.(HopeFully)
 
+        claims.put("type", "access");
+
         return createToken(claims, username, accessExpiration);
     }
 
     // Generate refresh token with given username
     public String generateRefreshToken(String username) {
-        return createToken(new HashMap<>(), username, refreshExpiration);
+        Map<String, Object> claims = new HashMap<>();
+
+        claims.put("type", "refresh");
+
+        return createToken(claims, username, refreshExpiration);
     }
 
     // Extract the username from the token
@@ -67,6 +73,9 @@ public class JwtService {
         final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
     }
+
+    // extract type
+    public String extractType(String token) {return  extractClaim(token,claims -> claims.get("type", String.class));}
 
     // Validate the token against user details and expiration
     public Boolean validateToken(String token, UserDetails userDetails) {

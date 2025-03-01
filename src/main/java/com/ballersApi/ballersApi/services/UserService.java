@@ -5,6 +5,7 @@ import com.ballersApi.ballersApi.dataTransferObjects.UserDTO;
 import com.ballersApi.ballersApi.exceptions.DatabaseConnectionErrorException;
 import com.ballersApi.ballersApi.exceptions.UserCreationErrorException;
 import com.ballersApi.ballersApi.exceptions.UserNotFoundException;
+import com.ballersApi.ballersApi.exceptions.UsernameAlreadyTakenException;
 import com.ballersApi.ballersApi.models.User;
 import com.ballersApi.ballersApi.repositories.UserRepository;
 import jakarta.transaction.Transactional;
@@ -80,7 +81,7 @@ public class UserService {
 
         // Basically "!= null"
         if (user.isPresent()) {
-            throw new UserCreationErrorException("Username already Taken");
+            throw new UsernameAlreadyTakenException("Username "  + username + " is already taken.");
         }
 
         //Check password

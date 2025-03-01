@@ -97,6 +97,17 @@ public class UserController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+
+    @GetMapping("/secret")
+    @PreAuthorize("hasAuthority('ROLE_PLAYER')")
+    public ResponseEntity<Map<String, Object>> getSecret() {
+        Map<String, Object> response = new HashMap<>();
+
+        response.put("msg", "secret");
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
     @PostMapping("/requestCode")
     public ResponseEntity<Map<String, Object>> requestCode(@Valid @RequestBody UsernameDTO usernameDTO) {
         Map<String, Object> response = new HashMap<>();
