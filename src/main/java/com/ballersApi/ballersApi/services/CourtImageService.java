@@ -27,22 +27,28 @@ public class CourtImageService {
 
     public List<CourtImage> getImagesByCourtId(Long courtId) {
         if (!courtRepository.existsById(courtId)) {
-            throw new CourtIdNotFoundException("Court with Id " + courtId + " Not Found");
+            throw new CourtIdNotFoundException("Cant get images forz Court with Id " + courtId + " Not Found");
         }
         return courtImageRepository.findByCourtId(courtId);
     }
 
+    public CourtImage getImageById(Long imageId) {
+        return courtImageRepository.findById(imageId)
+                .orElseThrow(() -> new CourtImageIdNotFoundException("Cant get Court image with Id " + imageId + " not found"));
+    }
+
     public CourtImage addImage(Long courtId, CourtImage courtImage) {
-        Court court = courtRepository.findById(courtId).orElseThrow(() -> new CourtIdNotFoundException("Court with Id " + courtId + " Not Found"));
+        Court court = courtRepository.findById(courtId).orElseThrow(() -> new CourtIdNotFoundException(" Cant add image to Court with Id " + courtId + " Not Found"));
+
 
         courtImage.setCourt(court);
 
         return courtImageRepository.save(courtImage);
     }
 
-    public CourtImage updateImage(Long imageId,String newPhotoUrl){
-        CourtImage existingImage = courtImageRepository.findById(imageId).orElseThrow(()-> new CourtImageIdNotFoundException("Court image with Id " + imageId +" not found "));
-        existingImage.setPhotoUrl(newPhotoUrl);
+    public CourtImage updateImage(Long imageId, CourtImage updatedImage) {
+        CourtImage existingImage = courtImageRepository.findById(imageId).orElseThrow(() -> new CourtImageIdNotFoundException("Cant update image Court image with Id " + imageId + " not found "));
+        existingImage.setPhotoUrl(updatedImage.getPhotoUrl());
         return courtImageRepository.save(existingImage);
     }
 

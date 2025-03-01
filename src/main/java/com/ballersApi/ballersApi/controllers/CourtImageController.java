@@ -26,13 +26,18 @@ public class CourtImageController {
         return courtImageService.getImagesByCourtId(courtId);
     }
 
+    @GetMapping("/{id}")
+    public CourtImage getImageById(@PathVariable Long id) {
+        return courtImageService.getImageById(id);
+    }
+
     @PostMapping("/add/{courtId}")
-    public CourtImage addImage(@PathVariable Long courtId, @RequestBody  CourtImage courtImage) {
+    public CourtImage addImage(@PathVariable Long courtId, @RequestBody CourtImage courtImage) {
         return courtImageService.addImage(courtId, courtImage);
     }
 
     @PutMapping("/update/{imageId}")
-    public CourtImage updateImage(@PathVariable Long imageId, @RequestBody String newPhotoUrl) {
+    public CourtImage updateImage(@PathVariable Long imageId, @RequestBody CourtImage newPhotoUrl) {
         return courtImageService.updateImage(imageId, newPhotoUrl);
     }
 
