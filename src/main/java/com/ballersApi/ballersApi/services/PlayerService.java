@@ -82,9 +82,8 @@ public class PlayerService {
     }
 
     @Transactional
-    public String refreshToken(String token) {
-
-        String newToken;
+    public TokenDTO refreshToken(String token) {
+        TokenDTO tokenDto = new TokenDTO();
         String username = jwtService.extractUsername(token);
 
         // Validate token, should throw exceptions for invalid tokens.
@@ -97,11 +96,15 @@ public class PlayerService {
         }
 
         // Generate new Refresh Token.
-        newToken = jwtService.generateRefreshToken(username);
-        // Update refresh token.
-        updateRefreshToken(username, newToken);
+        tokenDto.setRefreshToken(jwtService.generateRefreshToken(username));
 
-        return newToken;
+        // Generate new Access token
+        tokenDto.setAccessToken(jwtService.generateAccessToken(username));
+
+        // Update refresh token.
+        updateRefreshToken(username, tokenDto.getRefreshToken());
+
+        return tokenDto;
     }
 
     @Transactional

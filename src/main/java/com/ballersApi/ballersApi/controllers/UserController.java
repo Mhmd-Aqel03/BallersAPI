@@ -36,6 +36,8 @@ public class UserController {
 
         // Add the player
         playerService.addPlayer(playerDTO);
+        // Send Email Code
+        playerService.requestCode(playerDTO.getUsername());
 
         response.put("message", "Player registered Successfully");
 
@@ -81,15 +83,16 @@ public class UserController {
     // Why isn't this in the /players controller? shut up nerd.
     @PostMapping("/refresh")
     public ResponseEntity<Map<String, Object>> refreshToken(@Valid @RequestBody RefreshTokenDTO refreshTokenDTO) {
-        String newToken;
+        TokenDTO tokenDto;
         Map<String, Object> response = new HashMap<>();
 
         // Get token from POST Body.
         String token = refreshTokenDTO.getToken();
 
-        newToken = playerService.refreshToken(token);
+        tokenDto = playerService.refreshToken(token);
 
-        response.put("token", newToken);
+        response.put("Access token", tokenDto.getAccessToken());
+        response.put("Refresh token", tokenDto.getRefreshToken());
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
