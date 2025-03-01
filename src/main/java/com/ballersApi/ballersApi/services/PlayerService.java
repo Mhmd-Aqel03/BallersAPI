@@ -75,8 +75,14 @@ public class PlayerService {
     }
 
     public Player getPlayerByUsername(String username) {
-        // User Service should throw the not found here
+        // User Service should throw a Not found
         User user = userService.getUserByUsername(username);
+
+        return user.getPlayer();
+    }
+
+    public Player getPlayerByEmail(String email) {
+        User user = userService.getUserByEmail(email);
 
         return user.getPlayer();
     }
@@ -199,12 +205,12 @@ public class PlayerService {
     }
 
     @Transactional
-    public void requestPassCode(String username) {
+    public void requestPassCode(String email) {
 
-        User user = userService.getUserByUsername(username);
+        User user = userService.getUserByEmail(email);
         String code = CodeGenerator.generateCode();
 
-        Player player = getPlayerByUsername(username);
+        Player player = getPlayerByUsername(user.getUsername());
 
         player.setPasswordChangeCode(code);
         try {

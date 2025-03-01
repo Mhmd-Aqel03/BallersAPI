@@ -131,11 +131,11 @@ public class UserController {
     }
 
     @PostMapping("/requestPassCode")
-    public ResponseEntity<Map<String, Object>> requestPassCode(@Valid @RequestBody UsernameDTO usernameDTO) {
-        String username = usernameDTO.getUsername();
+    public ResponseEntity<Map<String, Object>> requestPassCode(@Valid @RequestBody EmailDTO emailDTO) {
+        String email = emailDTO.getEmail();
         Map<String, Object> response = new HashMap<>();
 
-        playerService.requestPassCode(username);
+        playerService.requestPassCode(email);
 
         response.put("message", "Password Change Code sent to User's email");
 

@@ -61,6 +61,18 @@ public class UserService {
         return user.orElseThrow(() -> new UserNotFoundException("User not found with username: " + username));
     }
 
+    public User getUserByEmail(String email) {
+        Optional<User> user;
+        try {
+            user = userRepository.findByEmail(email);
+        } catch (DataAccessException e) {
+            throw new DatabaseConnectionErrorException("Something went wrong while trying to access user" + e.getMessage());
+        }
+
+        // orElseThrow will return the object if it exists, or throw and exception if it doesn't. So cool shout out to Java.
+        return user.orElseThrow(() -> new UserNotFoundException("User not found with email: " + email));
+    }
+
     public void updateUser(User user) {
         try {
             userRepository.save(user);
