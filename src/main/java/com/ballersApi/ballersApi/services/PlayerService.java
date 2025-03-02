@@ -223,19 +223,18 @@ public class PlayerService {
     }
 
 
-    public void verifyPassCode(String username, String code) {
-        Player player = getPlayerByUsername(username);
+    public void verifyPassCode(String email, String code) {
+        Player player = getPlayerByEmail(email);
 
         if (!(player.getPasswordChangeCode() != null && player.getPasswordChangeCode().equals(code)))
             throw new CodeVerificationException("Password verification code is invalid");
-
     }
 
     @Transactional
     public void changePassword(ChangePasswordDTO changePasswordDTO) {
-        User user = userService.getUserByUsername(changePasswordDTO.getUsername());
+        User user = userService.getUserByEmail(changePasswordDTO.getEmail());
 
-        verifyPassCode(changePasswordDTO.getUsername(), changePasswordDTO.getCode());
+        verifyPassCode(changePasswordDTO.getEmail(), changePasswordDTO.getCode());
 
         //Check password
         if (!changePasswordDTO.getNewPassword().matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]*$")) {

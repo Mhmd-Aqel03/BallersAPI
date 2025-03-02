@@ -142,16 +142,16 @@ public class UserController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @PostMapping("/verifyPassCode")
-    public ResponseEntity<Map<String, Object>> verifyPassCode(@Valid @RequestBody VerifyCodeDTO verifyCodeDTO){
-        Map<String, Object> response = new HashMap<>();
-
-        playerService.verifyPassCode(verifyCodeDTO.getUsername(), verifyCodeDTO.getCode());
-
-        response.put("message", "Password change code verified");
-
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
+//    @PostMapping("/verifyPassCode")
+//    public ResponseEntity<Map<String, Object>> verifyPassCode(@Valid @RequestBody VerifyCodeDTO verifyCodeDTO){
+//        Map<String, Object> response = new HashMap<>();
+//
+//        playerService.verifyPassCode(verifyCodeDTO.getUsername(), verifyCodeDTO.getCode());
+//
+//        response.put("message", "Password change code verified");
+//
+//        return new ResponseEntity<>(response, HttpStatus.OK);
+//    }
 
     @PostMapping("/changePassword")
     public ResponseEntity<Map<String,Object>> changePassword(@Valid @RequestBody ChangePasswordDTO changePasswordDTO){

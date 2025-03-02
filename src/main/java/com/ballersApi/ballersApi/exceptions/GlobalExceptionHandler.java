@@ -3,6 +3,7 @@ package com.ballersApi.ballersApi.exceptions;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -50,7 +51,7 @@ public class GlobalExceptionHandler {
 
         response.put("message", ex.getMessage());
 
-        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
     // This Handles validation errors
@@ -83,7 +84,7 @@ public class GlobalExceptionHandler {
 
         response.put("message","Invalid Token: " + ex.getMessage());
 
-        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(AuthenticationFailedException.class)
@@ -92,7 +93,7 @@ public class GlobalExceptionHandler {
 
         response.put("message","Something went wrong with authenticating the User: " + ex.getMessage());
 
-        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(AuthorizationFailedException.class)
@@ -120,5 +121,14 @@ public class GlobalExceptionHandler {
         response.put("message",ex.getMessage());
 
         return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(AuthorizationDeniedException.class)
+    public ResponseEntity<Map<String, Object>> handleAuthorizationDeniedException(Exception ex) {
+        Map<String, Object> response = new HashMap<>();
+
+        response.put("message", "Something went wrong with authorization, make sure you have an 'Authorization header set': " + ex.getMessage());
+
+        return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
     }
 }
