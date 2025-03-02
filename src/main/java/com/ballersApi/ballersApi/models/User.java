@@ -1,7 +1,7 @@
 package com.ballersApi.ballersApi.models;
-
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
@@ -18,13 +18,15 @@ public class User {
 
     @NotEmpty(message = "Username can't be empty")
     @Size(min = 7, max = 20,message = "Username must be between 7-20 characters long")
-    @Column(unique = true)
+    @Column(unique = true,nullable = false)
     private String username;
 
     @NotEmpty(message = "Email can't be empty")
     @Email(message = "Email is not valid")
-    @Column(unique = true)
+
+    @Column(unique = true,nullable = false)
     private String email;
+
 
     @NotEmpty(message = "Password can't be empty")
     private String password;
