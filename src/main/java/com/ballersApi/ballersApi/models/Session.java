@@ -41,8 +41,6 @@ public class Session {
     @Max(value = 12, message = "Max players cannot exceed 12")
     private int playerCount;
 
-    private int playerCount;
-
     @ManyToOne()
     @JoinColumn(name = "court_id")
     private Court court;

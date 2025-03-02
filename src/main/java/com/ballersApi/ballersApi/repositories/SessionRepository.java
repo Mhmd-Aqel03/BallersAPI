@@ -8,5 +8,5 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface SessionRepository extends JpaRepository<Session, Long> {
-    List<Session> findBymatchDateTimeAfter(LocalDateTime now);
+    List<Session> findByMatchDateTimeAfter(LocalDateTime now);
 }

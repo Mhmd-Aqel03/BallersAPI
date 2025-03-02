@@ -1,11 +1,9 @@
 package com.ballersApi.ballersApi.exceptions;
 
 
-import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authorization.AuthorizationDeniedException;
-
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -22,7 +20,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, Object>> handleGeneralException(Exception ex) {
         Map<String, Object> response = new HashMap<>();
 
-        response.put("message", "Something went wrong: " + ex.getClass().getSimpleName() + " - " +ex.getMessage());
+        response.put("message", "Something went wrong: " + ex.getClass().getSimpleName() + " - " + ex.getMessage());
 
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -61,6 +59,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleSessionCreationException(SessionCreationException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
+
     @ExceptionHandler(SessionNotFoundException.class)
     public ResponseEntity<String> handleSessionNotFoundException(SessionNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
@@ -94,7 +93,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, Object>> handleJwtTokenValidationException(Exception ex) {
         Map<String, Object> response = new HashMap<>();
 
-        response.put("message","Invalid Token: " + ex.getMessage());
+        response.put("message", "Invalid Token: " + ex.getMessage());
 
         return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
     }
@@ -103,7 +102,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, Object>> handleAuthenticationFailedException(Exception ex) {
         Map<String, Object> response = new HashMap<>();
 
-        response.put("message","Something went wrong with authenticating the User: " + ex.getMessage());
+        response.put("message", "Something went wrong with authenticating the User: " + ex.getMessage());
 
         return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
     }
@@ -130,7 +129,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, Object>> handleUsernameAlreadyTakenException(Exception ex) {
         Map<String, Object> response = new HashMap<>();
 
-        response.put("message",ex.getMessage());
+        response.put("message", ex.getMessage());
 
         return new ResponseEntity<>(response, HttpStatus.CONFLICT);
     }
@@ -143,7 +142,7 @@ public class GlobalExceptionHandler {
 
         return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
     }
-  
+
     @ExceptionHandler(TeamSessionNotFoundException.class)
     public ResponseEntity<Map<String, String>> handleTeamSessionNotFound(TeamSessionNotFoundException ex) {
         Map<String, String> response = new HashMap<>();
@@ -157,6 +156,7 @@ public class GlobalExceptionHandler {
         response.put("error", ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
+
     @ExceptionHandler(CourtIdNotFoundException.class)
     public ResponseEntity<String> handleCourtIdNotFoundException(CourtIdNotFoundException e) {
         return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
@@ -170,5 +170,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(CourtImageIdNotFoundException.class)
     public ResponseEntity<String> handleCourtImageIdNotFoundException(CourtImageIdNotFoundException e) {
         return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
-    
+
+    }
 }
