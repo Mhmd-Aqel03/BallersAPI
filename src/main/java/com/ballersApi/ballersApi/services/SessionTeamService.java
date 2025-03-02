@@ -87,12 +87,12 @@ public class SessionTeamService {
         }
     }
 
-    public void deleteTeamSession(Long teamSessionId) {
+   public void deleteAllTeamSessions() {
         try {
-            if (!sessionTeamRepository.existsById(teamSessionId)) {
-                throw new IllegalArgumentException("Team session not found with ID: " + teamSessionId);
+            if (sessionTeamRepository.findAll().isEmpty()) {
+                throw new IllegalArgumentException("Team sessions do not exist. " );
             }
-            sessionTeamRepository.deleteById(teamSessionId);
+            sessionTeamRepository.deleteAll();
         } catch (IllegalArgumentException e) {
             System.err.println("Validation Error: " + e.getMessage());
         } catch (Exception e) {
