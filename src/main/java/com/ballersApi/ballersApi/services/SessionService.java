@@ -42,14 +42,14 @@ public class SessionService {
 
     }
 
-    public void deleteSession(Session session) {
+    public void deleteSession(Long sessionId) {
 
         try {
-           Session session1 = sessionRepository.findById(session.getId()).orElse(null);
+           Session session1 = sessionRepository.findById(sessionId).orElse(null);
             if (session1==null) {
-                throw new SessionNotFoundException("Session with ID " + session.getId() + " not found");
+                throw new SessionNotFoundException("Session with ID " + sessionId + " not found");
             }
-            sessionRepository.delete(session);
+            sessionRepository.deleteById(sessionId);
         } catch (Exception e) {
             throw new RuntimeException("Error deleting session: " + e.getMessage(), e);
         }
