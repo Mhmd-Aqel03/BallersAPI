@@ -1,9 +1,11 @@
 package com.ballersApi.ballersApi.exceptions;
 
+
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authorization.AuthorizationDeniedException;
+
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -51,7 +53,17 @@ public class GlobalExceptionHandler {
 
         response.put("message", ex.getMessage());
 
+
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(SessionCreationException.class)
+    public ResponseEntity<String> handleSessionCreationException(SessionCreationException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+    @ExceptionHandler(SessionNotFoundException.class)
+    public ResponseEntity<String> handleSessionNotFoundException(SessionNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
 
     // This Handles validation errors
@@ -131,4 +143,32 @@ public class GlobalExceptionHandler {
 
         return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
     }
+  
+    @ExceptionHandler(TeamSessionNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleTeamSessionNotFound(TeamSessionNotFoundException ex) {
+        Map<String, String> response = new HashMap<>();
+        response.put("error", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+    }
+
+    @ExceptionHandler(PlayerAlreadyInTeamException.class)
+    public ResponseEntity<Map<String, String>> handlePlayerAlreadyInTeam(PlayerAlreadyInTeamException ex) {
+        Map<String, String> response = new HashMap<>();
+        response.put("error", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    }
+    @ExceptionHandler(CourtIdNotFoundException.class)
+    public ResponseEntity<String> handleCourtIdNotFoundException(CourtIdNotFoundException e) {
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(NoCourtsFoundException.class)
+    public ResponseEntity<String> handleNoCourtsFoundException(NoCourtsFoundException e) {
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(CourtImageIdNotFoundException.class)
+    public ResponseEntity<String> handleCourtImageIdNotFoundException(CourtImageIdNotFoundException e) {
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+    
 }

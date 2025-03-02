@@ -21,19 +21,6 @@ public class BallersApiApplication {
 			UserRepository userRepository
 	) {
 		return args -> {
-//			User user = new User();
-//
-//			user.setUsername("Pookie");
-//			user.setEmail("pookie@gmail.com");
-//			user.setPassword("pookie");
-//
-//			Player player =  new Player();
-//
-//			user.setPlayer(player);
-//
-//			userRepository.save(user);
-//
-//			System.out.println(playerRepository.findByUsername("Pookie"));
 		};
 
 

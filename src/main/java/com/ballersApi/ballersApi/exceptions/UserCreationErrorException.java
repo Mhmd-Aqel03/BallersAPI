@@ -5,3 +5,4 @@ public class UserCreationErrorException extends RuntimeException {
         super(message);
     }
 }
+

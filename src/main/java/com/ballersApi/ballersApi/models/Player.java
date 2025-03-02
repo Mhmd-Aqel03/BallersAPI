@@ -16,8 +16,10 @@ public class Player {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    @NotBlank(message = "Position Can't be empty")
     private String postion;
 
+    @NotBlank(message = "Phone Number Can't be empty")
     private String phoneNumber;
 
     private String photoUrl;
@@ -43,6 +45,7 @@ public class Player {
     private boolean isVerified = false;
 
     private String refreshToken;
+
 
 //  Session Team relationship
     @ManyToMany
