@@ -38,9 +38,14 @@ public class Player {
 
     private int MVPs = 0;
 
-    private String verificationCode;
+    private String EmailVerificationCode;
+
+    private String passwordChangeCode;
 
     private boolean isVerified = false;
+
+    private String refreshToken;
+
 
 //  Session Team relationship
     @ManyToMany

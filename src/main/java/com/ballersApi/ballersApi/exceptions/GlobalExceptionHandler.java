@@ -1,14 +1,40 @@
 package com.ballersApi.ballersApi.exceptions;
+
+
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authorization.AuthorizationDeniedException;
+
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
 import java.util.HashMap;
 import java.util.Map;
+
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    //  This Handles all "Non Custom" error, or internal server errors.
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Map<String, Object>> handleGeneralException(Exception ex) {
+        Map<String, Object> response = new HashMap<>();
+
+        response.put("message", "Something went wrong: " + ex.getClass().getSimpleName() + " - " +ex.getMessage());
+
+        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(InvalidTokenException.class)
+    public ResponseEntity<Map<String, Object>> handleInvalidTokenException(InvalidTokenException ex) {
+        Map<String, Object> response = new HashMap<>();
+
+        response.put("message", ex.getMessage());
+
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
 
     //  This Handles Custom Exception, User not found in this case.
     @ExceptionHandler(UserNotFoundException.class)
@@ -27,17 +53,8 @@ public class GlobalExceptionHandler {
 
         response.put("message", ex.getMessage());
 
-        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
 
-    //  This Handles all "Non Custom" error, or internal server errors.
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<Map<String, Object>> handleGeneralException(Exception ex) {
-        Map<String, Object> response = new HashMap<>();
-
-        response.put("message", ex.getMessage());
-
-        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(SessionCreationException.class)
@@ -48,6 +65,8 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleSessionNotFoundException(SessionNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
+
+    // This Handles validation errors
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, Object>> handleValidationExceptions(MethodArgumentNotValidException ex) {
         Map<String, Object> response = new HashMap<>();
@@ -60,6 +79,71 @@ public class GlobalExceptionHandler {
 
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
+
+    // I'll use this exception as a "shit went wrong with the DB"
+    @ExceptionHandler(DatabaseConnectionErrorException.class)
+    public ResponseEntity<Map<String, Object>> handleDatabaseConnectionErrorException(Exception ex) {
+        Map<String, Object> response = new HashMap<>();
+
+        response.put("message", ex.getMessage());
+
+        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(JwtTokenValidationException.class)
+    public ResponseEntity<Map<String, Object>> handleJwtTokenValidationException(Exception ex) {
+        Map<String, Object> response = new HashMap<>();
+
+        response.put("message","Invalid Token: " + ex.getMessage());
+
+        return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(AuthenticationFailedException.class)
+    public ResponseEntity<Map<String, Object>> handleAuthenticationFailedException(Exception ex) {
+        Map<String, Object> response = new HashMap<>();
+
+        response.put("message","Something went wrong with authenticating the User: " + ex.getMessage());
+
+        return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(AuthorizationFailedException.class)
+    public ResponseEntity<Map<String, Object>> handleAuthorizationFailedException(Exception ex) {
+        Map<String, Object> response = new HashMap<>();
+
+        response.put("message", "Something went wrong with authorization: " + ex.getMessage());
+
+        return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(CodeVerificationException.class)
+    public ResponseEntity<Map<String, Object>> handleEmailCodeVerificationException(Exception ex) {
+        Map<String, Object> response = new HashMap<>();
+
+        response.put("message", "Something went Verifying Email: " + ex.getMessage());
+
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(UsernameAlreadyTakenException.class)
+    public ResponseEntity<Map<String, Object>> handleUsernameAlreadyTakenException(Exception ex) {
+        Map<String, Object> response = new HashMap<>();
+
+        response.put("message",ex.getMessage());
+
+        return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(AuthorizationDeniedException.class)
+    public ResponseEntity<Map<String, Object>> handleAuthorizationDeniedException(Exception ex) {
+        Map<String, Object> response = new HashMap<>();
+
+        response.put("message", "Something went wrong with authorization, make sure you have an 'Authorization header set': " + ex.getMessage());
+
+        return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+    }
+  
     @ExceptionHandler(TeamSessionNotFoundException.class)
     public ResponseEntity<Map<String, String>> handleTeamSessionNotFound(TeamSessionNotFoundException ex) {
         Map<String, String> response = new HashMap<>();

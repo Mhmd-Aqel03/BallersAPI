@@ -1,6 +1,8 @@
 package com.ballersApi.ballersApi;
 
+import com.ballersApi.ballersApi.models.Player;
 import com.ballersApi.ballersApi.models.User;
+import com.ballersApi.ballersApi.repositories.PlayerRepository;
 import com.ballersApi.ballersApi.repositories.UserRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -19,8 +21,6 @@ public class BallersApiApplication {
 			UserRepository userRepository
 	) {
 		return args -> {
-
-
 		};
 
 
