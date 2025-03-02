@@ -19,7 +19,7 @@ import org.springframework.stereotype.Service;
 
 @AllArgsConstructor
 @Service
-public class PlayerService {
+public class PlayerAuthService {
 
     private final PlayerRepository playerRepository;
 

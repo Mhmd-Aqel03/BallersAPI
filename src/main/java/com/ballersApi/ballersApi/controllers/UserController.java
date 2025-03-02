@@ -3,7 +3,7 @@ package com.ballersApi.ballersApi.controllers;
 import com.ballersApi.ballersApi.JsonWebTokens.JwtService;
 import com.ballersApi.ballersApi.dataTransferObjects.*;
 import com.ballersApi.ballersApi.services.EmailService;
-import com.ballersApi.ballersApi.services.PlayerService;
+import com.ballersApi.ballersApi.services.PlayerAuthService;
 import com.ballersApi.ballersApi.services.UserService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -25,7 +25,7 @@ public class UserController {
 
     private final JwtService jwtService;
 
-    private final PlayerService playerService;
+    private final PlayerAuthService playerAuthService;
 
     private final EmailService emailService;
 
@@ -35,9 +35,9 @@ public class UserController {
         Map<String, Object> response = new HashMap<>();
 
         // Add the player
-        playerService.addPlayer(playerDTO);
+        playerAuthService.addPlayer(playerDTO);
         // Send Email Code
-        playerService.requestCode(playerDTO.getUsername());
+        playerAuthService.requestCode(playerDTO.getUsername());
 
         response.put("message", "Player registered Successfully");
 
@@ -48,7 +48,7 @@ public class UserController {
     @PostMapping("/login")
     public ResponseEntity<Map<String, Object>> loginUser(@Valid @RequestBody LoginDTO loginDTO) {
         // The Jwt token that will be returned(Inshallah).
-        TokenDTO tokenDTO = playerService.login(loginDTO);
+        TokenDTO tokenDTO = playerAuthService.login(loginDTO);
         Map<String, Object> response = new HashMap<>();
 
         // Generate access and refresh JWT Tokens, and put them in the response.
@@ -72,7 +72,7 @@ public class UserController {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         Map<String, Object> response = new HashMap<>();
 
-        playerService.logout(username);
+        playerAuthService.logout(username);
 
         response.put("message", "User logged Out Successfully");
 
@@ -89,7 +89,7 @@ public class UserController {
         // Get token from POST Body.
         String token = refreshTokenDTO.getToken();
 
-        tokenDto = playerService.refreshToken(token);
+        tokenDto = playerAuthService.refreshToken(token);
 
         response.put("Access token", tokenDto.getAccessToken());
         response.put("Refresh token", tokenDto.getRefreshToken());
@@ -112,7 +112,7 @@ public class UserController {
     public ResponseEntity<Map<String, Object>> requestCode(@Valid @RequestBody UsernameDTO usernameDTO) {
         Map<String, Object> response = new HashMap<>();
 
-        playerService.requestCode(usernameDTO.getUsername());
+        playerAuthService.requestCode(usernameDTO.getUsername());
 
         response.put("message", "Request Code sent to User's email");
 
@@ -123,7 +123,7 @@ public class UserController {
     public ResponseEntity<Map<String, Object>> verifyCode(@Valid @RequestBody VerifyCodeDTO verifyCodeDTO) {
         Map<String, Object> response = new HashMap<>();
 
-        playerService.verifyCode(verifyCodeDTO.getUsername(), verifyCodeDTO.getCode());
+        playerAuthService.verifyCode(verifyCodeDTO.getUsername(), verifyCodeDTO.getCode());
 
         response.put("message", "Player email verified Successfully");
 
@@ -135,7 +135,7 @@ public class UserController {
         String email = emailDTO.getEmail();
         Map<String, Object> response = new HashMap<>();
 
-        playerService.requestPassCode(email);
+        playerAuthService.requestPassCode(email);
 
         response.put("message", "Password Change Code sent to User's email");
 
@@ -157,7 +157,7 @@ public class UserController {
     public ResponseEntity<Map<String,Object>> changePassword(@Valid @RequestBody ChangePasswordDTO changePasswordDTO){
         Map<String, Object> response = new HashMap<>();
 
-        playerService.changePassword(changePasswordDTO);
+        playerAuthService.changePassword(changePasswordDTO);
 
         response.put("message", "Player's password changed successfully");
 
