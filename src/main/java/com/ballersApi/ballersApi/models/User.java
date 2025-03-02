@@ -15,6 +15,7 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+
     @NotEmpty(message = "Username can't be empty")
     @Size(min = 7, max = 20,message = "Username must be between 7-20 characters long")
     @Column(unique = true,nullable = false)
@@ -22,8 +23,11 @@ public class User {
 
     @NotEmpty(message = "Email can't be empty")
     @Email(message = "Email is not valid")
+
     @Column(unique = true,nullable = false)
     private String email;
+
+
     @NotEmpty(message = "Password can't be empty")
     private String password;
 

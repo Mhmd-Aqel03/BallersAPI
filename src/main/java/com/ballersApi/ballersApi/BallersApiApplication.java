@@ -19,16 +19,7 @@ public class BallersApiApplication {
 			UserRepository userRepository
 	) {
 		return args -> {
-			User user = new User();
 
-			user.setUsername("baller");
-			user.setPassword("pp");
-
-			userRepository.save(user);
-
-			System.out.println("Skibid");
-
-			userRepository.findAll().forEach(System.out::println);
 
 		};
 

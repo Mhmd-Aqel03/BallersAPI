@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.util.HashMap;
 import java.util.Map;
-
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -40,6 +39,7 @@ public class GlobalExceptionHandler {
 
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
     @ExceptionHandler(SessionCreationException.class)
     public ResponseEntity<String> handleSessionCreationException(SessionCreationException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
@@ -73,13 +73,18 @@ public class GlobalExceptionHandler {
         response.put("error", ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
+    @ExceptionHandler(CourtIdNotFoundException.class)
+    public ResponseEntity<String> handleCourtIdNotFoundException(CourtIdNotFoundException e) {
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+    }
 
+    @ExceptionHandler(NoCourtsFoundException.class)
+    public ResponseEntity<String> handleNoCourtsFoundException(NoCourtsFoundException e) {
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+    }
 
-
-
-
-
-
-
-
+    @ExceptionHandler(CourtImageIdNotFoundException.class)
+    public ResponseEntity<String> handleCourtImageIdNotFoundException(CourtImageIdNotFoundException e) {
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+    
 }

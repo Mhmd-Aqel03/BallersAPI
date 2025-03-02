@@ -1,7 +1,7 @@
 package com.ballersApi.ballersApi.models;
 
 public enum Role {
-    ADMIN,
-    REFEREE,
-    PLAYER
+    ROLE_ADMIN,
+    ROLE_REFEREE,
+    ROLE_PLAYER
 }
