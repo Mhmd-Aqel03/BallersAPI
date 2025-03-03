@@ -170,36 +170,36 @@ public class PlayerAuthService {
     public TokenDTO login(LoginDTO loginDTO) {
         TokenDTO tokenDTO = new TokenDTO();
         // This throws an exception if no User is found.
-        User user = userService.getUserByUsername(loginDTO.getUsername());
+        User user = userService.getUserByEmail(loginDTO.getEmail());
 
 
         if (user.getRole() == Role.ROLE_PLAYER) {
 
-            if (user.getUsername().equals(loginDTO.getUsername()) && passwordEncoder.matches(loginDTO.getPassword(), user.getPassword())) {
+            if (user.getEmail().equals(loginDTO.getEmail()) && passwordEncoder.matches(loginDTO.getPassword(), user.getPassword())) {
 
-                Player player = getPlayerByUsername(loginDTO.getUsername());
+                Player player = getPlayerByEmail(loginDTO.getEmail());
 
                 if (!player.isVerified()) {
                     throw new AuthorizationFailedException("Player's Email is not verified");
                 }
 
-                tokenDTO.setAccessToken(jwtService.generateAccessToken(loginDTO.getUsername()));
-                tokenDTO.setRefreshToken(jwtService.generateRefreshToken(loginDTO.getUsername()));
+                tokenDTO.setAccessToken(jwtService.generateAccessToken(user.getUsername()));
+                tokenDTO.setRefreshToken(jwtService.generateRefreshToken(user.getUsername()));
 
                 // Update refresh Token for player
-                updateRefreshToken(loginDTO.getUsername(), tokenDTO.getRefreshToken());
+                updateRefreshToken(user.getUsername(), tokenDTO.getRefreshToken());
 
                 return tokenDTO;
             } else {
-                throw new AuthenticationFailedException("Username or password are incorrect");
+                throw new AuthenticationFailedException("Email or password are incorrect");
             }
         } else {
-            if (user.getUsername().equals(loginDTO.getUsername()) && passwordEncoder.matches(loginDTO.getPassword(), user.getPassword())) {
-                tokenDTO.setAccessToken(jwtService.generateAccessToken(loginDTO.getUsername()));
+            if (user.getEmail().equals(loginDTO.getEmail()) && passwordEncoder.matches(loginDTO.getPassword(), user.getPassword())) {
+                tokenDTO.setAccessToken(jwtService.generateAccessToken(user.getUsername()));
 
                 return tokenDTO;
             } else {
-                throw new AuthenticationFailedException("Username or password are incorrect");
+                throw new AuthenticationFailedException("Email or password are incorrect");
             }
         }
     }

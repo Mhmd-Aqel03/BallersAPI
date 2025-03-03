@@ -8,13 +8,11 @@ import lombok.Data;
 
 @Data
 public class PlayerDTO {
-
     @NotEmpty(message = "Username can't be empty")
     @Size(min = 7, max = 20, message = "Username must be between 7-20 characters long")
     private String username;
 
     @NotEmpty(message = "Password can't be empty")
-
     private String password;
 
     @NotEmpty(message = "Email can't be empty")
@@ -25,6 +23,6 @@ public class PlayerDTO {
     private String phoneNumber;
 
     @NotBlank(message = "Position Can't be empty")
-    private String position;
+        private String position;
     private String photoUrl;
 }

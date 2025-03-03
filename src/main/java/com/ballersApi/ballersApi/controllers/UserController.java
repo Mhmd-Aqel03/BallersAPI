@@ -51,15 +51,10 @@ public class UserController {
         TokenDTO tokenDTO = playerAuthService.login(loginDTO);
         Map<String, Object> response = new HashMap<>();
 
-        // Generate access and refresh JWT Tokens, and put them in the response.
-        TokenDTO tokens = new TokenDTO();
-        tokens.setAccessToken(jwtService.generateAccessToken(loginDTO.getUsername()));
-        tokens.setRefreshToken(jwtService.generateRefreshToken(loginDTO.getUsername()));
-
-        response.put("accessToken", tokens.getAccessToken());
+        response.put("accessToken", tokenDTO.getAccessToken());
 
         if (tokenDTO.getRefreshToken() != null)
-            response.put("refreshToken", tokens.getRefreshToken());
+            response.put("refreshToken", tokenDTO.getRefreshToken());
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
@@ -141,17 +136,6 @@ public class UserController {
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
-
-//    @PostMapping("/verifyPassCode")
-//    public ResponseEntity<Map<String, Object>> verifyPassCode(@Valid @RequestBody VerifyCodeDTO verifyCodeDTO){
-//        Map<String, Object> response = new HashMap<>();
-//
-//        playerService.verifyPassCode(verifyCodeDTO.getUsername(), verifyCodeDTO.getCode());
-//
-//        response.put("message", "Password change code verified");
-//
-//        return new ResponseEntity<>(response, HttpStatus.OK);
-//    }
 
     @PostMapping("/changePassword")
     public ResponseEntity<Map<String,Object>> changePassword(@Valid @RequestBody ChangePasswordDTO changePasswordDTO){

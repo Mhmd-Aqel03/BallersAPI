@@ -21,9 +21,10 @@ public class BallersApiApplication {
 			UserRepository userRepository
 	) {
 		return args -> {
+
+
+			System.out.println("Server running on port 5000");
 		};
-
-
 	}
 
 }
