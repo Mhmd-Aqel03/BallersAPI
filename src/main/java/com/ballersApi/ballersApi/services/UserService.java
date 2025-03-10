@@ -54,7 +54,7 @@ public class UserService {
         try {
             user = userRepository.findByUsername(username);
         } catch (DataAccessException e) {
-            throw new DatabaseConnectionErrorException("Something went wrong while trying to access user" + e.getMessage());
+            throw new DatabaseConnectionErrorException("Something went wrong while trying to retrieve user" + e.getMessage());
         }
 
         // orElseThrow will return the object if it exists, or throw and exception if it doesn't. So cool shout out to Java.
@@ -66,11 +66,23 @@ public class UserService {
         try {
             user = userRepository.findByEmail(email);
         } catch (DataAccessException e) {
-            throw new DatabaseConnectionErrorException("Something went wrong while trying to access user" + e.getMessage());
+            throw new DatabaseConnectionErrorException("Something went wrong while trying to retrieve user" + e.getMessage());
         }
 
         // orElseThrow will return the object if it exists, or throw and exception if it doesn't. So cool shout out to Java.
         return user.orElseThrow(() -> new UserNotFoundException("User not found with email: " + email));
+    }
+
+    public User getUserById(Long id){
+        Optional<User> user;
+        try{
+            user = userRepository.findById(id);
+        } catch (DataAccessException e) {
+            throw new DatabaseConnectionErrorException("Something went wrong while trying to retrieve user" + e.getMessage());
+        }
+
+        // orElseThrow will return the object if it exists, or throw and exception if it doesn't. So cool shout out to Java.
+        return user.orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
     }
 
     public void updateUser(User user) {

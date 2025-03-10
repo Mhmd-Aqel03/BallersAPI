@@ -23,6 +23,7 @@ public class PlayerDTO {
     private String phoneNumber;
 
     @NotBlank(message = "Position Can't be empty")
-        private String position;
+    private String position;
+
     private String photoUrl;
 }

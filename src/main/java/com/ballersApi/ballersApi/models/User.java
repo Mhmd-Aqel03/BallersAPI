@@ -26,7 +26,6 @@ public class User {
     @Column(unique = true,nullable = false)
     private String email;
 
-
     @NotEmpty(message = "Password can't be empty")
     private String password;
 

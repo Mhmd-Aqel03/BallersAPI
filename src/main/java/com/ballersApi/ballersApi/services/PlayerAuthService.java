@@ -87,6 +87,12 @@ public class PlayerAuthService {
         return user.getPlayer();
     }
 
+    public Player getPlayerById(Long id){
+        User user = userService.getUserById(id);
+
+        return user.getPlayer();
+    }
+
     @Transactional
     public TokenDTO refreshToken(String token) {
         TokenDTO tokenDto = new TokenDTO();
