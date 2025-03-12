@@ -1,5 +1,6 @@
 package com.ballersApi.ballersApi.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -38,15 +39,17 @@ public class Player {
 
     private int MVPs = 0;
 
+    @JsonIgnore
     private String EmailVerificationCode;
-
+    @JsonIgnore
     private String passwordChangeCode;
-
+    @JsonIgnore
     private boolean isVerified = false;
-
+    @JsonIgnore
     private String refreshToken;
 
 
+    @JsonIgnore
 //  Session Team relationship
     @ManyToMany
     @JoinTable(
@@ -60,6 +63,7 @@ public class Player {
     )
     private List<SessionTeam> sessionTeams;
 
+    @JsonIgnore
 //  Player and Chat relationship
     @ManyToMany
     @JoinTable(

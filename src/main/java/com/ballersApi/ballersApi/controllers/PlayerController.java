@@ -2,7 +2,10 @@ package com.ballersApi.ballersApi.controllers;
 
 import com.ballersApi.ballersApi.dataTransferObjects.UsernameDTO;
 import com.ballersApi.ballersApi.models.Player;
+import com.ballersApi.ballersApi.models.User;
 import com.ballersApi.ballersApi.services.PlayerAuthService;
+import com.ballersApi.ballersApi.services.PlayerService;
+import com.ballersApi.ballersApi.services.UserService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,32 +23,44 @@ public class PlayerController {
 
     private final PlayerAuthService playerAuthService;
 
-    @GetMapping("/getPlayer")
+    private final PlayerService playerService;
+
+    private final UserService userService;
+
+    @GetMapping("/getUser")
     public ResponseEntity<Map<String, Object>> getPlayer() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         Map<String, Object> response = new HashMap<>();
 
-        Player player = playerAuthService.getPlayerByUsername(username);
+        User user = userService.getUserByUsername(username);
 
-        response.put("player", player);
+        response.put("user", user);
 
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/getPlayer/{id}")
+    @GetMapping("/getUser/{id}")
     public ResponseEntity<Map<String, Object>> getPlayer(@PathVariable Long id) {
         Map<String, Object> response = new HashMap<>();
 
-        Player player = playerAuthService.getPlayerById(id);
+        User user = userService.getUserById(id);
 
-        response.put("player", player);
+        response.put("user", user);
 
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/searchPlayer/{username}")
-    public ResponseEntity<Map<String, Object>> searchPlayer(@PathVariable String username) {
+    @GetMapping("/searchUsers/{username}")
+    public ResponseEntity<Map<String, Object>> searchUsers(@PathVariable String username) {
         Map<String, Object> response = new HashMap<>();
-        ArrayList <Player> players = ;
+        ArrayList <User> users = userService.searchUsers(username);
+        if(!users.isEmpty()){
+            response.put("users", users);
+
+            return ResponseEntity.ok(response);
+        } else{
+            return ResponseEntity.notFound().build();
+        }
+
     }
 }
