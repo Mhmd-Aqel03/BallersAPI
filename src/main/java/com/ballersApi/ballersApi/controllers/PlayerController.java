@@ -1,5 +1,6 @@
 package com.ballersApi.ballersApi.controllers;
 
+import com.ballersApi.ballersApi.dataTransferObjects.PlayerIdDTO;
 import com.ballersApi.ballersApi.dataTransferObjects.UsernameDTO;
 import com.ballersApi.ballersApi.models.Player;
 import com.ballersApi.ballersApi.models.User;
@@ -62,5 +63,38 @@ public class PlayerController {
             return ResponseEntity.notFound().build();
         }
 
+    }
+
+    @PostMapping("/endorseGoodLeader")
+    public ResponseEntity<Map<String,Object>> endorseGoodLeader(@Valid @RequestBody PlayerIdDTO playerIdDTO) {
+        Map<String, Object> response = new HashMap<>();
+
+        playerService.endorseGoodLeader(playerIdDTO.getPlayerId());
+
+        response.put("msg", "Player with id: " + playerIdDTO.getPlayerId() + " has been endorsed successfully");
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/endorseTeamPlayer")
+    public ResponseEntity<Map<String,Object>> endorseTeamPlayer(@Valid @RequestBody PlayerIdDTO playerIdDTO) {
+        Map<String, Object> response = new HashMap<>();
+
+        playerService.endorseTeamPlayer(playerIdDTO.getPlayerId());
+
+        response.put("msg", "Player with id: " + playerIdDTO.getPlayerId() + " has been endorsed successfully");
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/endorsePositiveAttitude")
+    public ResponseEntity<Map<String,Object>> endorsePositiveAttitude(@Valid @RequestBody PlayerIdDTO playerIdDTO) {
+        Map<String, Object> response = new HashMap<>();
+
+        playerService.endorsePositiveAttitude(playerIdDTO.getPlayerId());
+
+        response.put("msg", "Player with id: " + playerIdDTO.getPlayerId() + " has been endorsed successfully");
+
+        return ResponseEntity.ok(response);
     }
 }
