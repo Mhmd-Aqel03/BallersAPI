@@ -97,4 +97,16 @@ public class PlayerController {
 
         return ResponseEntity.ok(response);
     }
+
+    @PostMapping("/addFavourite")
+    public ResponseEntity<Map<String, Object>> addFav(@Valid @RequestBody PlayerIdDTO playerIdDTO) {
+        Map<String, Object> response = new HashMap<>();
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        playerService.addFavourite(username, playerIdDTO.getPlayerId());
+
+        response.put("msg", "Player with id: " + playerIdDTO.getPlayerId() + " has been added to the user's favourite list successfully");
+
+        return ResponseEntity.ok(response);
+    }
 }

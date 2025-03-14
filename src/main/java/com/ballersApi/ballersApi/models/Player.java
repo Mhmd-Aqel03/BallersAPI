@@ -8,7 +8,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.antlr.v4.runtime.misc.NotNull;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
 @Entity
 @Data
 @NoArgsConstructor
@@ -76,4 +80,13 @@ public class Player {
             }
     )
     private List<Chat> chats;
+
+    // Player favourite list(We forgor lol)
+    @ManyToMany
+    @JoinTable(
+            name = "player_favorites",
+            joinColumns = @JoinColumn(name = "player_id"),
+            inverseJoinColumns = @JoinColumn(name = "favorite_id")
+    )
+    private Set<Player> favorites = new HashSet<>();
 }

@@ -76,7 +76,11 @@ public class BallersApiApplication {
 
 			user3.setPlayer(player3);
 
+			player3.getFavorites().add(player2);
+
 			userRepository.save(user3);
+
+
 
 			System.out.println("Server running on port " + serverPort);
 		};

@@ -53,4 +53,17 @@ public class PlayerService {
         }
     }
 
+    public void addFavourite(String playerUsername, long favourite_id){
+        Player ourPlayer = playerAuthService.getPlayerByUsername(playerUsername);
+        Player favouritePlayer = playerAuthService.getPlayerById(favourite_id);
+
+        ourPlayer.getFavorites().add(favouritePlayer);
+
+        try{
+            playerRepository.save(ourPlayer);
+        } catch (DataAccessException e){
+            throw new DatabaseConnectionErrorException("Error connecting to DB while adding player to favourites: " + e.getMessage());
+        }
+    }
+
 }
