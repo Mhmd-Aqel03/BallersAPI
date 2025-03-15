@@ -172,4 +172,12 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
 
     }
+
+    @ExceptionHandler(EmailSendingException.class)
+    public ResponseEntity<Map<String, Object>> handleEmailSendingException(EmailSendingException ex) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "Something went wrong wit sending email: " + ex.getMessage());
+
+        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 }

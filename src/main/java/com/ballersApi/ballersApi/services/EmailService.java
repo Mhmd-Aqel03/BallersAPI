@@ -1,5 +1,6 @@
 package com.ballersApi.ballersApi.services;
 
+import com.ballersApi.ballersApi.exceptions.EmailSendingException;
 import lombok.AllArgsConstructor;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -20,7 +21,7 @@ public class EmailService {
         try {
             mailSender.send(message);
         }catch(Exception e) {
-            throw new RuntimeException("FAK");
+            throw new EmailSendingException(e.getMessage());
         }
     }
 }

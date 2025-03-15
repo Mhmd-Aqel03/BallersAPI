@@ -82,6 +82,7 @@ public class Player {
     private List<Chat> chats;
 
     // Player favourite list(We forgor lol)
+    @JsonIgnore
     @ManyToMany
     @JoinTable(
             name = "player_favorites",

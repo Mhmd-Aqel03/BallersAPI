@@ -1,15 +1,13 @@
 package com.ballersApi.ballersApi.services;
 
 import com.ballersApi.ballersApi.JsonWebTokens.JwtService;
-import com.ballersApi.ballersApi.dataTransferObjects.ChangePasswordDTO;
-import com.ballersApi.ballersApi.dataTransferObjects.LoginDTO;
-import com.ballersApi.ballersApi.dataTransferObjects.PlayerDTO;
-import com.ballersApi.ballersApi.dataTransferObjects.TokenDTO;
+import com.ballersApi.ballersApi.dataTransferObjects.*;
 import com.ballersApi.ballersApi.exceptions.*;
 import com.ballersApi.ballersApi.models.Player;
 import com.ballersApi.ballersApi.models.Role;
 import com.ballersApi.ballersApi.models.User;
 import com.ballersApi.ballersApi.repositories.PlayerRepository;
+import com.ballersApi.ballersApi.repositories.UserRepository;
 import com.ballersApi.ballersApi.util.CodeGenerator;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -30,7 +28,6 @@ public class PlayerAuthService {
     private final EmailService emailService;
 
     private final PasswordEncoder passwordEncoder;
-
     @Transactional
     public void addPlayer(PlayerDTO playerDTO) {
         User newUser = new User();
@@ -87,7 +84,7 @@ public class PlayerAuthService {
         return user.getPlayer();
     }
 
-    public Player getPlayerById(Long id){
+    public Player getPlayerById(Long id) {
         User user = userService.getUserById(id);
 
         return user.getPlayer();
@@ -250,6 +247,22 @@ public class PlayerAuthService {
         }
 
         user.setPassword(passwordEncoder.encode(changePasswordDTO.getNewPassword()));
+
+        userService.updateUser(user);
+    }
+
+    public void updatePlayer(String username, UpdatePlayerDTO updatePlayerDTO) {
+        Player player = getPlayerByUsername(username);
+        User user = userService.getUserByUsername(username);
+
+        if (userService.checkIfUserExists(updatePlayerDTO.getUsername())) {
+            throw new UsernameAlreadyTakenException("Username " + updatePlayerDTO.getUsername() + " is already taken");
+        }
+
+        user.setUsername(updatePlayerDTO.getUsername());
+
+        player.setPostion(updatePlayerDTO.getPosition());
+        player.setPhotoUrl(updatePlayerDTO.getPhotoUrl());
 
         userService.updateUser(user);
     }

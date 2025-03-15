@@ -1,6 +1,7 @@
 package com.ballersApi.ballersApi.controllers;
 
 import com.ballersApi.ballersApi.dataTransferObjects.PlayerIdDTO;
+import com.ballersApi.ballersApi.dataTransferObjects.UpdatePlayerDTO;
 import com.ballersApi.ballersApi.dataTransferObjects.UsernameDTO;
 import com.ballersApi.ballersApi.models.Player;
 import com.ballersApi.ballersApi.models.User;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @AllArgsConstructor
@@ -106,6 +108,42 @@ public class PlayerController {
         playerService.addFavourite(username, playerIdDTO.getPlayerId());
 
         response.put("msg", "Player with id: " + playerIdDTO.getPlayerId() + " has been added to the user's favourite list successfully");
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/getFavourites")
+    public ResponseEntity<Map<String, Object>> getFavourites() {
+        Map<String, Object> response = new HashMap<>();
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        List<Player> favourites = playerService.getFavourites(username);
+
+        response.put("favourites", favourites);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/removeFavourite")
+    public ResponseEntity<Map<String,Object>> removeFavourite(@Valid @RequestBody PlayerIdDTO playerIdDTO) {
+        Map<String, Object> response = new HashMap<>();
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        playerService.removeFavourite(username, playerIdDTO.getPlayerId());
+
+        response.put("msg", "Player with id: " + playerIdDTO.getPlayerId() + " has been removed from favourites successfully");
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/updatePlayer")
+    public ResponseEntity<Map<String,Object>> updatePlayer(@Valid @RequestBody UpdatePlayerDTO updatePlayerDTO) {
+        Map<String, Object> response = new HashMap<>();
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        playerAuthService.updatePlayer(username, updatePlayerDTO);
+
+        response.put("msg", "Player updated successfully");
 
         return ResponseEntity.ok(response);
     }

@@ -26,8 +26,6 @@ public class UserService {
 
     private final PasswordEncoder passwordEncoder;
 
-    private final JwtService jwtService;
-
     public void addUser(UserDTO userDto) {
 
         User newUser = new User();
@@ -49,6 +47,10 @@ public class UserService {
         } catch (DataAccessException e) {
             throw new DatabaseConnectionErrorException("Could not save user to database:  " + e.getMessage());
         }
+    }
+
+    public boolean checkIfUserExists(String username) {
+        return userRepository.findByUsername(username).isPresent();
     }
 
     public User getUserByUsername(String username) {
