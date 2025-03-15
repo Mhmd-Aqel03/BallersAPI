@@ -58,9 +58,9 @@ public class PlayerAuthService {
     }
 
     @Transactional
-    public void updateRefreshToken(String username, String refreshToken) {
+    public void updateRefreshToken(Long id, String refreshToken) {
 
-        Player player = getPlayerByUsername(username);
+        Player player = getPlayerById(id);
 
         player.setRefreshToken(refreshToken);
         try {
@@ -93,25 +93,25 @@ public class PlayerAuthService {
     @Transactional
     public TokenDTO refreshToken(String token) {
         TokenDTO tokenDto = new TokenDTO();
-        String username = jwtService.extractUsername(token);
+        Long id = Long.parseLong(jwtService.extractUsername(token));
 
         // Validate token, should throw exceptions for invalid tokens.
         jwtService.validateToken(token);
 
-        Player player = getPlayerByUsername(username);
+        Player player = getPlayerById(id);
 
         if (player.getRefreshToken() == null || !player.getRefreshToken().equals(token)) {
             throw new JwtTokenValidationException("Refresh Token is either invalid or outDated");
         }
 
         // Generate new Refresh Token.
-        tokenDto.setRefreshToken(jwtService.generateRefreshToken(username));
+        tokenDto.setRefreshToken(jwtService.generateRefreshToken(id));
 
         // Generate new Access token
-        tokenDto.setAccessToken(jwtService.generateAccessToken(username));
+        tokenDto.setAccessToken(jwtService.generateAccessToken(id));
 
         // Update refresh token.
-        updateRefreshToken(username, tokenDto.getRefreshToken());
+        updateRefreshToken(id, tokenDto.getRefreshToken());
 
         return tokenDto;
     }
@@ -186,11 +186,11 @@ public class PlayerAuthService {
                     throw new AuthorizationFailedException("Player's Email is not verified");
                 }
 
-                tokenDTO.setAccessToken(jwtService.generateAccessToken(user.getUsername()));
-                tokenDTO.setRefreshToken(jwtService.generateRefreshToken(user.getUsername()));
+                tokenDTO.setAccessToken(jwtService.generateAccessToken(user.getId()));
+                tokenDTO.setRefreshToken(jwtService.generateRefreshToken(user.getId()));
 
                 // Update refresh Token for player
-                updateRefreshToken(user.getUsername(), tokenDTO.getRefreshToken());
+                updateRefreshToken(user.getId(), tokenDTO.getRefreshToken());
 
                 return tokenDTO;
             } else {
@@ -198,7 +198,7 @@ public class PlayerAuthService {
             }
         } else {
             if (user.getEmail().equals(loginDTO.getEmail()) && passwordEncoder.matches(loginDTO.getPassword(), user.getPassword())) {
-                tokenDTO.setAccessToken(jwtService.generateAccessToken(user.getUsername()));
+                tokenDTO.setAccessToken(jwtService.generateAccessToken(user.getId()));
 
                 return tokenDTO;
             } else {

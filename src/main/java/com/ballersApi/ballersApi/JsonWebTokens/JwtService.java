@@ -33,10 +33,10 @@ public class JwtService {
     }
 
     // Generate access token with given username
-    public String generateAccessToken(String username) {
+    public String generateAccessToken(Long id) {
         Map<String, Object> claims = new HashMap<>();
 
-        UserDetails userDetails = appUserDetailsService.loadUserByUsername(username);
+        UserDetails userDetails = appUserDetailsService.loadUserById(id);
 
         claims.put("role", userDetails.getAuthorities()
                 .stream()
@@ -46,16 +46,16 @@ public class JwtService {
 
         claims.put("type", "access");
 
-        return createToken(claims, username, accessExpiration);
+        return createToken(claims, id.toString(), accessExpiration);
     }
 
     // Generate refresh token with given username
-    public String generateRefreshToken(String username) {
+    public String generateRefreshToken(Long id) {
         Map<String, Object> claims = new HashMap<>();
 
         claims.put("type", "refresh");
 
-        return createToken(claims, username, refreshExpiration);
+        return createToken(claims, id.toString(), refreshExpiration);
     }
 
     // Extract the username from the token
@@ -77,11 +77,13 @@ public class JwtService {
     // extract type
     public String extractType(String token) {return  extractClaim(token,claims -> claims.get("type", String.class));}
 
+    //
+
+
     // Validate the token against user details and expiration
     public Boolean validateToken(String token, UserDetails userDetails) {
         try {
-            final String username = extractUsername(token);
-            return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+            return (!isTokenExpired(token));
         } catch (Exception e) {
             return false;
         }
