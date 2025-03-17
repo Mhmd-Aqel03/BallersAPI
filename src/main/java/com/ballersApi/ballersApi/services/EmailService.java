@@ -4,6 +4,7 @@ import com.ballersApi.ballersApi.exceptions.EmailSendingException;
 import lombok.AllArgsConstructor;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 @AllArgsConstructor
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 public class EmailService {
     private JavaMailSender mailSender;
 
+    @Async
     public void sendEmail(String to, String subject, String text) {
         SimpleMailMessage message = new SimpleMailMessage();
 
