@@ -178,12 +178,14 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(EmailSendingException.class)
     public ResponseEntity<Map<String, Object>> handleEmailSendingException(EmailSendingException ex) {
         Map<String, Object> response = new HashMap<>();
+        System.out.println("Something went wrong with the email Service: " + ex.getMessage());
         response.put("message", "Something went wrong with the email Service: " + ex.getMessage());
 
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    @ExceptionHandler(NoResourceFoundException.class)public ResponseEntity<Map<String, Object>> handleResourceNotFound(NoResourceFoundException ex) {
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleResourceNotFound(NoResourceFoundException ex) {
         Map<String, Object> response = new HashMap<>();
         response.put("message", "Endpoint doesn't exist, maybe check your spelling: " + ex.getMessage());
 
