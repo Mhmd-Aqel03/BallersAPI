@@ -1,9 +1,9 @@
 package com.ballersApi.ballersApi;
 
-import com.ballersApi.ballersApi.models.Player;
-import com.ballersApi.ballersApi.models.Role;
-import com.ballersApi.ballersApi.models.User;
+import com.ballersApi.ballersApi.models.*;
+import com.ballersApi.ballersApi.repositories.CourtRepository;
 import com.ballersApi.ballersApi.repositories.PlayerRepository;
+import com.ballersApi.ballersApi.repositories.SessionRepository;
 import com.ballersApi.ballersApi.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
@@ -11,6 +11,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableAsync;
+
+import java.time.LocalDateTime;
 
 @SpringBootApplication
 @EnableAsync
@@ -25,7 +27,9 @@ public class BallersApiApplication {
 
 	@Bean
 	public CommandLineRunner commandLineRunner(
-			UserRepository userRepository
+			UserRepository userRepository,
+			SessionRepository sessionRepository,
+			CourtRepository courtRepository
 	) {
 		return args -> {
 			User user = new User();
@@ -82,7 +86,22 @@ public class BallersApiApplication {
 
 			userRepository.save(user3);
 
+			Session session = new Session();
+			session.setPrice(2);
+			session.setType("Boom");
+			session.setMatchDateTime(LocalDateTime.now().plusMonths(1));
+			session.setMaxPlayers(12);
 
+			Court court = new Court();
+			court.setCity("ss");
+			court.setName("Court 1");
+			court.setPlaceId("d");
+
+			courtRepository.save(court);
+
+			session.setCourt(court);
+
+			sessionRepository.save(session);
 
 			System.out.println("Server running on port " + serverPort);
 		};

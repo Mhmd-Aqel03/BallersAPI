@@ -23,7 +23,7 @@ public class Court {
     @Column(nullable = false)
     private String name;
 
-    //  Google Maps an ID for each "location"
+    //  Google Maps has an ID for each "location"
     @NotNull(message = "Place ID cannot be null")
     @Column(nullable = false)
     private String placeId;

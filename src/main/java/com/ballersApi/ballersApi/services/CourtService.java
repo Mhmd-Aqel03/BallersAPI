@@ -28,7 +28,6 @@ public class CourtService {
 
         return courtRepository.findById(id).orElseThrow(() -> new CourtIdNotFoundException("Cant get Court with ID " + id + " not found"));
 
-
     }
 
     public Court addCourt(Court court) {

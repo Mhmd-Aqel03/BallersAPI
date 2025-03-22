@@ -160,8 +160,12 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(CourtIdNotFoundException.class)
-    public ResponseEntity<String> handleCourtIdNotFoundException(CourtIdNotFoundException e) {
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+    public ResponseEntity<Map<String, Object>> handleCourtIdNotFoundException(CourtIdNotFoundException e) {
+        Map<String, Object> response = new HashMap<>();
+
+        response.put("msg", e.getMessage());
+
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(NoCourtsFoundException.class)
