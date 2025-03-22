@@ -32,6 +32,7 @@ public class BallersApiApplication {
 			CourtRepository courtRepository
 	) {
 		return args -> {
+			// User for testing
 			User user = new User();
 			user.setUsername("username");
 			user.setPassword("password98!");
@@ -40,6 +41,7 @@ public class BallersApiApplication {
 			Player player = new Player();
 			player.setPhoneNumber("23432");
 			player.setPostion("CT");
+			player.setVerified(true);
 
 			user.setPlayer(player);
 

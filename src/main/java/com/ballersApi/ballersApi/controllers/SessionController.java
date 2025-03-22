@@ -38,9 +38,6 @@ public class SessionController {
         sessionService.createSession(session);
         sessionTeamService.createTeamSession(session.getId());
         return sessionTeamService.createTeamSession(session.getId());
-
-
-
     }
     @DeleteMapping("deleteSession/{id}")
     public ResponseEntity<Void> deleteSession(@PathVariable  Long id){
@@ -76,8 +73,4 @@ public class SessionController {
         List<SessionTeam> teams = sessionTeamService.getTeamsBySession(sessionId);
         return ResponseEntity.ok(teams);
     }
-
-
-
-
 }

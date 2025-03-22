@@ -52,5 +52,4 @@ public class CourtService {
         }
         courtRepository.deleteById(id);
     }
-
 }
