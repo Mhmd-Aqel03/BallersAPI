@@ -11,6 +11,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDateTime;
 
@@ -29,13 +30,14 @@ public class BallersApiApplication {
 	public CommandLineRunner commandLineRunner(
 			UserRepository userRepository,
 			SessionRepository sessionRepository,
-			CourtRepository courtRepository
+			CourtRepository courtRepository,
+			PasswordEncoder passwordEncoder
 	) {
 		return args -> {
 			// User for testing
 			User user = new User();
 			user.setUsername("username");
-			user.setPassword("password98!");
+			user.setPassword(passwordEncoder.encode("password98!"));
 			user.setRole(Role.ROLE_PLAYER);
 			user.setEmail("admin@gmail.com");
 			Player player = new Player();
@@ -90,20 +92,37 @@ public class BallersApiApplication {
 
 			Session session = new Session();
 			session.setPrice(2);
-			session.setType("Boom");
+			session.setType("Teams");
 			session.setMatchDateTime(LocalDateTime.now().plusMonths(1));
 			session.setMaxPlayers(12);
 
 			Court court = new Court();
-			court.setCity("ss");
-			court.setName("Court 1");
-			court.setPlaceId("d");
+			court.setCity("Ajloun");
+			court.setName("Ajloun Court");
+			court.setPlaceId("ChIJ7_H6QjqeHBURRyJte_2Qunw");
 
 			courtRepository.save(court);
 
 			session.setCourt(court);
 
 			sessionRepository.save(session);
+
+			Session session2 = new Session();
+			session2.setPrice(2);
+			session2.setType("Bam");
+			session2.setMatchDateTime(LocalDateTime.now().plusMonths(1));
+			session2.setMaxPlayers(12);
+
+			Court court2 = new Court();
+			court2.setCity("Amman");
+			court2.setName("Al-Shafa Court");
+			court2.setPlaceId("ChIJ7_H6QjqeHBURRyJte_2Qunw");
+
+			courtRepository.save(court2);
+
+			session.setCourt(court2);
+
+			sessionRepository.save(session2);
 
 			System.out.println("Server running on port " + serverPort);
 		};

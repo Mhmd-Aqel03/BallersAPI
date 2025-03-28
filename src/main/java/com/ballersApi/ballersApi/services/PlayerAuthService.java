@@ -175,7 +175,6 @@ public class PlayerAuthService {
         // This throws an exception if no User is found.
         User user = userService.getUserByEmail(loginDTO.getEmail());
 
-
         if (user.getRole() == Role.ROLE_PLAYER) {
 
             if (user.getEmail().equals(loginDTO.getEmail()) && passwordEncoder.matches(loginDTO.getPassword(), user.getPassword())) {

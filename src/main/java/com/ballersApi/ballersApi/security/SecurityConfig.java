@@ -36,6 +36,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/player/**").hasAuthority("ROLE_PLAYER")
+                        .requestMatchers("/court/**").hasAuthority("ROLE_PLAYER")
+                        .requestMatchers("/session/**").hasAuthority("ROLE_PLAYER")
                         .anyRequest().authenticated() // Protect all other endpoints
                 )
                 .sessionManagement(sess -> sess

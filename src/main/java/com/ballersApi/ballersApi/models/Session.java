@@ -23,12 +23,10 @@ public class Session {
     @Column(nullable = false)
     private String type;
 
-
     @NotNull(message = "matchDateTime can't be null")
     @Column(nullable = false)
     // Time stamp for the date and time
     private LocalDateTime matchDateTime;
-
 
     @NotNull(message = "maxPlayers can't be null")
     @Column(nullable = false)
