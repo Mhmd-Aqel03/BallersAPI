@@ -9,20 +9,27 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 
 
-@RequestMapping("/api/Session")
+@RequestMapping("/session")
 public class SessionController {
     @Autowired
     private SessionService sessionService;
     @Autowired
     private SessionTeamService sessionTeamService;
+
     @GetMapping("getSessions")
-    public List<Session> getAllUpcomingSessions(){
-        return sessionService.getAllUpcomingSessions();
+    public ResponseEntity<Map<String,Object>> getAllUpcomingSessions(){
+        Map<String, Object> response = new HashMap<>();
+
+        response.put("sessions", sessionService.getAllUpcomingSessions());
+
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("createSession")
@@ -31,9 +38,6 @@ public class SessionController {
         sessionService.createSession(session);
         sessionTeamService.createTeamSession(session.getId());
         return sessionTeamService.createTeamSession(session.getId());
-
-
-
     }
     @DeleteMapping("deleteSession/{id}")
     public ResponseEntity<Void> deleteSession(@PathVariable  Long id){
@@ -69,8 +73,4 @@ public class SessionController {
         List<SessionTeam> teams = sessionTeamService.getTeamsBySession(sessionId);
         return ResponseEntity.ok(teams);
     }
-
-
-
-
 }
