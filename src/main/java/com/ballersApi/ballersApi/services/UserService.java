@@ -1,12 +1,11 @@
 package com.ballersApi.ballersApi.services;
 
-import com.ballersApi.ballersApi.JsonWebTokens.JwtService;
 import com.ballersApi.ballersApi.dataTransferObjects.UserDTO;
 import com.ballersApi.ballersApi.exceptions.DatabaseConnectionErrorException;
 import com.ballersApi.ballersApi.exceptions.UserCreationErrorException;
 import com.ballersApi.ballersApi.exceptions.UserNotFoundException;
 import com.ballersApi.ballersApi.exceptions.UsernameAlreadyTakenException;
-import com.ballersApi.ballersApi.models.Player;
+import com.ballersApi.ballersApi.models.Role;
 import com.ballersApi.ballersApi.models.User;
 import com.ballersApi.ballersApi.repositories.UserRepository;
 import jakarta.transaction.Transactional;
@@ -77,9 +76,9 @@ public class UserService {
         return user.orElseThrow(() -> new UserNotFoundException("User not found with email: " + email));
     }
 
-    public User getUserById(Long id){
+    public User getUserById(Long id) {
         Optional<User> user;
-        try{
+        try {
             user = userRepository.findById(id);
         } catch (DataAccessException e) {
             throw new DatabaseConnectionErrorException("Something went wrong while trying to retrieve user" + e.getMessage());
@@ -90,15 +89,20 @@ public class UserService {
     }
 
     public ArrayList<User> searchUsers(String username) {
-        Optional<ArrayList<User>> users;
-        try{
+        ArrayList<User> users;
+        try {
             users = userRepository.findTop10ByUsernameContainingIgnoreCase(username);
-        }catch (DataAccessException e) {
+        } catch (DataAccessException e) {
             throw new DatabaseConnectionErrorException("Something went wrong while trying to retrieve user" + e.getMessage());
         }
 
-        // orElseThrow will return the object if it exists, or throw and exception if it doesn't. So cool shout out to Java.
-        return users.orElseThrow(() -> new UserNotFoundException("User not found with username: " + username));
+        users.removeIf(user -> !user.getRole().equals(Role.ROLE_PLAYER));
+
+        if(users.isEmpty()){
+            throw new UserNotFoundException("No user with username: " + username + " was found");
+        }
+
+        return users;
     }
 
     public void updateUser(User user) {
@@ -121,7 +125,7 @@ public class UserService {
 
         // Basically "!= null"
         if (user.isPresent()) {
-            throw new UsernameAlreadyTakenException("Username "  + username + " is already taken.");
+            throw new UsernameAlreadyTakenException("Username " + username + " is already taken.");
         }
 
         //Check password

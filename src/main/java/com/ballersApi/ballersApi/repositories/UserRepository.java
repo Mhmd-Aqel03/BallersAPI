@@ -15,5 +15,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findById(Long id);
 
-    Optional<ArrayList<User>> findTop10ByUsernameContainingIgnoreCase(String username);
+    ArrayList<User> findTop10ByUsernameContainingIgnoreCase(String username);
 }

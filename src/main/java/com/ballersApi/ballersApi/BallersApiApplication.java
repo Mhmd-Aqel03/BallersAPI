@@ -34,7 +34,7 @@ public class BallersApiApplication {
 			PasswordEncoder passwordEncoder
 	) {
 		return args -> {
-			// User for testing
+			// Users for testing
 			User user = new User();
 			user.setUsername("username");
 			user.setPassword(passwordEncoder.encode("password98!"));
@@ -48,6 +48,14 @@ public class BallersApiApplication {
 			user.setPlayer(player);
 
 			userRepository.save(user);
+
+			User adminUser = new User();
+			adminUser.setUsername("adminABC");
+			adminUser.setPassword(passwordEncoder.encode("password98!"));
+			adminUser.setRole(Role.ROLE_ADMIN);
+			adminUser.setEmail("admin2w@gmail.com");
+
+			userRepository.save(adminUser);
 
 			User user1 = new User();
 			user1.setUsername("ahmedKhalid");

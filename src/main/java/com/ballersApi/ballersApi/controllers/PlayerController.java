@@ -2,7 +2,6 @@ package com.ballersApi.ballersApi.controllers;
 
 import com.ballersApi.ballersApi.dataTransferObjects.PlayerIdDTO;
 import com.ballersApi.ballersApi.dataTransferObjects.UpdatePlayerDTO;
-import com.ballersApi.ballersApi.dataTransferObjects.UsernameDTO;
 import com.ballersApi.ballersApi.models.Player;
 import com.ballersApi.ballersApi.models.User;
 import com.ballersApi.ballersApi.services.PlayerAuthService;
@@ -56,19 +55,17 @@ public class PlayerController {
     @GetMapping("/searchUsers/{username}")
     public ResponseEntity<Map<String, Object>> searchUsers(@PathVariable String username) {
         Map<String, Object> response = new HashMap<>();
-        ArrayList <User> users = userService.searchUsers(username);
-        if(!users.isEmpty()){
-            response.put("users", users);
+        ArrayList<User> users = userService.searchUsers(username);
 
-            return ResponseEntity.ok(response);
-        } else{
-            return ResponseEntity.notFound().build();
-        }
+        response.put("users", users);
+
+        return ResponseEntity.ok(response);
+
 
     }
 
     @PostMapping("/endorseGoodLeader")
-    public ResponseEntity<Map<String,Object>> endorseGoodLeader(@Valid @RequestBody PlayerIdDTO playerIdDTO) {
+    public ResponseEntity<Map<String, Object>> endorseGoodLeader(@Valid @RequestBody PlayerIdDTO playerIdDTO) {
         Map<String, Object> response = new HashMap<>();
 
         playerService.endorseGoodLeader(playerIdDTO.getPlayerId(), playerAuthService.getPlayerByUsername(SecurityContextHolder.getContext().getAuthentication().getName()));
@@ -79,7 +76,7 @@ public class PlayerController {
     }
 
     @PostMapping("/endorseTeamPlayer")
-    public ResponseEntity<Map<String,Object>> endorseTeamPlayer(@Valid @RequestBody PlayerIdDTO playerIdDTO) {
+    public ResponseEntity<Map<String, Object>> endorseTeamPlayer(@Valid @RequestBody PlayerIdDTO playerIdDTO) {
         Map<String, Object> response = new HashMap<>();
 
         playerService.endorseTeamPlayer(playerIdDTO.getPlayerId(), playerAuthService.getPlayerByUsername(SecurityContextHolder.getContext().getAuthentication().getName()));
@@ -90,7 +87,7 @@ public class PlayerController {
     }
 
     @PostMapping("/endorsePositiveAttitude")
-    public ResponseEntity<Map<String,Object>> endorsePositiveAttitude(@Valid @RequestBody PlayerIdDTO playerIdDTO) {
+    public ResponseEntity<Map<String, Object>> endorsePositiveAttitude(@Valid @RequestBody PlayerIdDTO playerIdDTO) {
         Map<String, Object> response = new HashMap<>();
 
         playerService.endorsePositiveAttitude(playerIdDTO.getPlayerId(), playerAuthService.getPlayerByUsername(SecurityContextHolder.getContext().getAuthentication().getName()));
@@ -125,7 +122,7 @@ public class PlayerController {
     }
 
     @PostMapping("/removeFavourite")
-    public ResponseEntity<Map<String,Object>> removeFavourite(@Valid @RequestBody PlayerIdDTO playerIdDTO) {
+    public ResponseEntity<Map<String, Object>> removeFavourite(@Valid @RequestBody PlayerIdDTO playerIdDTO) {
         Map<String, Object> response = new HashMap<>();
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
 
@@ -137,7 +134,7 @@ public class PlayerController {
     }
 
     @PostMapping("/updatePlayer")
-    public ResponseEntity<Map<String,Object>> updatePlayer(@Valid @RequestBody UpdatePlayerDTO updatePlayerDTO) {
+    public ResponseEntity<Map<String, Object>> updatePlayer(@Valid @RequestBody UpdatePlayerDTO updatePlayerDTO) {
         Map<String, Object> response = new HashMap<>();
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
 
