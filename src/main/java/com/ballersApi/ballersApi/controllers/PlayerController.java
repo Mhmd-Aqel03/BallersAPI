@@ -71,7 +71,7 @@ public class PlayerController {
     public ResponseEntity<Map<String,Object>> endorseGoodLeader(@Valid @RequestBody PlayerIdDTO playerIdDTO) {
         Map<String, Object> response = new HashMap<>();
 
-        playerService.endorseGoodLeader(playerIdDTO.getPlayerId());
+        playerService.endorseGoodLeader(playerIdDTO.getPlayerId(), playerAuthService.getPlayerByUsername(SecurityContextHolder.getContext().getAuthentication().getName()));
 
         response.put("msg", "Player with id: " + playerIdDTO.getPlayerId() + " has been endorsed successfully");
 
@@ -82,7 +82,7 @@ public class PlayerController {
     public ResponseEntity<Map<String,Object>> endorseTeamPlayer(@Valid @RequestBody PlayerIdDTO playerIdDTO) {
         Map<String, Object> response = new HashMap<>();
 
-        playerService.endorseTeamPlayer(playerIdDTO.getPlayerId());
+        playerService.endorseTeamPlayer(playerIdDTO.getPlayerId(), playerAuthService.getPlayerByUsername(SecurityContextHolder.getContext().getAuthentication().getName()));
 
         response.put("msg", "Player with id: " + playerIdDTO.getPlayerId() + " has been endorsed successfully");
 
@@ -93,7 +93,7 @@ public class PlayerController {
     public ResponseEntity<Map<String,Object>> endorsePositiveAttitude(@Valid @RequestBody PlayerIdDTO playerIdDTO) {
         Map<String, Object> response = new HashMap<>();
 
-        playerService.endorsePositiveAttitude(playerIdDTO.getPlayerId());
+        playerService.endorsePositiveAttitude(playerIdDTO.getPlayerId(), playerAuthService.getPlayerByUsername(SecurityContextHolder.getContext().getAuthentication().getName()));
 
         response.put("msg", "Player with id: " + playerIdDTO.getPlayerId() + " has been endorsed successfully");
 

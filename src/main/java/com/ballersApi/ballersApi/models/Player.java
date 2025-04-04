@@ -52,6 +52,17 @@ public class Player {
     @JsonIgnore
     private String refreshToken;
 
+    // A better solution here is to create an "Endorsement" entity, but this works for now.
+    // This is a set of the players that endorsed this player.
+    // The @ElementCollection should work like the one to many decorator, without needing to create another model.
+    @ElementCollection
+    private Set<Long> teamPlayerEndorsements = new HashSet<>();
+
+    @ElementCollection
+    private Set<Long> goodLeaderEndorsements = new HashSet<>();
+
+    @ElementCollection
+    private Set<Long> positiveAttitudeEndorsements = new HashSet<>();
 
     @JsonIgnore
 //  Session Team relationship

@@ -203,4 +203,12 @@ public class GlobalExceptionHandler {
 
         return new ResponseEntity<>(response, HttpStatus.METHOD_NOT_ALLOWED);
     }
+
+    @ExceptionHandler(PlayerAlreadyEndorsedException.class)
+    public ResponseEntity<Map<String, Object>> handlePlayerAlreadyEndorsedException(PlayerAlreadyEndorsedException ex) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "Something with endorsing player: " + ex.getMessage());
+
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
 }

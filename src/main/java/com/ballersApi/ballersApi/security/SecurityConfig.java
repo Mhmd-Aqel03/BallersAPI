@@ -38,6 +38,7 @@ public class SecurityConfig {
                         .requestMatchers("/player/**").hasAuthority("ROLE_PLAYER")
                         .requestMatchers("/court/**").hasAuthority("ROLE_PLAYER")
                         .requestMatchers("/session/**").hasAuthority("ROLE_PLAYER")
+                        .requestMatchers("/admin/**").hasAuthority("ROLE_ADMIN")
                         .anyRequest().authenticated() // Protect all other endpoints
                 )
                 .sessionManagement(sess -> sess
