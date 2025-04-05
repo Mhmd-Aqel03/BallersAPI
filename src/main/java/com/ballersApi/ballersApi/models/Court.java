@@ -24,7 +24,7 @@ public class Court {
     private String name;
 
     //  Google Maps has an ID for each "location"
-    @NotNull(message = "Place ID cannot be null")
+    @NotBlank(message = "Place ID cannot be empty")
     @Column(nullable = false)
     private String placeId;
 
@@ -32,14 +32,9 @@ public class Court {
     @NotBlank(message = "City name cannot be empty")
     private String city;
 
-    private boolean hasParking;
+    private boolean hasParking = false;
 
-    private boolean hasBathroom;
+    private boolean hasBathroom =  false;
 
-    private boolean hasCafeteria;
-
-    //@OneToMany(mappedBy = "court", cascade = CascadeType.ALL, orphanRemoval = true)
-    //@ToString.Exclude
-    //@Builder.Default
-    //private List<CourtImage> images = new ArrayList<>();
+    private boolean hasCafeteria = false;
 }

@@ -37,10 +37,7 @@ public class CourtController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/create")
-    public Court createCourt(@RequestBody @Valid Court court) {
-        return courtService.addCourt(court);
-    }
+
 
     @PutMapping("/update/{id}")
     public Court updateCourt(@PathVariable Long id,@RequestBody @Valid Court court) {

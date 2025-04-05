@@ -1,9 +1,12 @@
 package com.ballersApi.ballersApi.services;
 
 import com.ballersApi.ballersApi.exceptions.CourtIdNotFoundException;
+import com.ballersApi.ballersApi.exceptions.DatabaseConnectionErrorException;
 import com.ballersApi.ballersApi.exceptions.NoCourtsFoundException;
 import com.ballersApi.ballersApi.models.Court;
 import com.ballersApi.ballersApi.repositories.CourtRepository;
+import jakarta.transaction.Transactional;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -30,9 +33,14 @@ public class CourtService {
 
     }
 
-    public Court addCourt(Court court) {
+    @Transactional
+    public void addCourt(Court court) {
+        try{
+            courtRepository.save(court);
+        } catch (DataAccessException e){
+            throw new DatabaseConnectionErrorException("Something went wrong while trying to create new court: " + e.getMessage());
+        }
 
-        return courtRepository.save(court);
     }
 
     public Court updateCourt(Court court,Long id) {
