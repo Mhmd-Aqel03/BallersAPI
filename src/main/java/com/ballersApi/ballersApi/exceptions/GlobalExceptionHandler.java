@@ -237,7 +237,7 @@ public class GlobalExceptionHandler {
         errorResponse.put("error", ex.getMessage());
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
 
-
+    }
     @ExceptionHandler(EmailSendingException.class)
     public ResponseEntity<Map<String, Object>> handleEmailSendingException(EmailSendingException ex) {
         Map<String, Object> response = new HashMap<>();
