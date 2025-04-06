@@ -1,6 +1,9 @@
 package com.ballersApi.ballersApi.services;
 
+
 import com.ballersApi.ballersApi.exceptions.CanNotFetchDataException;
+
+import com.ballersApi.ballersApi.exceptions.DatabaseConnectionErrorException;
 import com.ballersApi.ballersApi.exceptions.SessionCreationException;
 import com.ballersApi.ballersApi.exceptions.SessionNotFoundException;
 import com.ballersApi.ballersApi.models.Session;
@@ -31,7 +34,9 @@ public class SessionService {
             try{
         return sessionRepository.findByMatchDateAfter(LocalDate.now());
     } catch (Exception e){
-                throw new CanNotFetchDataException("Error fetching upcoming sessions");
+
+             throw new DatabaseConnectionErrorException("Error fetching upcoming sessions: " + e.getMessage());
+
             }
     }
     public Optional<Session> getSessionById(Long sessionId) {

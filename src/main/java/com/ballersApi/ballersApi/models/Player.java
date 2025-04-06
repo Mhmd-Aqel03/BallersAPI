@@ -1,5 +1,6 @@
 package com.ballersApi.ballersApi.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -7,7 +8,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.antlr.v4.runtime.misc.NotNull;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
 @Entity
 @Data
 @NoArgsConstructor
@@ -38,10 +43,17 @@ public class Player {
 
     private int MVPs = 0;
 
-    private String verificationCode;
-
+    @JsonIgnore
+    private String EmailVerificationCode;
+    @JsonIgnore
+    private String passwordChangeCode;
+    @JsonIgnore
     private boolean isVerified = false;
+    @JsonIgnore
+    private String refreshToken;
 
+
+    @JsonIgnore
 //  Session Team relationship
     @ManyToMany
     @JoinTable(
@@ -55,6 +67,7 @@ public class Player {
     )
     private List<SessionTeam> sessionTeams;
 
+    @JsonIgnore
 //  Player and Chat relationship
     @ManyToMany
     @JoinTable(
@@ -67,4 +80,14 @@ public class Player {
             }
     )
     private List<Chat> chats;
+
+    // Player favourite list(We forgor lol)
+    @JsonIgnore
+    @ManyToMany
+    @JoinTable(
+            name = "player_favorites",
+            joinColumns = @JoinColumn(name = "player_id"),
+            inverseJoinColumns = @JoinColumn(name = "favorite_id")
+    )
+    private Set<Player> favorites = new HashSet<>();
 }

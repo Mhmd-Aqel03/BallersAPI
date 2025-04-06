@@ -121,7 +121,9 @@ public class SessionTeamService {
    public void deleteAllTeamSessions() {
         try {
             if (sessionTeamRepository.findAll().isEmpty()) {
+
                 throw new TeamSessionNotFoundException("Team sessions do not exist." );
+
             }
             sessionTeamRepository.deleteAll();
         } catch (IllegalArgumentException e) {

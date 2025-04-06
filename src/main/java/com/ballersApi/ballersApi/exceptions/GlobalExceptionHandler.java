@@ -1,14 +1,16 @@
 package com.ballersApi.ballersApi.exceptions;
 
 
-import jakarta.persistence.ElementCollection;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.validation.FieldError;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
+
 
 import java.util.HashMap;
 import java.util.Map;
@@ -68,7 +70,6 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
 
-
     // This Handles validation errors
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, Object>> handleValidationExceptions(MethodArgumentNotValidException ex) {
@@ -91,6 +92,7 @@ public class GlobalExceptionHandler {
         response.put("message", ex.getMessage());
 
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+
     }
 
     @ExceptionHandler(JwtTokenValidationException.class)
@@ -124,7 +126,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, Object>> handleEmailCodeVerificationException(Exception ex) {
         Map<String, Object> response = new HashMap<>();
 
-        response.put("message", "Something went Verifying Email: " + ex.getMessage());
+        response.put("message", "Something went wrong with Verifying Email: " + ex.getMessage());
 
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
@@ -148,7 +150,6 @@ public class GlobalExceptionHandler {
     }
 
 
-
     @ExceptionHandler(PlayerAlreadyInTeamException.class)
     public ResponseEntity<Map<String, String>> handlePlayerAlreadyInTeam(PlayerAlreadyInTeamException ex) {
         Map<String, String> response = new HashMap<>();
@@ -157,8 +158,12 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(CourtIdNotFoundException.class)
-    public ResponseEntity<String> handleCourtIdNotFoundException(CourtIdNotFoundException e) {
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+    public ResponseEntity<Map<String, Object>> handleCourtIdNotFoundException(CourtIdNotFoundException e) {
+        Map<String, Object> response = new HashMap<>();
+
+        response.put("msg", e.getMessage());
+
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(NoCourtsFoundException.class)
@@ -171,6 +176,7 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
 
     }
+
     @ExceptionHandler(PlayerNotFoundException.class)
     public ResponseEntity<Map<String, String>> handlePlayerNotFoundException(PlayerNotFoundException ex) {
         Map<String, String> errorResponse = new HashMap<>();
@@ -188,8 +194,6 @@ public class GlobalExceptionHandler {
         Map<String, String> errorResponse = new HashMap<>();
         errorResponse.put("error", ex.getMessage());
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
-
-
     }
     @ExceptionHandler(WrongInvitationTypeException.class)
     public ResponseEntity<Map<String, String>> handleWrongInvitaionType(WrongInvitationTypeException ex) {
@@ -232,5 +236,31 @@ public class GlobalExceptionHandler {
         Map<String, String> errorResponse = new HashMap<>();
         errorResponse.put("error", ex.getMessage());
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+
+
+    @ExceptionHandler(EmailSendingException.class)
+    public ResponseEntity<Map<String, Object>> handleEmailSendingException(EmailSendingException ex) {
+        Map<String, Object> response = new HashMap<>();
+        System.out.println("Something went wrong with the email Service: " + ex.getMessage());
+        response.put("message", "Something went wrong with the email Service: " + ex.getMessage());
+
+        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleResourceNotFound(NoResourceFoundException ex) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "Endpoint doesn't exist, maybe check your spelling: " + ex.getMessage());
+
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<Map<String, Object>> handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException ex) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "HTTP Method not supported: " + ex.getMessage());
+
+        return new ResponseEntity<>(response, HttpStatus.METHOD_NOT_ALLOWED);
+
     }
 }

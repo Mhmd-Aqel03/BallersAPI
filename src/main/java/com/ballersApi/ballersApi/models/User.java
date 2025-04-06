@@ -1,7 +1,7 @@
 package com.ballersApi.ballersApi.models;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
@@ -27,13 +27,15 @@ public class User {
     @Column(unique = true,nullable = false)
     private String email;
 
-
+    @JsonIgnore
     @NotEmpty(message = "Password can't be empty")
     private String password;
 
+    @JsonIgnore
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    @JsonIgnore
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "referee_id")
     private Referee referee;

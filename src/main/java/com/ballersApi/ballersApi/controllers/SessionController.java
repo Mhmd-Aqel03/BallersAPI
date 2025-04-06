@@ -1,17 +1,16 @@
 package com.ballersApi.ballersApi.controllers;
-
 import com.ballersApi.ballersApi.dataTransferObjects.SessionTeamDTO;
 import com.ballersApi.ballersApi.models.Session;
 import com.ballersApi.ballersApi.models.SessionTeam;
-import com.ballersApi.ballersApi.services.PlayerService;
 import com.ballersApi.ballersApi.services.SessionService;
 import com.ballersApi.ballersApi.services.SessionTeamService;
 import com.ballersApi.ballersApi.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
+
 import org.springframework.security.core.context.SecurityContextHolder;
+
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -19,17 +18,28 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/Session")
+
+
+@RequestMapping("/session")
+
 public class SessionController {
     @Autowired
     private SessionService sessionService;
     @Autowired
     private SessionTeamService sessionTeamService;
+
     @Autowired
     private UserService userService;
-    @GetMapping("getAllSessions")
-    public List<Session> getAllUpcomingSessions(){
-        return sessionService.getAllUpcomingSessions();
+    
+
+    @GetMapping("getSessions")
+    public ResponseEntity<Map<String,Object>> getAllUpcomingSessions(){
+        Map<String, Object> response = new HashMap<>();
+
+        response.put("sessions", sessionService.getAllUpcomingSessions());
+
+        return ResponseEntity.ok(response);
+
     }
 
     @GetMapping("getSession/{id}")
@@ -51,6 +61,7 @@ public class SessionController {
         sessionTeamService.createTeamSession(session.getId());
         return sessionTeamService.createTeamSession(session.getId());
 
+
     }
     @DeleteMapping("deleteSession/{id}")
 
@@ -65,6 +76,8 @@ public class SessionController {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         Long playerId = userService.getUserByUsername(username).getId();
         SessionTeam teamSession = sessionTeamService.joinTeamSession(teamSessionId, playerId);
+
+  
 
         if (teamSession != null) {
             return ResponseEntity.ok(teamSession);
