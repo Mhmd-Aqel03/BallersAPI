@@ -1,5 +1,5 @@
 package com.ballersApi.ballersApi.controllers;
-
+import com.ballersApi.ballersApi.dataTransferObjects.SessionTeamDTO;
 import com.ballersApi.ballersApi.models.Session;
 import com.ballersApi.ballersApi.models.SessionTeam;
 import com.ballersApi.ballersApi.services.SessionService;
@@ -32,6 +32,14 @@ public class SessionController {
         return ResponseEntity.ok(response);
     }
 
+    @PostMapping("createSessionTeam")
+    public ResponseEntity<SessionTeam> createTeamSession(@RequestParam Long sessionId) {
+        SessionTeam teamSession = sessionTeamService.createTeamSession(sessionId);
+        if (teamSession != null) {
+            return ResponseEntity.ok(teamSession);
+        }
+        return ResponseEntity.badRequest().build();
+    }
     @PostMapping("joinSessionTeam")
     public ResponseEntity<SessionTeam> joinTeamSession(@RequestParam Long teamSessionId, @RequestParam Long playerId) {
         SessionTeam teamSession = sessionTeamService.joinTeamSession(teamSessionId, playerId);
@@ -40,10 +48,13 @@ public class SessionController {
         }
         return ResponseEntity.badRequest().build();
     }
-
+    @DeleteMapping("/deleteSessionTeam/{id}")
+    public ResponseEntity<Void> deleteTeamSession() {
+        sessionTeamService.deleteAllTeamSessions();
+        return ResponseEntity.ok().build();
+    }
     @GetMapping("/getTeam/{sessionId}")
-    public ResponseEntity<List<SessionTeam>> getTeamsBySession(@PathVariable Long sessionId) {
-        List<SessionTeam> teams = sessionTeamService.getTeamsBySession(sessionId);
-        return ResponseEntity.ok(teams);
+    public ResponseEntity<List<SessionTeamDTO>> getTeamsBySession(@PathVariable Long sessionId) {
+        return ResponseEntity.ok(sessionTeamService.getTeamsBySession(sessionId));
     }
 }

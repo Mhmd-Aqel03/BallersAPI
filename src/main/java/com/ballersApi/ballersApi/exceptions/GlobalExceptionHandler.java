@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -63,8 +64,10 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(SessionNotFoundException.class)
-    public ResponseEntity<String> handleSessionNotFoundException(SessionNotFoundException ex) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    public ResponseEntity<Map<String, String>> handleSessionNotFoundException(SessionNotFoundException ex) {
+        Map<String, String> errorResponse = new HashMap<>();
+        errorResponse.put("error", ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
 
     // This Handles validation errors
@@ -89,6 +92,7 @@ public class GlobalExceptionHandler {
         response.put("message", ex.getMessage());
 
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+
     }
 
     @ExceptionHandler(JwtTokenValidationException.class)
@@ -122,7 +126,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, Object>> handleEmailCodeVerificationException(Exception ex) {
         Map<String, Object> response = new HashMap<>();
 
-        response.put("message", "Something went Verifying Email: " + ex.getMessage());
+        response.put("message", "Something went wrong with Verifying Email: " + ex.getMessage());
 
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
@@ -145,12 +149,6 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
     }
 
-    @ExceptionHandler(TeamSessionNotFoundException.class)
-    public ResponseEntity<Map<String, String>> handleTeamSessionNotFound(TeamSessionNotFoundException ex) {
-        Map<String, String> response = new HashMap<>();
-        response.put("error", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
-    }
 
     @ExceptionHandler(PlayerAlreadyInTeamException.class)
     public ResponseEntity<Map<String, String>> handlePlayerAlreadyInTeam(PlayerAlreadyInTeamException ex) {
@@ -179,6 +177,67 @@ public class GlobalExceptionHandler {
 
     }
 
+    @ExceptionHandler(PlayerNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handlePlayerNotFoundException(PlayerNotFoundException ex) {
+        Map<String, String> errorResponse = new HashMap<>();
+        errorResponse.put("error", ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+    }
+    @ExceptionHandler(InvitationNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleInvitationNotFoundException(InvitationNotFoundException ex) {
+        Map<String, String> errorResponse = new HashMap<>();
+        errorResponse.put("error", ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+    }
+    @ExceptionHandler(TeamFullException.class)
+    public ResponseEntity<Map<String, String>> handleTeamFullException(TeamFullException ex) {
+        Map<String, String> errorResponse = new HashMap<>();
+        errorResponse.put("error", ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+    @ExceptionHandler(WrongInvitationTypeException.class)
+    public ResponseEntity<Map<String, String>> handleWrongInvitaionType(WrongInvitationTypeException ex) {
+        Map<String, String> errorResponse = new HashMap<>();
+        errorResponse.put("error", ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+    @ExceptionHandler(NotEnoughPlayersException.class)
+    public ResponseEntity<Map<String, String>> handleNotEnoughPlayers(NotEnoughPlayersException ex) {
+        Map<String, String> errorResponse = new HashMap<>();
+        errorResponse.put("error", ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+    @ExceptionHandler(CanNotFetchDataException.class)
+    public ResponseEntity<Map<String, String>> handleCanNotFetchData(CanNotFetchDataException ex) {
+        Map<String, String> errorResponse = new HashMap<>();
+        errorResponse.put("error", ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+    @ExceptionHandler(SessionDeletionException.class)
+    public ResponseEntity<Map<String, String>> handleSessionDeletionException(SessionDeletionException ex) {
+        Map<String, String> errorResponse = new HashMap<>();
+        errorResponse.put("error", ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+    @ExceptionHandler(TeamSessionCreationException.class)
+    public ResponseEntity<Map<String, String>> handleTeamSessionCreationException(TeamSessionCreationException ex) {
+        Map<String, String> errorResponse = new HashMap<>();
+        errorResponse.put("error", ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+    @ExceptionHandler(TeamSessionNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleTeamSessionNotFoundException(TeamSessionNotFoundException ex) {
+        Map<String, String> errorResponse = new HashMap<>();
+        errorResponse.put("error", ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+    }
+    @ExceptionHandler(RespondedToInviteException.class)
+    public ResponseEntity<Map<String, String>> handleRespondedToInviteException(RespondedToInviteException ex) {
+        Map<String, String> errorResponse = new HashMap<>();
+        errorResponse.put("error", ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+
+    }
     @ExceptionHandler(EmailSendingException.class)
     public ResponseEntity<Map<String, Object>> handleEmailSendingException(EmailSendingException ex) {
         Map<String, Object> response = new HashMap<>();
@@ -202,6 +261,7 @@ public class GlobalExceptionHandler {
         response.put("message", "HTTP Method not supported: " + ex.getMessage());
 
         return new ResponseEntity<>(response, HttpStatus.METHOD_NOT_ALLOWED);
+
     }
 
     @ExceptionHandler(PlayerAlreadyEndorsedException.class)
