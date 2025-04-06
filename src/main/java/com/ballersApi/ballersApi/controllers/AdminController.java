@@ -1,5 +1,6 @@
 package com.ballersApi.ballersApi.controllers;
 
+import com.ballersApi.ballersApi.dataTransferObjects.SessionDTO;
 import com.ballersApi.ballersApi.models.Court;
 import com.ballersApi.ballersApi.models.CourtImage;
 import com.ballersApi.ballersApi.models.Session;
@@ -87,12 +88,10 @@ public class AdminController {
 
     // Sessions
     @PostMapping("/createSession")
-    public ResponseEntity<Map<String,Object>> createSession(@Valid @RequestBody Session session){
+    public ResponseEntity<Map<String,Object>> createSession(@Valid @RequestBody SessionDTO sessionDTO){
         Map<String, Object> response = new HashMap<>();
 
-        sessionService.createSession(session);
-        sessionTeamService.createTeamSession(session.getId());
-        sessionTeamService.createTeamSession(session.getId());
+        sessionService.createSession(sessionDTO);
 
         response.put("msg","Session created successfully");
 
@@ -103,7 +102,6 @@ public class AdminController {
     public ResponseEntity<Map<String,Object>> deleteSession(@PathVariable Long id){
         Map<String, Object> response = new HashMap<>();
 
-        sessionTeamService.deleteAllTeamSessions();
         sessionService.deleteSession(id);
 
         response.put("msg","Session deleted successfully");
@@ -112,10 +110,10 @@ public class AdminController {
     }
 
     @PutMapping("updateSession/{id}")
-    public ResponseEntity<Map<String,Object>> updateSession(@PathVariable Long id,@RequestBody @Valid Session session){
+    public ResponseEntity<Map<String,Object>> updateSession(@PathVariable Long id,@RequestBody @Valid SessionDTO sessionDTO){
         Map<String, Object> response = new HashMap<>();
 
-        sessionService.updateSession(id, session);
+        sessionService.updateSession(id, sessionDTO);
 
         response.put("msg","Session updated successfully");
 

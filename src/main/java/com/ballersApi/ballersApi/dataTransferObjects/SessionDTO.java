@@ -1,53 +1,38 @@
-package com.ballersApi.ballersApi.models;
+package com.ballersApi.ballersApi.dataTransferObjects;
 
+import com.ballersApi.ballersApi.models.Court;
+import com.ballersApi.ballersApi.models.Referee;
+import com.ballersApi.ballersApi.models.SessionType;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-@Entity
 @Data
-@NoArgsConstructor
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
-public class Session {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
-
+public class SessionDTO {
     @NotNull(message = "Session type can't be empty")
-    @Column(nullable = false)
     private SessionType type;
 
     @NotNull(message = "matchDate can't be null")
-    @Column(nullable = false)
-    // Time stamp for the date
     private LocalDate matchDate;
+
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "hh:mm a")
     @NotNull(message = "matchStartTime can't be null")
-    @Column(nullable = false)
-    // Time stamp for the start of the session
     private LocalTime matchStartTime;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "hh:mm a")
-    @NotNull(message = "matchEndTime can't be null")
-    @Column(nullable = false)
-    // Time stamp for the End of the session
     private LocalTime matchEndTime;
 
     @NotNull(message = "maxPlayers can't be null")
-    @Column(nullable = false)
-
     @Min(value = 2, message = "Max players must be at least 2")
     @Max(value = 10, message = "Max players cannot exceed 10")
-
     private int maxPlayers;
 
     @NotNull(message = "price can't be null")
@@ -56,13 +41,8 @@ public class Session {
     @Max(value = 10, message = "Max players cannot exceed 12")
     private int playerCount = 0;
 
-    @ManyToOne()
-    @JoinColumn(name = "court_id")
-    private Court court;
+    //These are -1 because they'll be 0 by default, so I did this to check if the user send an id or not
+    private long courtId = -1;
 
-    @ManyToOne()
-    @JoinColumn(name = "referee_id")
-    private Referee referee;
-
-
+    private long refereeId = -1;
 }

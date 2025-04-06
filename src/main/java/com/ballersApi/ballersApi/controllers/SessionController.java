@@ -23,7 +23,7 @@ public class SessionController {
     @Autowired
     private SessionTeamService sessionTeamService;
 
-    @GetMapping("getSessions")
+    @GetMapping("/getSessions")
     public ResponseEntity<Map<String,Object>> getAllUpcomingSessions(){
         Map<String, Object> response = new HashMap<>();
 
@@ -32,14 +32,6 @@ public class SessionController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("createSessionTeam")
-    public ResponseEntity<SessionTeam> createTeamSession(@RequestParam Long sessionId) {
-        SessionTeam teamSession = sessionTeamService.createTeamSession(sessionId);
-        if (teamSession != null) {
-            return ResponseEntity.ok(teamSession);
-        }
-        return ResponseEntity.badRequest().build();
-    }
     @PostMapping("joinSessionTeam")
     public ResponseEntity<SessionTeam> joinTeamSession(@RequestParam Long teamSessionId, @RequestParam Long playerId) {
         SessionTeam teamSession = sessionTeamService.joinTeamSession(teamSessionId, playerId);
@@ -48,11 +40,7 @@ public class SessionController {
         }
         return ResponseEntity.badRequest().build();
     }
-    @DeleteMapping("/deleteSessionTeam/{id}")
-    public ResponseEntity<Void> deleteTeamSession() {
-        sessionTeamService.deleteAllTeamSessions();
-        return ResponseEntity.ok().build();
-    }
+
     @GetMapping("/getTeam/{sessionId}")
     public ResponseEntity<List<SessionTeamDTO>> getTeamsBySession(@PathVariable Long sessionId) {
         return ResponseEntity.ok(sessionTeamService.getTeamsBySession(sessionId));

@@ -1,13 +1,15 @@
 package com.ballersApi.ballersApi.services;
 
 
+import com.ballersApi.ballersApi.dataTransferObjects.SessionDTO;
 import com.ballersApi.ballersApi.exceptions.DatabaseConnectionErrorException;
 import com.ballersApi.ballersApi.exceptions.SessionCreationException;
 import com.ballersApi.ballersApi.exceptions.SessionNotFoundException;
+import com.ballersApi.ballersApi.models.Court;
+import com.ballersApi.ballersApi.models.Referee;
 import com.ballersApi.ballersApi.models.Session;
-import com.ballersApi.ballersApi.repositories.PlayerRepository;
 import com.ballersApi.ballersApi.repositories.SessionRepository;
-import com.ballersApi.ballersApi.repositories.SessionTeamRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
@@ -21,10 +23,15 @@ import java.util.stream.Collectors;
 public class SessionService {
     @Autowired
     private SessionRepository sessionRepository;
+
     @Autowired
-    private SessionTeamRepository sessionTeamRepository;
+    private CourtService courtService;
+
     @Autowired
-    private PlayerRepository playerRepository;
+    private RefereeService refereeService;
+
+    @Autowired
+    private SessionTeamService sessionTeamService;
 
 
     public List<Session> getAllUpcomingSessions() {
@@ -63,22 +70,41 @@ public class SessionService {
                 ));
     }
 
-    //For the Admin
+    @Transactional
+    public void createSession(SessionDTO sessionDTO) {
+        Session session = new Session();
 
-    public void createSession(Session session) {
-        try {
-            if (session == null) {
-                throw new SessionCreationException("Session data is missing");
-            }
+        session.setMatchDate(sessionDTO.getMatchDate());
+        session.setMatchStartTime(sessionDTO.getMatchStartTime());
+        session.setMatchEndTime(sessionDTO.getMatchEndTime());
+        session.setMaxPlayers(sessionDTO.getMaxPlayers());
+        session.setPrice(sessionDTO.getPrice());
+        session.setType(sessionDTO.getType());
 
-            sessionRepository.save(session);
-        } catch (Exception e) {
-            throw new SessionCreationException("Error creating session: " + e.getMessage());
+        if (sessionDTO.getCourtId() != -1) {
+            Court court = courtService.getCourtById(sessionDTO.getCourtId());
+            session.setCourt(court);
         }
 
+        if (sessionDTO.getRefereeId() != -1) {
+            Referee referee = refereeService.getRefereeById(sessionDTO.getRefereeId());
+            session.setReferee(referee);
+        }
+
+        try {
+            sessionRepository.save(session);
+        } catch (DataAccessException e) {
+            throw new DatabaseConnectionErrorException("Error saving session: " + e.getMessage());
+        }
+
+
+
+        sessionTeamService.createTeamSession(session.getId());
+        sessionTeamService.createTeamSession(session.getId());
     }
 
     public void deleteSession(Long sessionId) {
+        sessionTeamService.deleteAllTeamSessions(sessionId);
 
         try {
             Session session1 = sessionRepository.findById(sessionId).orElse(null);
@@ -92,7 +118,7 @@ public class SessionService {
     }
 
 
-    public void updateSession(Long id, Session newSession) {
+    public void updateSession(Long id, SessionDTO newSession) {
         Session session = sessionRepository.findById(id).orElseThrow(() -> new SessionNotFoundException("Session with ID " + id + " not found"));
 
         session.setMatchDate(newSession.getMatchDate());
@@ -100,8 +126,17 @@ public class SessionService {
         session.setMatchEndTime(newSession.getMatchEndTime());
         session.setMaxPlayers(newSession.getMaxPlayers());
         session.setPrice(newSession.getPrice());
-        session.setCourt(newSession.getCourt());
-        session.setReferee(newSession.getReferee());
+        session.setType(newSession.getType());
+
+        if (newSession.getCourtId() != -1) {
+            Court court = courtService.getCourtById(newSession.getCourtId());
+            session.setCourt(court);
+        }
+
+        if (newSession.getRefereeId() != -1) {
+            Referee referee = refereeService.getRefereeById(newSession.getRefereeId());
+            session.setReferee(referee);
+        }
 
         try {
             sessionRepository.save(session);

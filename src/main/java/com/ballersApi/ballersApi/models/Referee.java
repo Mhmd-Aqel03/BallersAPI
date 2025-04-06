@@ -15,5 +15,4 @@ public class Referee {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-
 }

@@ -11,4 +11,5 @@ public interface SessionTeamRepository extends JpaRepository<SessionTeam, Long> 
     List<SessionTeam> findBySession(Session session);
     List<SessionTeam> findBySessionId(Long sessionId);
     List<SessionTeam> id(Long id);
+    void deleteSessionTeamBySessionId(Long sessionId);
 }
