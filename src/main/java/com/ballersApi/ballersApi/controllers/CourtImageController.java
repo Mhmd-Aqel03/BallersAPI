@@ -31,18 +31,4 @@ public class CourtImageController {
         return courtImageService.getImageById(id);
     }
 
-    @PostMapping("/add/{courtId}")
-    public CourtImage addImage(@PathVariable Long courtId, @RequestBody CourtImage courtImage) {
-        return courtImageService.addImage(courtId, courtImage);
-    }
-
-    @PutMapping("/update/{imageId}")
-    public CourtImage updateImage(@PathVariable Long imageId, @RequestBody CourtImage newPhotoUrl) {
-        return courtImageService.updateImage(imageId, newPhotoUrl);
-    }
-
-    @DeleteMapping("/delete/{id}")
-    public void deleteImage(@PathVariable Long id) {
-        courtImageService.deleteImage(id);
-    }
 }

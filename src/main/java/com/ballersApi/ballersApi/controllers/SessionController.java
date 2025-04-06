@@ -32,29 +32,6 @@ public class SessionController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("createSession")
-    public SessionTeam createSession(@Valid @RequestBody Session session){
-
-        sessionService.createSession(session);
-        sessionTeamService.createTeamSession(session.getId());
-        return sessionTeamService.createTeamSession(session.getId());
-    }
-    @DeleteMapping("deleteSession/{id}")
-    public ResponseEntity<Void> deleteSession(@PathVariable  Long id){
-
-        sessionTeamService.deleteAllTeamSessions();
-        sessionService.deleteSession(id);
-        return ResponseEntity.ok().build();
-    }
-
-    @PostMapping("createSessionTeam")
-    public ResponseEntity<SessionTeam> createTeamSession(@RequestParam Long sessionId) {
-        SessionTeam teamSession = sessionTeamService.createTeamSession(sessionId);
-        if (teamSession != null) {
-            return ResponseEntity.ok(teamSession);
-        }
-        return ResponseEntity.badRequest().build();
-    }
     @PostMapping("joinSessionTeam")
     public ResponseEntity<SessionTeam> joinTeamSession(@RequestParam Long teamSessionId, @RequestParam Long playerId) {
         SessionTeam teamSession = sessionTeamService.joinTeamSession(teamSessionId, playerId);
@@ -63,11 +40,7 @@ public class SessionController {
         }
         return ResponseEntity.badRequest().build();
     }
-    @DeleteMapping("/deleteSessionTeam/{id}")
-    public ResponseEntity<Void> deleteTeamSession() {
-        sessionTeamService.deleteAllTeamSessions();
-        return ResponseEntity.ok().build();
-    }
+
     @GetMapping("/getTeam/{sessionId}")
     public ResponseEntity<List<SessionTeam>> getTeamsBySession(@PathVariable Long sessionId) {
         List<SessionTeam> teams = sessionTeamService.getTeamsBySession(sessionId);

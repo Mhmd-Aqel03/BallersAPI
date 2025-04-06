@@ -18,7 +18,6 @@ public class Session {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-
     @NotBlank(message = "Session type can't be empty")
     @Column(nullable = false)
     private String type;

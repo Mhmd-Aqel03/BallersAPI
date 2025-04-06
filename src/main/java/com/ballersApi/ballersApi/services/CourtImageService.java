@@ -2,14 +2,15 @@ package com.ballersApi.ballersApi.services;
 
 import com.ballersApi.ballersApi.exceptions.CourtIdNotFoundException;
 import com.ballersApi.ballersApi.exceptions.CourtImageIdNotFoundException;
+import com.ballersApi.ballersApi.exceptions.DatabaseConnectionErrorException;
 import com.ballersApi.ballersApi.models.Court;
 import com.ballersApi.ballersApi.models.CourtImage;
 import com.ballersApi.ballersApi.repositories.CourtImageRepository;
 import com.ballersApi.ballersApi.repositories.CourtRepository;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class CourtImageService {
@@ -37,13 +38,15 @@ public class CourtImageService {
                 .orElseThrow(() -> new CourtImageIdNotFoundException("Cant get Court image with Id " + imageId + " not found"));
     }
 
-    public CourtImage addImage(Long courtId, CourtImage courtImage) {
+    public void addImage(Long courtId, CourtImage courtImage) {
         Court court = courtRepository.findById(courtId).orElseThrow(() -> new CourtIdNotFoundException(" Cant add image to Court with Id " + courtId + " Not Found"));
 
-
         courtImage.setCourt(court);
-
-        return courtImageRepository.save(courtImage);
+        try {
+            courtImageRepository.save(courtImage);
+        } catch (DataAccessException e){
+            throw new DatabaseConnectionErrorException("something went wrong while trying to add court image: "  + e.getMessage());
+        }
     }
 
     public CourtImage updateImage(Long imageId, CourtImage updatedImage) {
@@ -58,6 +61,10 @@ public class CourtImageService {
         if (!courtImageRepository.existsById(id)) {
             throw new CourtImageIdNotFoundException("Cant delete court image with id " + id + " not found");
         }
-        courtImageRepository.deleteById(id);
+        try {
+            courtImageRepository.deleteById(id);
+        } catch (DataAccessException e){
+            throw new DatabaseConnectionErrorException("something went wrong while trying to delete court image: "  + e.getMessage());
+        }
     }
 }

@@ -28,9 +28,7 @@ public class CourtService {
     }
 
     public Court getCourtById(Long id) {
-
-        return courtRepository.findById(id).orElseThrow(() -> new CourtIdNotFoundException("Cant get Court with ID " + id + " not found"));
-
+        return courtRepository.findById(id).orElseThrow(() -> new CourtIdNotFoundException("Can't get Court with ID " + id + " not found"));
     }
 
     @Transactional
@@ -43,21 +41,31 @@ public class CourtService {
 
     }
 
-    public Court updateCourt(Court court,Long id) {
+    public void updateCourt(Court court,Long id) {
         Court existingCourt = getCourtById(id);
+
         existingCourt.setName(court.getName());
         existingCourt.setPlaceId(court.getPlaceId());
         existingCourt.setCity(court.getCity());
         existingCourt.setHasParking(court.isHasParking());
         existingCourt.setHasBathroom(court.isHasBathroom());
         existingCourt.setHasCafeteria(court.isHasCafeteria());
-        return courtRepository.save(existingCourt);
+
+        try{
+            courtRepository.save(existingCourt);
+        } catch (DataAccessException e){
+            throw new DatabaseConnectionErrorException("Something went wrong while trying to create new court: " + e.getMessage());
+        }
     }
 
     public void deleteCourt(Long id) {
         if (!courtRepository.existsById(id)) {
             throw new CourtIdNotFoundException("Cant Delete Court with ID " + id + " not found");
         }
-        courtRepository.deleteById(id);
+        try{
+            courtRepository.deleteById(id);
+        } catch (DataAccessException e){
+            throw new DatabaseConnectionErrorException("Something went wrong while trying to create new court: " + e.getMessage());
+        }
     }
 }

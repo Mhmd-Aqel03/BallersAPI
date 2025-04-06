@@ -25,7 +25,7 @@ public class SessionTeamService {
         return sessionTeamRepository.save(session);
     }
     @Transactional
-    public SessionTeam createTeamSession(Long sessionId) {
+    public void createTeamSession(Long sessionId) {
         try {
             // Validate session existence
             Optional<Session> sessionOpt = sessionRepository.findById(sessionId);
@@ -42,14 +42,12 @@ public class SessionTeamService {
 
 
             SessionTeam teamSession = new SessionTeam(session);
-            return sessionTeamRepository.save(teamSession);
+            sessionTeamRepository.save(teamSession);
 
         } catch (IllegalArgumentException | IllegalStateException e) {
             System.err.println("Validation Error: " + e.getMessage());
-            return null;
         } catch (Exception e) {
             System.err.println("Unexpected Error: " + e.getMessage());
-            return null;
         }
     }
 

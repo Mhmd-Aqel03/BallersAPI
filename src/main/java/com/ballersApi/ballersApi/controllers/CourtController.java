@@ -36,17 +36,5 @@ public class CourtController {
 
         return ResponseEntity.ok(response);
     }
-
-
-
-    @PutMapping("/update/{id}")
-    public Court updateCourt(@PathVariable Long id,@RequestBody @Valid Court court) {
-        return courtService.updateCourt(court,id);
-    }
-
-    @DeleteMapping("/delete/{id}")
-    public void deleteCourt(@PathVariable Long id) {
-        courtService.deleteCourt(id);
-    }
 }
 
