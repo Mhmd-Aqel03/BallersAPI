@@ -118,19 +118,16 @@ public class SessionTeamService {
         sessionTeamRepository.save(teamSession);
     }
 
-   public void deleteAllTeamSessions() {
-        try {
-            if (sessionTeamRepository.findAll().isEmpty()) {
+  public void deleteAllTeamSessions(Long sessionId) {
 
-                throw new TeamSessionNotFoundException("Team sessions do not exist." );
+            List<SessionTeam> teamsInSession = sessionTeamRepository.findBySessionId(sessionId);
 
+            if (teamsInSession.isEmpty()) {
+                throw new TeamSessionNotFoundException("No teams found for session with ID: " + sessionId);
             }
-            sessionTeamRepository.deleteAll();
-        } catch (IllegalArgumentException e) {
-            System.err.println("Validation Error: " + e.getMessage());
-        } catch (Exception e) {
-            System.err.println("Unexpected Error: " + e.getMessage());
-        }
+
+            sessionTeamRepository.deleteAll(teamsInSession);
+
     }
     public List<SessionTeamDTO> getTeamsBySession(Long sessionId) {
         // Validate session existence
