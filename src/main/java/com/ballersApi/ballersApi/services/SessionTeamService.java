@@ -1,5 +1,7 @@
 package com.ballersApi.ballersApi.services;
 
+import com.ballersApi.ballersApi.dataTransferObjects.SessionTeamDTO;
+import com.ballersApi.ballersApi.exceptions.*;
 import com.ballersApi.ballersApi.models.Player;
 import com.ballersApi.ballersApi.models.Session;
 import com.ballersApi.ballersApi.models.SessionTeam;
@@ -10,8 +12,10 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class SessionTeamService {
@@ -26,97 +30,130 @@ public class SessionTeamService {
     }
     @Transactional
     public SessionTeam createTeamSession(Long sessionId) {
-        try {
+
             // Validate session existence
             Optional<Session> sessionOpt = sessionRepository.findById(sessionId);
             if (sessionOpt.isEmpty()) {
-                throw new IllegalArgumentException("Session not found with ID: " + sessionId);
+                throw new SessionNotFoundException("Session with id " + sessionId + " not found");
             }
             Session session = sessionOpt.get();
 
             // Ensure session does not exceed 2 teams
             List<SessionTeam> existingTeams = sessionTeamRepository.findBySession(session);
             if (existingTeams.size() >= 2) {
-                throw new IllegalStateException("This session already has two teams assigned.");
+                throw new TeamSessionCreationException("This session already has two teams assigned.");
             }
 
 
             SessionTeam teamSession = new SessionTeam(session);
             return sessionTeamRepository.save(teamSession);
 
-        } catch (IllegalArgumentException | IllegalStateException e) {
-            System.err.println("Validation Error: " + e.getMessage());
-            return null;
-        } catch (Exception e) {
-            System.err.println("Unexpected Error: " + e.getMessage());
-            return null;
-        }
+
     }
 
     public SessionTeam joinTeamSession(Long teamSessionId, Long playerId) {
-        try {
+
             // Validate team session existence
             Optional<SessionTeam> teamSessionOpt = sessionTeamRepository.findById(teamSessionId);
             if (teamSessionOpt.isEmpty()) {
-                throw new IllegalArgumentException("Team session not found with ID: " + teamSessionId);
+
+                throw new TeamSessionNotFoundException("Team Session with id " + teamSessionId + " not found");
             }
+
             SessionTeam teamSession = teamSessionOpt.get();
 
             // Validate player existence
             Optional<Player> playerOpt = playerRepository.findById(playerId);
             if (playerOpt.isEmpty()) {
-                throw new IllegalArgumentException("Player not found with ID: " + playerId);
+                throw new PlayerNotFoundException("Player with id " + playerId + " not found");
             }
+        List<SessionTeam> teamsInSession = sessionTeamRepository.findBySessionId(teamSession.getSession().getId());
+        boolean isInAnyTeamInSession = teamsInSession.stream()
+                .anyMatch(team -> team.getPlayers().stream()
+                        .anyMatch(playerInTeam -> playerInTeam.getId().equals(playerId)));
+
+
             Player player = playerOpt.get();
+            if (isInAnyTeamInSession) {
+                throw new PlayerAlreadyInTeamException("Player already joined team  with ID: " + teamSessionId);
+            }
+
 
             // Ensure team does not exceed max players (5)
-            if (teamSession.getPlayers().size() >= 5) {
-                throw new IllegalStateException("Team is already full (max 5 players).");
+            if (!(teamSession.getSession().getPlayerCount() < teamSession.getSession().getMaxPlayers())) {
+                throw new TeamFullException("Team is already full.");
             }
 
             // Add player to the team and save
             teamSession.getPlayers().add(player);
+            player.getSessionTeams().add(teamSession);
+            teamSession.getSession().setPlayerCount(teamSession.getSession().getPlayerCount()+1);
+            playerRepository.save(player);
+           
             return sessionTeamRepository.save(teamSession);
 
-        } catch (IllegalArgumentException | IllegalStateException e) {
-            System.err.println("Validation Error: " + e.getMessage());
-            return null;
-        } catch (Exception e) {
-            System.err.println("Unexpected Error: " + e.getMessage());
-            return null;
+
+    }
+    public void leaveTeam(Long playerId, Long teamId) {
+        // Find the player
+        Player player = playerRepository.findById(playerId)
+                .orElseThrow(() -> new PlayerNotFoundException("Player "+playerId+" not found "));
+
+        // Find the team
+        SessionTeam teamSession = sessionTeamRepository.findById(teamId)
+                .orElseThrow(() -> new TeamSessionNotFoundException("Team "+teamId+" not found"));
+
+        // Check if the player is in the team
+        if (!teamSession.getPlayers().contains(player)) {
+            throw new PlayerNotInTeamException("Player id: "+ playerId + " is not part of this team");
         }
+
+        // Remove the player from the team
+        teamSession.getPlayers().remove(player);
+        player.getSessionTeams().remove(teamSession);
+        teamSession.getSession().setPlayerCount(teamSession.getSession().getPlayerCount()-1);
+        playerRepository.save(player);
+
+        // Save the updated team
+        sessionTeamRepository.save(teamSession);
     }
 
-    public void deleteTeamSession(Long teamSessionId) {
+   public void deleteAllTeamSessions() {
         try {
-            if (!sessionTeamRepository.existsById(teamSessionId)) {
-                throw new IllegalArgumentException("Team session not found with ID: " + teamSessionId);
+            if (sessionTeamRepository.findAll().isEmpty()) {
+                throw new TeamSessionNotFoundException("Team sessions do not exist." );
             }
-            sessionTeamRepository.deleteById(teamSessionId);
+            sessionTeamRepository.deleteAll();
         } catch (IllegalArgumentException e) {
             System.err.println("Validation Error: " + e.getMessage());
         } catch (Exception e) {
             System.err.println("Unexpected Error: " + e.getMessage());
         }
     }
-    public List<SessionTeam> getTeamsBySession(Long sessionId) {
-        try {
-            // Validate session existence
-            Optional<Session> sessionOpt = sessionRepository.findById(sessionId);
-            if (sessionOpt.isEmpty()) {
-                throw new IllegalArgumentException("Session not found with ID: " + sessionId);
-            }
-            return sessionTeamRepository.findBySession(sessionOpt.get());
-
-        } catch (IllegalArgumentException e) {
-            System.err.println("Validation Error: " + e.getMessage());
-            return List.of(); // Return empty list
-        } catch (Exception e) {
-            System.err.println("Unexpected Error: " + e.getMessage());
-            return List.of(); // Return empty list
+    public List<SessionTeamDTO> getTeamsBySession(Long sessionId) {
+        // Validate session existence
+        Optional<Session> sessionOpt = sessionRepository.findById(sessionId);
+        if (sessionOpt.isEmpty()) {
+            throw new SessionNotFoundException("Session with id " + sessionId + " not found");
         }
-    }
 
+        // Get teams for this session
+        List<SessionTeam> teams = sessionTeamRepository.findBySession(sessionOpt.get());
+        for(Player p : teams.get(0).getPlayers()) {
+            System.out.println(p.getId());
+        }
+        // Map each team to a DTO
+        List<SessionTeamDTO> teamDTOs = new ArrayList<>();
+        for (SessionTeam team : teams) {
+            // Debug line to check if teams have players
+            System.out.println("Team " + team.getId() + " has " +
+                    (team.getPlayers() != null ? team.getPlayers().size() : 0) + " players");
+
+            teamDTOs.add(new SessionTeamDTO(team));
+        }
+
+        return teamDTOs;
+    }
 
 
 
