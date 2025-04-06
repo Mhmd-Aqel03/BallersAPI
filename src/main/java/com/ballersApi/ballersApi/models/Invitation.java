@@ -14,7 +14,6 @@ public class Invitation {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    private String sessionType;
 
     private boolean status;
 
@@ -23,7 +22,9 @@ public class Invitation {
     @ManyToOne
     @JoinColumn(name = "player_id")
     private Player player;
-
+    @ManyToOne
+    @JoinColumn(name = "receiver_id")
+    private Player receiver;
     @ManyToOne
     @JoinColumn(name = "session_id")
     private Session session;
