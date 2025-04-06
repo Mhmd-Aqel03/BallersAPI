@@ -68,7 +68,7 @@ public class SessionController {
 
     public ResponseEntity<Void> deleteSession(@PathVariable  Long id){
 
-        sessionTeamService.deleteAllTeamSessions();
+        sessionTeamService.deleteAllTeamSessions(id);
         sessionService.deleteSession(id);
         return ResponseEntity.ok().build();
     }
@@ -92,11 +92,7 @@ public class SessionController {
         sessionTeamService.leaveTeam(playerId, teamId);
         return ResponseEntity.ok("Player removed from the team successfully");
     }
-    @DeleteMapping("/deleteSessionTeam/{id}")
-    public ResponseEntity<Void> deleteTeamSession() {
-        sessionTeamService.deleteAllTeamSessions();
-        return ResponseEntity.ok().build();
-    }
+   
     @GetMapping("/getTeam/{sessionId}")
     public ResponseEntity<List<SessionTeamDTO>> getTeamsBySession(@PathVariable Long sessionId) {
         return ResponseEntity.ok(sessionTeamService.getTeamsBySession(sessionId));
