@@ -62,7 +62,6 @@ public class Session {
 
     @ManyToOne()
     @JoinColumn(name = "referee_id")
-    private Referee referee;
-
+    private User referee;
 
 }

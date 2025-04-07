@@ -183,10 +183,6 @@ public class BallersApiApplication {
             user4.setRole(Role.ROLE_REFEREE);
             user4.setEmail("referee@gmail.com");
 
-            Referee referee = new Referee();
-
-            user4.setReferee(referee);
-
             userRepository.save(user4);
 
 

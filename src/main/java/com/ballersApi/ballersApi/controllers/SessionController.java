@@ -32,7 +32,7 @@ public class SessionController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("joinSessionTeam")
+    @PostMapping("/joinSessionTeam")
     public ResponseEntity<SessionTeam> joinTeamSession(@RequestParam Long teamSessionId, @RequestParam Long playerId) {
         SessionTeam teamSession = sessionTeamService.joinTeamSession(teamSessionId, playerId);
         if (teamSession != null) {

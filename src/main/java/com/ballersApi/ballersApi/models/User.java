@@ -35,11 +35,6 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @JsonIgnore
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "referee_id")
-    private Referee referee;
-
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "player_id")
     private Player player;

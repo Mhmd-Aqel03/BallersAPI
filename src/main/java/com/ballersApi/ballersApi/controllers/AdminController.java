@@ -1,19 +1,15 @@
 package com.ballersApi.ballersApi.controllers;
 
+import com.ballersApi.ballersApi.dataTransferObjects.RefereeDTO;
 import com.ballersApi.ballersApi.dataTransferObjects.SessionDTO;
-import com.ballersApi.ballersApi.models.Court;
-import com.ballersApi.ballersApi.models.CourtImage;
-import com.ballersApi.ballersApi.models.Session;
-import com.ballersApi.ballersApi.models.SessionTeam;
-import com.ballersApi.ballersApi.services.CourtImageService;
-import com.ballersApi.ballersApi.services.CourtService;
-import com.ballersApi.ballersApi.services.SessionService;
-import com.ballersApi.ballersApi.services.SessionTeamService;
+import com.ballersApi.ballersApi.models.*;
+import com.ballersApi.ballersApi.services.*;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,7 +23,7 @@ public class AdminController {
 
     private final SessionService sessionService;
 
-    private final SessionTeamService sessionTeamService;
+    private final RefereeService refereeService;
 
     // Courts
     @PostMapping("/createCourt")
@@ -119,6 +115,35 @@ public class AdminController {
 
         return ResponseEntity.ok(response);
     }
+
+    // Referee
+    @PostMapping("/createReferee")
+    public ResponseEntity<Map<String,Object>> createReferee(@Valid @RequestBody RefereeDTO refereeDTO){
+        Map<String, Object> response = new HashMap<>();
+
+        refereeService.addReferee(refereeDTO);
+
+        response.put("msg","referee created successfully");
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/getAllReferees")
+    public ResponseEntity<Map<String,Object>> getAllReferees(){
+        Map<String, Object> response = new HashMap<>();
+
+        ArrayList<User> referee = refereeService.getAllReferees();
+        response.put("referees",referee);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/deleteReferee/{id}")
+    public ResponseEntity<Map<String,Object>> deleteReferee(@PathVariable Long id){
+        Map<String, Object> response = new HashMap<>();
+
+        refereeService.deleteReferee(id);
+        response.put("msg","referee deleted successfully");
+
+        return ResponseEntity.ok(response);
+    }
 }
-
-

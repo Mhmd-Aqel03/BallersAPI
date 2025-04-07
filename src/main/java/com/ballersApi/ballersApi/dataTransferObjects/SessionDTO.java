@@ -1,12 +1,7 @@
 package com.ballersApi.ballersApi.dataTransferObjects;
 
-import com.ballersApi.ballersApi.models.Court;
-import com.ballersApi.ballersApi.models.Referee;
 import com.ballersApi.ballersApi.models.SessionType;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import jakarta.persistence.Column;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;

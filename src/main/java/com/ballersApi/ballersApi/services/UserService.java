@@ -1,6 +1,5 @@
 package com.ballersApi.ballersApi.services;
 
-import com.ballersApi.ballersApi.dataTransferObjects.UserDTO;
 import com.ballersApi.ballersApi.exceptions.DatabaseConnectionErrorException;
 import com.ballersApi.ballersApi.exceptions.UserCreationErrorException;
 import com.ballersApi.ballersApi.exceptions.UserNotFoundException;
@@ -25,18 +24,6 @@ public class UserService {
 
     private final PasswordEncoder passwordEncoder;
 
-    public void addUser(UserDTO userDto) {
-
-        User newUser = new User();
-        newUser.setUsername(userDto.getUsername());
-        newUser.setPassword(userDto.getPassword());
-        newUser.setEmail(userDto.getEmail());
-        try {
-            userRepository.save(newUser);
-        } catch (DataAccessException e) {
-            throw new DatabaseConnectionErrorException("Could not save user to database: " + e.getMessage());
-        }
-    }
 
     @Transactional
     public void addUser(User user) {
@@ -88,6 +75,10 @@ public class UserService {
         return user.orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
     }
 
+    public ArrayList<User> getUsersByRole(Role role) {
+        return userRepository.getUsersByRole(role);
+    }
+
     public ArrayList<User> searchUsers(String username) {
         ArrayList<User> users;
         try {
@@ -98,7 +89,7 @@ public class UserService {
 
         users.removeIf(user -> !user.getRole().equals(Role.ROLE_PLAYER));
 
-        if(users.isEmpty()){
+        if (users.isEmpty()) {
             throw new UserNotFoundException("No user with username: " + username + " was found");
         }
 
@@ -110,6 +101,14 @@ public class UserService {
             userRepository.save(user);
         } catch (DataAccessException e) {
             throw new DatabaseConnectionErrorException("Something went wrong while trying to access user: " + e.getMessage());
+        }
+    }
+
+    public void deleteUser(long id) {
+        try {
+            userRepository.deleteById(id);
+        } catch (DataAccessException e){
+            throw new DatabaseConnectionErrorException("Something went wrong while trying to delete User: " + e.getMessage());
         }
     }
 

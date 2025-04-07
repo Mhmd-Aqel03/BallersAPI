@@ -6,8 +6,8 @@ import com.ballersApi.ballersApi.exceptions.DatabaseConnectionErrorException;
 import com.ballersApi.ballersApi.exceptions.SessionCreationException;
 import com.ballersApi.ballersApi.exceptions.SessionNotFoundException;
 import com.ballersApi.ballersApi.models.Court;
-import com.ballersApi.ballersApi.models.Referee;
 import com.ballersApi.ballersApi.models.Session;
+import com.ballersApi.ballersApi.models.User;
 import com.ballersApi.ballersApi.repositories.SessionRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +44,6 @@ public class SessionService {
 
     public Optional<Session> getSessionById(Long sessionId) {
         return sessionRepository.findById(sessionId);
-
     }
 
     public Map<String, List<Session>> getSessionsForWeek(LocalDate startDate) {
@@ -87,7 +86,7 @@ public class SessionService {
         }
 
         if (sessionDTO.getRefereeId() != -1) {
-            Referee referee = refereeService.getRefereeById(sessionDTO.getRefereeId());
+            User referee = refereeService.getRefereeById(sessionDTO.getRefereeId());
             session.setReferee(referee);
         }
 
@@ -96,8 +95,6 @@ public class SessionService {
         } catch (DataAccessException e) {
             throw new DatabaseConnectionErrorException("Error saving session: " + e.getMessage());
         }
-
-
 
         sessionTeamService.createTeamSession(session.getId());
         sessionTeamService.createTeamSession(session.getId());
@@ -134,7 +131,7 @@ public class SessionService {
         }
 
         if (newSession.getRefereeId() != -1) {
-            Referee referee = refereeService.getRefereeById(newSession.getRefereeId());
+            User referee = refereeService.getRefereeById(newSession.getRefereeId());
             session.setReferee(referee);
         }
 

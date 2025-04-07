@@ -1,5 +1,6 @@
 package com.ballersApi.ballersApi.repositories;
 
+import com.ballersApi.ballersApi.models.Role;
 import com.ballersApi.ballersApi.models.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -16,4 +17,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findById(Long id);
 
     ArrayList<User> findTop10ByUsernameContainingIgnoreCase(String username);
+
+    ArrayList<User> getUsersByRole(Role role);
 }
