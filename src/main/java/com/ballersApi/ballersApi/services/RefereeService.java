@@ -28,7 +28,7 @@ public class RefereeService {
     public void addReferee(RefereeDTO refereeDTO){
         User referee = new User();
 
-        userService.checkUserInput(refereeDTO.getUsername(), refereeDTO.getPassword());
+        userService.checkUserInput(refereeDTO.getUsername(), refereeDTO.getPassword(), refereeDTO.getEmail());
 
         referee.setUsername(refereeDTO.getUsername());
         referee.setPassword(refereeDTO.getPassword());

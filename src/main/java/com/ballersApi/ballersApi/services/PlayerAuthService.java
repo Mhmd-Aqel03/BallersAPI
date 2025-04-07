@@ -32,7 +32,7 @@ public class PlayerAuthService {
     public void addPlayer(PlayerDTO playerDTO) {
         User newUser = new User();
 
-        userService.checkUserInput(playerDTO.getUsername(), playerDTO.getPassword());
+        userService.checkUserInput(playerDTO.getUsername(), playerDTO.getPassword(),playerDTO.getEmail());
 
         // Create User
         newUser.setUsername(playerDTO.getUsername());

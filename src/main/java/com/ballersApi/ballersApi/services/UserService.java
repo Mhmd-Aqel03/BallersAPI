@@ -112,7 +112,7 @@ public class UserService {
         }
     }
 
-    public void checkUserInput(String username, String password) {
+    public void checkUserInput(String username, String password, String email) {
         // Validate username format
         // ChatGPT wrote this regex, hopefully it works lol.
         if (!username.matches("^[a-zA-Z][a-zA-Z0-9_]*$")) {
@@ -125,6 +125,13 @@ public class UserService {
         // Basically "!= null"
         if (user.isPresent()) {
             throw new UsernameAlreadyTakenException("Username " + username + " is already taken.");
+        }
+
+        // Check if email is taken
+        Optional<User> useremail = userRepository.findByEmail(email);
+
+        if (useremail.isPresent()) {
+            throw new UsernameAlreadyTakenException("Email " + email + " is already used for another account.");
         }
 
         //Check password
