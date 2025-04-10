@@ -1,5 +1,7 @@
 package com.ballersApi.ballersApi.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
@@ -48,5 +50,10 @@ public class Session {
     @ManyToOne()
     @JoinColumn(name = "referee_id")
     private Referee referee;
+
+    @OneToOne(mappedBy = "session", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    @JsonIgnore
+    private Chat chat;
 
 }

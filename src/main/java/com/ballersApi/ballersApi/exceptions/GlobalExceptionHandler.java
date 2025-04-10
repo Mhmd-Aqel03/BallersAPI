@@ -172,4 +172,9 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
 
     }
+    @ExceptionHandler(SessionChatNotFoundException.class)
+    public ResponseEntity<String> handleSessionChatNotFound(SessionChatNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    }
+
 }

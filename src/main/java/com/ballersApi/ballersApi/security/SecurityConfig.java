@@ -39,6 +39,9 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable()) // Disable CSRF for stateless APIs
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/ws/**").permitAll()// permits the handshake then check for jwt using interceptor web sockets
+                        .requestMatchers("/", "/index.html","/index2.html", "/css/**", "/js/**").permitAll()
+                        .requestMatchers("/topic/**", "/app/**").authenticated()
                         .requestMatchers("/auth/player/**").hasAuthority("ROLE_PLAYER")
                         .requestMatchers("/auth/admin/**").hasAuthority("ROLE_ADMIN")
                         .requestMatchers("/auth/referee/**").hasAuthority("ROLE_REFEREE")

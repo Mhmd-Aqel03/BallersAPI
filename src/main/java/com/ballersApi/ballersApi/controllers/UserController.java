@@ -97,8 +97,9 @@ public class UserController {
     @PreAuthorize("hasAuthority('ROLE_PLAYER')")
     public ResponseEntity<Map<String, Object>> getSecret() {
         Map<String, Object> response = new HashMap<>();
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
 
-        response.put("msg", "secret");
+        response.put("msg", username);
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
