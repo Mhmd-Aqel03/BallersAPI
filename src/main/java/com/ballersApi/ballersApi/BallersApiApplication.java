@@ -1,11 +1,17 @@
 package com.ballersApi.ballersApi;
 
+
+import com.ballersApi.ballersApi.models.Player;
+import com.ballersApi.ballersApi.models.Role;
+import com.ballersApi.ballersApi.models.User;
+
 import com.ballersApi.ballersApi.models.*;
 
 import com.ballersApi.ballersApi.repositories.PlayerRepository;
 import com.ballersApi.ballersApi.repositories.SessionRepository;
 import com.ballersApi.ballersApi.repositories.SessionTeamRepository;
 import com.ballersApi.ballersApi.repositories.CourtRepository;
+
 import com.ballersApi.ballersApi.repositories.PlayerRepository;
 import com.ballersApi.ballersApi.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
@@ -55,6 +61,26 @@ public class BallersApiApplication {
 			player.setPhoneNumber("23432");
 			player.setPostion("CT");
 			player.setVerified(true);
+      
+       User user = new User();
+            user.setUsername("mohanadadgoated");
+            user.setPassword("mohammagoat123");
+            user.setRole(Role.ROLE_PLAYER);
+            user.setEmail("admin@gmail.com");
+            Player player = new Player();
+            player.setPhoneNumber("23432");
+            player.setPostion("CT");
+            userRepository.save(user);
+
+            User user1 = new User();
+            user1.setUsername("MohammadGoatlove");
+            user1.setPassword("mohammagoat123");
+            user1.setRole(Role.ROLE_PLAYER);
+            user1.setEmail("shafa@gmail.com");
+            Player player1 = new Player();
+            player1.setPhoneNumber("224232");
+            player1.setPostion("CT");
+            userRepository.save(user1);
 
 	user.setPlayer(player);
 
@@ -182,5 +208,6 @@ public class BallersApiApplication {
 			System.out.println("Server running on port " + serverPort);
 		};
 	}
+
 
 }

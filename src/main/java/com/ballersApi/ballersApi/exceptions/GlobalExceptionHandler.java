@@ -177,6 +177,12 @@ public class GlobalExceptionHandler {
 
     }
 
+    @ExceptionHandler(SessionChatNotFoundException.class)
+    public ResponseEntity<String> handleSessionChatNotFound(SessionChatNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    }
+
+
     @ExceptionHandler(PlayerNotFoundException.class)
     public ResponseEntity<Map<String, String>> handlePlayerNotFoundException(PlayerNotFoundException ex) {
         Map<String, String> errorResponse = new HashMap<>();
@@ -263,4 +269,5 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.METHOD_NOT_ALLOWED);
 
     }
+
 }

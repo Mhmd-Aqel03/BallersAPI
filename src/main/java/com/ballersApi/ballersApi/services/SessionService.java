@@ -6,6 +6,7 @@ import com.ballersApi.ballersApi.exceptions.CanNotFetchDataException;
 import com.ballersApi.ballersApi.exceptions.DatabaseConnectionErrorException;
 import com.ballersApi.ballersApi.exceptions.SessionCreationException;
 import com.ballersApi.ballersApi.exceptions.SessionNotFoundException;
+import com.ballersApi.ballersApi.models.Chat;
 import com.ballersApi.ballersApi.models.Session;
 import com.ballersApi.ballersApi.repositories.PlayerRepository;
 import com.ballersApi.ballersApi.repositories.SessionRepository;
@@ -73,7 +74,9 @@ public class SessionService {
             if (session == null) {
                 throw new SessionCreationException("Session data is missing");
             }
-
+            Chat chat = new Chat();
+            chat.setSession(session);
+            session.setChat(chat);
             return sessionRepository.save(session);
         } catch (Exception e) {
             throw new SessionCreationException("Error creating session: " + e.getMessage());
