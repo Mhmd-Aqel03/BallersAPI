@@ -45,10 +45,10 @@ public class WebSocketAuthChannelInterceptor implements ChannelInterceptor {
                 }
 
                 String token = bearerToken.substring(7);
-                String username = jwtService.extractUsername(token);
+                Long username = Long.parseLong(jwtService.extractUsername(token));
                 jwtService.validateToken(token);
 
-                AppUserDetails userDetails = appUserDetailsService.loadUserByUsername(username);
+                AppUserDetails userDetails = appUserDetailsService.loadUserById(username);
                 accessor.setUser(new WebSocketUserPrincipal(userDetails.getUsername())); // Attach user to session
 
             } catch (Exception e) {

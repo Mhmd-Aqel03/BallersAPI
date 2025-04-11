@@ -61,16 +61,27 @@ public class BallersApiApplication {
 			player.setPhoneNumber("23432");
 			player.setPostion("CT");
 			player.setVerified(true);
-      
-       User user = new User();
-            user.setUsername("mohanadadgoated");
-            user.setPassword("mohammagoat123");
-            user.setRole(Role.ROLE_PLAYER);
-            user.setEmail("admin@gmail.com");
-            Player player = new Player();
-            player.setPhoneNumber("23432");
-            player.setPostion("CT");
-            userRepository.save(user);
+
+
+			User user12 = new User();
+			user12.setUsername("adminChat");
+			user12.setPassword("mohammagoat123");
+			user12.setRole(Role.ROLE_ADMIN);
+			user12.setEmail("adminchat@gmail.com");
+
+			userRepository.save(user12);
+
+
+
+       User user33 = new User();
+            user33.setUsername("mohanadadgoated");
+            user33.setPassword("mohammagoat123");
+            user33.setRole(Role.ROLE_PLAYER);
+            user33.setEmail("admin22@gmail.com");
+            Player player33 = new Player();
+            player33.setPhoneNumber("23432");
+            player33.setPostion("CT");
+            userRepository.save(user33);
 
             User user1 = new User();
             user1.setUsername("MohammadGoatlove");
@@ -139,18 +150,18 @@ public class BallersApiApplication {
 
 		
 
-			User user1 = new User();
-			user1.setUsername("ahmedKhalid");
-			user1.setPassword("mohammagoat123!");
-			user1.setRole(Role.ROLE_PLAYER);
-			user1.setEmail("admin4@gmail.com");
-			Player player1 = new Player();
-			player1.setPhoneNumber("23432");
-			player1.setPostion("CT");
+			User user11 = new User();
+			user11.setUsername("ahmedKhalid");
+			user11.setPassword("mohammagoat123!");
+			user11.setRole(Role.ROLE_PLAYER);
+			user11.setEmail("admin4@gmail.com");
+			Player player11 = new Player();
+			player11.setPhoneNumber("23432");
+			player11.setPostion("CT");
 
-			user1.setPlayer(player1);
+			user1.setPlayer(player11);
 
-			userRepository.save(user1);
+			userRepository.save(user11);
 
 			User user2 = new User();
 			user2.setUsername("ahmed123");
