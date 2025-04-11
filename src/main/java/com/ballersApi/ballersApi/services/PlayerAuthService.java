@@ -1,15 +1,13 @@
 package com.ballersApi.ballersApi.services;
 
 import com.ballersApi.ballersApi.JsonWebTokens.JwtService;
-import com.ballersApi.ballersApi.dataTransferObjects.ChangePasswordDTO;
-import com.ballersApi.ballersApi.dataTransferObjects.LoginDTO;
-import com.ballersApi.ballersApi.dataTransferObjects.PlayerDTO;
-import com.ballersApi.ballersApi.dataTransferObjects.TokenDTO;
+import com.ballersApi.ballersApi.dataTransferObjects.*;
 import com.ballersApi.ballersApi.exceptions.*;
 import com.ballersApi.ballersApi.models.Player;
 import com.ballersApi.ballersApi.models.Role;
 import com.ballersApi.ballersApi.models.User;
 import com.ballersApi.ballersApi.repositories.PlayerRepository;
+import com.ballersApi.ballersApi.repositories.UserRepository;
 import com.ballersApi.ballersApi.util.CodeGenerator;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -30,7 +28,6 @@ public class PlayerAuthService {
     private final EmailService emailService;
 
     private final PasswordEncoder passwordEncoder;
-
     @Transactional
     public void addPlayer(PlayerDTO playerDTO) {
         User newUser = new User();
@@ -61,9 +58,9 @@ public class PlayerAuthService {
     }
 
     @Transactional
-    public void updateRefreshToken(String username, String refreshToken) {
+    public void updateRefreshToken(Long id, String refreshToken) {
 
-        Player player = getPlayerByUsername(username);
+        Player player = getPlayerById(id);
 
         player.setRefreshToken(refreshToken);
         try {
@@ -87,28 +84,34 @@ public class PlayerAuthService {
         return user.getPlayer();
     }
 
+    public Player getPlayerById(Long id) {
+        User user = userService.getUserById(id);
+
+        return user.getPlayer();
+    }
+
     @Transactional
     public TokenDTO refreshToken(String token) {
         TokenDTO tokenDto = new TokenDTO();
-        String username = jwtService.extractUsername(token);
+        Long id = Long.parseLong(jwtService.extractUsername(token));
 
         // Validate token, should throw exceptions for invalid tokens.
         jwtService.validateToken(token);
 
-        Player player = getPlayerByUsername(username);
+        Player player = getPlayerById(id);
 
         if (player.getRefreshToken() == null || !player.getRefreshToken().equals(token)) {
             throw new JwtTokenValidationException("Refresh Token is either invalid or outDated");
         }
 
         // Generate new Refresh Token.
-        tokenDto.setRefreshToken(jwtService.generateRefreshToken(username));
+        tokenDto.setRefreshToken(jwtService.generateRefreshToken(id));
 
         // Generate new Access token
-        tokenDto.setAccessToken(jwtService.generateAccessToken(username));
+        tokenDto.setAccessToken(jwtService.generateAccessToken(id));
 
         // Update refresh token.
-        updateRefreshToken(username, tokenDto.getRefreshToken());
+        updateRefreshToken(id, tokenDto.getRefreshToken());
 
         return tokenDto;
     }
@@ -172,7 +175,6 @@ public class PlayerAuthService {
         // This throws an exception if no User is found.
         User user = userService.getUserByEmail(loginDTO.getEmail());
 
-
         if (user.getRole() == Role.ROLE_PLAYER) {
 
             if (user.getEmail().equals(loginDTO.getEmail()) && passwordEncoder.matches(loginDTO.getPassword(), user.getPassword())) {
@@ -183,11 +185,11 @@ public class PlayerAuthService {
                     throw new AuthorizationFailedException("Player's Email is not verified");
                 }
 
-                tokenDTO.setAccessToken(jwtService.generateAccessToken(user.getUsername()));
-                tokenDTO.setRefreshToken(jwtService.generateRefreshToken(user.getUsername()));
+                tokenDTO.setAccessToken(jwtService.generateAccessToken(user.getId()));
+                tokenDTO.setRefreshToken(jwtService.generateRefreshToken(user.getId()));
 
                 // Update refresh Token for player
-                updateRefreshToken(user.getUsername(), tokenDTO.getRefreshToken());
+                updateRefreshToken(user.getId(), tokenDTO.getRefreshToken());
 
                 return tokenDTO;
             } else {
@@ -195,7 +197,7 @@ public class PlayerAuthService {
             }
         } else {
             if (user.getEmail().equals(loginDTO.getEmail()) && passwordEncoder.matches(loginDTO.getPassword(), user.getPassword())) {
-                tokenDTO.setAccessToken(jwtService.generateAccessToken(user.getUsername()));
+                tokenDTO.setAccessToken(jwtService.generateAccessToken(user.getId()));
 
                 return tokenDTO;
             } else {
@@ -244,6 +246,22 @@ public class PlayerAuthService {
         }
 
         user.setPassword(passwordEncoder.encode(changePasswordDTO.getNewPassword()));
+
+        userService.updateUser(user);
+    }
+
+    public void updatePlayer(String username, UpdatePlayerDTO updatePlayerDTO) {
+        Player player = getPlayerByUsername(username);
+        User user = userService.getUserByUsername(username);
+
+        if (userService.checkIfUserExists(updatePlayerDTO.getUsername())) {
+            throw new UsernameAlreadyTakenException("Username " + updatePlayerDTO.getUsername() + " is already taken");
+        }
+
+        user.setUsername(updatePlayerDTO.getUsername());
+
+        player.setPostion(updatePlayerDTO.getPosition());
+        player.setPhotoUrl(updatePlayerDTO.getPhotoUrl());
 
         userService.updateUser(user);
     }

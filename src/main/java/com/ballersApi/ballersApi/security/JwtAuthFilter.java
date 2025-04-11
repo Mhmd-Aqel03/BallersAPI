@@ -34,6 +34,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             
             String token = null;
             String username = null;
+            Long id = null;
             String type = null;
 
             // Check if the header starts with "Bearer "
@@ -41,7 +42,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 token = authHeader.substring(7); // Extract token
                 try {
                     // Extract username from token
-                    username = jwtService.extractUsername(token);
+                    id = Long.parseLong(jwtService.extractUsername(token));
                     type = jwtService.extractType(token);
                 } catch (Exception e) {
                     System.out.println("JWT token is invalid : " + e.getMessage());
@@ -56,10 +57,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             }
 
             // If the token is valid and no authentication is set in the context
-            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            if (id != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 try {
-                    AppUserDetails appUserDetails = appUserDetailsService.loadUserByUsername(username);
-
+                    AppUserDetails appUserDetails = appUserDetailsService.loadUserById(id);
                     // Validate token and set authentication
                     if (jwtService.validateToken(token, appUserDetails)) {
                         UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
@@ -79,6 +79,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
         }
         catch (InvalidTokenException e) {
+            System.out.println("Invalid token exception: " + e.getMessage());
             throw new AuthorizationFailedException(e.getMessage());
         }
         catch (Exception e) {

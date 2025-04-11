@@ -36,4 +36,10 @@ public class AppUserDetailsService implements UserDetailsService {
                 .orElseThrow(() -> new UserNotFoundException("User with username: " + username + " not found"));
     }
 
+    public  AppUserDetails loadUserById(Long id) throws UserNotFoundException {
+        Optional<User> userDetail = userRepository.findById(id);
+
+        return userDetail.map(AppUserDetails::new)
+                .orElseThrow(() -> new UserNotFoundException("User with id: " + id + " not found"));
+    }
 }

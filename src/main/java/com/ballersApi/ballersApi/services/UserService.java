@@ -6,6 +6,7 @@ import com.ballersApi.ballersApi.exceptions.DatabaseConnectionErrorException;
 import com.ballersApi.ballersApi.exceptions.UserCreationErrorException;
 import com.ballersApi.ballersApi.exceptions.UserNotFoundException;
 import com.ballersApi.ballersApi.exceptions.UsernameAlreadyTakenException;
+import com.ballersApi.ballersApi.models.Player;
 import com.ballersApi.ballersApi.models.User;
 import com.ballersApi.ballersApi.repositories.UserRepository;
 import jakarta.transaction.Transactional;
@@ -14,6 +15,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Optional;
 
 @AllArgsConstructor
@@ -23,8 +25,6 @@ public class UserService {
     private final UserRepository userRepository;
 
     private final PasswordEncoder passwordEncoder;
-
-    private final JwtService jwtService;
 
     public void addUser(UserDTO userDto) {
 
@@ -49,12 +49,16 @@ public class UserService {
         }
     }
 
+    public boolean checkIfUserExists(String username) {
+        return userRepository.findByUsername(username).isPresent();
+    }
+
     public User getUserByUsername(String username) {
         Optional<User> user;
         try {
             user = userRepository.findByUsername(username);
         } catch (DataAccessException e) {
-            throw new DatabaseConnectionErrorException("Something went wrong while trying to access user" + e.getMessage());
+            throw new DatabaseConnectionErrorException("Something went wrong while trying to retrieve user" + e.getMessage());
         }
 
         // orElseThrow will return the object if it exists, or throw and exception if it doesn't. So cool shout out to Java.
@@ -66,11 +70,35 @@ public class UserService {
         try {
             user = userRepository.findByEmail(email);
         } catch (DataAccessException e) {
-            throw new DatabaseConnectionErrorException("Something went wrong while trying to access user" + e.getMessage());
+            throw new DatabaseConnectionErrorException("Something went wrong while trying to retrieve user" + e.getMessage());
         }
 
         // orElseThrow will return the object if it exists, or throw and exception if it doesn't. So cool shout out to Java.
         return user.orElseThrow(() -> new UserNotFoundException("User not found with email: " + email));
+    }
+
+    public User getUserById(Long id){
+        Optional<User> user;
+        try{
+            user = userRepository.findById(id);
+        } catch (DataAccessException e) {
+            throw new DatabaseConnectionErrorException("Something went wrong while trying to retrieve user" + e.getMessage());
+        }
+
+        // orElseThrow will return the object if it exists, or throw and exception if it doesn't. So cool shout out to Java.
+        return user.orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
+    }
+
+    public ArrayList<User> searchUsers(String username) {
+        Optional<ArrayList<User>> users;
+        try{
+            users = userRepository.findTop10ByUsernameContainingIgnoreCase(username);
+        }catch (DataAccessException e) {
+            throw new DatabaseConnectionErrorException("Something went wrong while trying to retrieve user" + e.getMessage());
+        }
+
+        // orElseThrow will return the object if it exists, or throw and exception if it doesn't. So cool shout out to Java.
+        return users.orElseThrow(() -> new UserNotFoundException("User not found with username: " + username));
     }
 
     public void updateUser(User user) {
