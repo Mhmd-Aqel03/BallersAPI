@@ -98,7 +98,7 @@ public class UserController {
     public ResponseEntity<Map<String, Object>> getSecret() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         Map<String, Object> response = new HashMap<>();
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+
 
         response.put("msg", username);
 

@@ -29,7 +29,7 @@ function connect(event) {
         var socket = new SockJS('/ws');
         stompClient = Stomp.over(socket);
 
-        var token = "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiUk9MRV9QTEFZRVIiLCJzdWIiOiJNb2hhbW1hZEdvYXRsb3ZlIiwiaWF0IjoxNzQwNDc3MzYyLCJleHAiOjk5OTk5OTk5OTk5fQ.BpTgIfomY6TZGfEeUJf3O8WNKMXfEedcElKjdqXmmM0";
+        var token = "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiUk9MRV9QTEFZRVIiLCJzdWIiOiIyIiwiaWF0IjoxNzQwNDc3MzYyLCJleHAiOjk5OTk5OTk5OTk5fQ.kx6SvMt0zzK4X3K0AtDxa7fikQkVsprEWE1cNDIRNv8";
         stompClient.connect(
             { Authorization: "Bearer " + token },
             onConnected,
@@ -48,7 +48,7 @@ function fetchAndDisplayOldMessages(chatId) {
     fetch(`/chat/messages/${chatId}`, {
         method: 'GET',
         headers: {
-            'Authorization': 'Bearer ' + "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiUk9MRV9QTEFZRVIiLCJzdWIiOiJNb2hhbW1hZEdvYXRsb3ZlIiwiaWF0IjoxNzQwNDc3MzYyLCJleHAiOjk5OTk5OTk5OTk5fQ.BpTgIfomY6TZGfEeUJf3O8WNKMXfEedcElKjdqXmmM0"
+            'Authorization': 'Bearer ' + "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiUk9MRV9QTEFZRVIiLCJzdWIiOiIyIiwiaWF0IjoxNzQwNDc3MzYyLCJleHAiOjk5OTk5OTk5OTk5fQ.kx6SvMt0zzK4X3K0AtDxa7fikQkVsprEWE1cNDIRNv8"
         }
     })
         .then(response => response.json())
@@ -134,16 +134,16 @@ function getAvatarColor(messageSender) {
 
 function onConnected() {
     if (stompClient && stompClient.connected) {
-        stompClient.unsubscribe('/topic/chat/1');
+        stompClient.unsubscribe('/topic/chat/6');
     }
     //1 here is the session ID
 // the one here should be dynamic based on teh chat the user wants to join the end point is /topic/chat/{sessionID}
-    stompClient.subscribe('/topic/chat/1', onMessageReceived);
+    stompClient.subscribe('/topic/chat/6', onMessageReceived);
 
     // Subscribe to receive previous messages only for the new user
     stompClient.subscribe('/user/queue/history', onPreviousMessagesReceived);
 
-    // Send request to fetch previous messages via WebSocket given caht ID
+    // Send request to fetch previous messages via WebSocket given chat ID
     requestPreviousMessages(1);
 
     connectingElement.classList.add('hidden');
@@ -175,7 +175,7 @@ function sendMessage(event) {
             type: 'CHAT'
         };
         //1 here is session ID
-        stompClient.send("/app/chat/1", {}, JSON.stringify(chatMessage));
+        stompClient.send("/app/chat/6", {}, JSON.stringify(chatMessage));
         messageInput.value = '';
     }
     event.preventDefault();

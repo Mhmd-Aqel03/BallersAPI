@@ -118,10 +118,10 @@ function getAvatarColor(messageSender) {
 
 function onConnected() {
     if (stompClient && stompClient.connected) {
-        stompClient.unsubscribe('/topic/chat/1');
+        stompClient.unsubscribe('/topic/chat/6');
     }
 
-    stompClient.subscribe('/topic/chat/1', onMessageReceived);
+    stompClient.subscribe('/topic/chat/6', onMessageReceived);
 
     // Subscribe to receive previous messages only for the new user
     stompClient.subscribe('/user/queue/history', onPreviousMessagesReceived);
@@ -155,7 +155,7 @@ function sendMessage(event) {
             message: messageContent,
             type: 'CHAT'
         };
-        stompClient.send("/app/chat/1", {}, JSON.stringify(chatMessage));
+        stompClient.send("/app/chat/6", {}, JSON.stringify(chatMessage));
         messageInput.value = '';
     }
     event.preventDefault();
