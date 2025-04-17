@@ -270,4 +270,11 @@ public class GlobalExceptionHandler {
 
     }
 
+    @ExceptionHandler(PlayerAlreadyEndorsedException.class)
+    public ResponseEntity<Map<String, Object>> handlePlayerAlreadyEndorsedException(PlayerAlreadyEndorsedException ex) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "Something with endorsing player: " + ex.getMessage());
+
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
 }

@@ -1,12 +1,10 @@
 package com.ballersApi.ballersApi.services;
 
-import com.ballersApi.ballersApi.JsonWebTokens.JwtService;
-import com.ballersApi.ballersApi.dataTransferObjects.UserDTO;
 import com.ballersApi.ballersApi.exceptions.DatabaseConnectionErrorException;
 import com.ballersApi.ballersApi.exceptions.UserCreationErrorException;
 import com.ballersApi.ballersApi.exceptions.UserNotFoundException;
 import com.ballersApi.ballersApi.exceptions.UsernameAlreadyTakenException;
-import com.ballersApi.ballersApi.models.Player;
+import com.ballersApi.ballersApi.models.Role;
 import com.ballersApi.ballersApi.models.User;
 import com.ballersApi.ballersApi.repositories.UserRepository;
 import jakarta.transaction.Transactional;
@@ -26,18 +24,6 @@ public class UserService {
 
     private final PasswordEncoder passwordEncoder;
 
-    public void addUser(UserDTO userDto) {
-
-        User newUser = new User();
-        newUser.setUsername(userDto.getUsername());
-        newUser.setPassword(userDto.getPassword());
-        newUser.setEmail(userDto.getEmail());
-        try {
-            userRepository.save(newUser);
-        } catch (DataAccessException e) {
-            throw new DatabaseConnectionErrorException("Could not save user to database: " + e.getMessage());
-        }
-    }
 
     @Transactional
     public void addUser(User user) {
@@ -77,9 +63,9 @@ public class UserService {
         return user.orElseThrow(() -> new UserNotFoundException("User not found with email: " + email));
     }
 
-    public User getUserById(Long id){
+    public User getUserById(Long id) {
         Optional<User> user;
-        try{
+        try {
             user = userRepository.findById(id);
         } catch (DataAccessException e) {
             throw new DatabaseConnectionErrorException("Something went wrong while trying to retrieve user" + e.getMessage());
@@ -89,16 +75,25 @@ public class UserService {
         return user.orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
     }
 
+    public ArrayList<User> getUsersByRole(Role role) {
+        return userRepository.getUsersByRole(role);
+    }
+
     public ArrayList<User> searchUsers(String username) {
-        Optional<ArrayList<User>> users;
-        try{
+        ArrayList<User> users;
+        try {
             users = userRepository.findTop10ByUsernameContainingIgnoreCase(username);
-        }catch (DataAccessException e) {
+        } catch (DataAccessException e) {
             throw new DatabaseConnectionErrorException("Something went wrong while trying to retrieve user" + e.getMessage());
         }
 
-        // orElseThrow will return the object if it exists, or throw and exception if it doesn't. So cool shout out to Java.
-        return users.orElseThrow(() -> new UserNotFoundException("User not found with username: " + username));
+        users.removeIf(user -> !user.getRole().equals(Role.ROLE_PLAYER));
+
+        if (users.isEmpty()) {
+            throw new UserNotFoundException("No user with username: " + username + " was found");
+        }
+
+        return users;
     }
 
     public void updateUser(User user) {
@@ -109,7 +104,15 @@ public class UserService {
         }
     }
 
-    public void checkUserInput(String username, String password) {
+    public void deleteUser(long id) {
+        try {
+            userRepository.deleteById(id);
+        } catch (DataAccessException e){
+            throw new DatabaseConnectionErrorException("Something went wrong while trying to delete User: " + e.getMessage());
+        }
+    }
+
+    public void checkUserInput(String username, String password, String email) {
         // Validate username format
         // ChatGPT wrote this regex, hopefully it works lol.
         if (!username.matches("^[a-zA-Z][a-zA-Z0-9_]*$")) {
@@ -121,7 +124,14 @@ public class UserService {
 
         // Basically "!= null"
         if (user.isPresent()) {
-            throw new UsernameAlreadyTakenException("Username "  + username + " is already taken.");
+            throw new UsernameAlreadyTakenException("Username " + username + " is already taken.");
+        }
+
+        // Check if email is taken
+        Optional<User> useremail = userRepository.findByEmail(email);
+
+        if (useremail.isPresent()) {
+            throw new UsernameAlreadyTakenException("Email " + email + " is already used for another account.");
         }
 
         //Check password
