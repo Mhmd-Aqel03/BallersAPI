@@ -1,8 +1,7 @@
 package com.ballersApi.ballersApi.models;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
+import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -64,4 +63,13 @@ public class Session {
     @JoinColumn(name = "referee_id")
     private User referee;
 
+
+    @OneToOne(mappedBy = "session", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    @JsonIgnore
+    private Chat chat;
+
 }
+
+
+

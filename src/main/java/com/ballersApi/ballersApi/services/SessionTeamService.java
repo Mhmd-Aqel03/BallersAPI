@@ -126,6 +126,7 @@ public class SessionTeamService {
         } catch(DataAccessException e){
             throw new DatabaseConnectionErrorException("something went wrong while trying to delete session teams: " + e.getMessage());
         }
+
     }
 
     public List<SessionTeamDTO> getTeamsBySession(Long sessionId) {

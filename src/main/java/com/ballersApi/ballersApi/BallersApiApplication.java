@@ -1,5 +1,6 @@
 package com.ballersApi.ballersApi;
 
+
 import com.ballersApi.ballersApi.models.*;
 import com.ballersApi.ballersApi.repositories.CourtRepository;
 import com.ballersApi.ballersApi.repositories.SessionRepository;
@@ -28,8 +29,6 @@ public class BallersApiApplication {
 
     @Bean
     public CommandLineRunner commandLineRunner(
-
-
             UserRepository userRepository,
             SessionRepository sessionRepository,
             CourtRepository courtRepository,

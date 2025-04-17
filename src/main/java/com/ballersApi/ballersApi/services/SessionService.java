@@ -5,6 +5,7 @@ import com.ballersApi.ballersApi.dataTransferObjects.SessionDTO;
 import com.ballersApi.ballersApi.exceptions.DatabaseConnectionErrorException;
 import com.ballersApi.ballersApi.exceptions.SessionCreationException;
 import com.ballersApi.ballersApi.exceptions.SessionNotFoundException;
+import com.ballersApi.ballersApi.models.Chat;
 import com.ballersApi.ballersApi.models.Court;
 import com.ballersApi.ballersApi.models.Session;
 import com.ballersApi.ballersApi.models.User;
@@ -72,7 +73,6 @@ public class SessionService {
     @Transactional
     public void createSession(SessionDTO sessionDTO) {
         Session session = new Session();
-
         session.setMatchDate(sessionDTO.getMatchDate());
         session.setMatchStartTime(sessionDTO.getMatchStartTime());
         session.setMatchEndTime(sessionDTO.getMatchEndTime());
@@ -84,6 +84,10 @@ public class SessionService {
             Court court = courtService.getCourtById(sessionDTO.getCourtId());
             session.setCourt(court);
         }
+        // Create chat for session
+        Chat chat = new Chat();
+        chat.setSession(session);
+        session.setChat(chat);
 
         if (sessionDTO.getRefereeId() != -1) {
             User referee = refereeService.getRefereeById(sessionDTO.getRefereeId());

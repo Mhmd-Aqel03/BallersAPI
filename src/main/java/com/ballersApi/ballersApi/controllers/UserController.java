@@ -99,6 +99,7 @@ public class UserController {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         Map<String, Object> response = new HashMap<>();
 
+
         response.put("msg", username);
 
         return new ResponseEntity<>(response, HttpStatus.OK);
