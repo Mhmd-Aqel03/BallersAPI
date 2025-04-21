@@ -32,7 +32,8 @@ public class BallersApiApplication {
             UserRepository userRepository,
             SessionRepository sessionRepository,
             CourtRepository courtRepository,
-            PasswordEncoder passwordEncoder
+            PasswordEncoder passwordEncoder,
+        SessionTeamRepository sessionTeamRepository
 
     ) {
         return args -> {
@@ -51,25 +52,154 @@ public class BallersApiApplication {
 
             userRepository.save(user);
 
-            Session session = new Session();
-            session.setPlayerCount(3);
-            session.setPrice(8);
-            session.setType(SessionType.Random);
-            session.setMatchDate(LocalDate.now().plusDays(3));
-            session.setMaxPlayers(10);
-            session.setMatchStartTime(LocalTime.now().plusHours(4));
-            session.setMatchEndTime(LocalTime.now().plusHours(6));
-            sessionRepository.save(session);
+           
+			Session session = new Session();
+			session.setPlayerCount(4);
+			session.setPrice(8);
+			session.setType(SessionType.Random);
+			session.setMatchDate(LocalDate.now().plusDays(1));
+			session.setMaxPlayers(10);
+			session.setMatchStartTime(LocalTime.now().plusHours(2));
+			session.setMatchEndTime(LocalTime.now().plusHours(4));
+			SessionTeam sessionTeam8 = new SessionTeam();
+			SessionTeam sessionTeam9 = new SessionTeam();
+			sessionRepository.save(session);
+			sessionTeamRepository.save(sessionTeam8);
+			sessionTeamRepository.save(sessionTeam9);
+			session.setTeamA(sessionTeam8);
+			session.setTeamB(sessionTeam9);
+			sessionTeamRepository.save(sessionTeam8);
+			sessionTeamRepository.save(sessionTeam9);
+			sessionRepository.save(session);
 
-            Session session1 = new Session();
-            session1.setPlayerCount(0);
-            session1.setPrice(10);
-            session1.setType(SessionType.Teams);
-            session1.setMatchDate(LocalDate.now().plusDays(3));
-            session1.setMaxPlayers(10);
-            session1.setMatchStartTime(LocalTime.now().plusHours(2));
-            session1.setMatchEndTime(LocalTime.now().plusHours(4));
-            sessionRepository.save(session1);
+
+			Session session1 = new Session();
+			session1.setPlayerCount(5);
+			session1.setPrice(8);
+			session1.setType(SessionType.Random);
+			session1.setMatchDate(LocalDate.now().plusDays(1));
+			session1.setMaxPlayers(10);
+			session1.setMatchStartTime(LocalTime.now().plusHours(2));
+			session1.setMatchEndTime(LocalTime.now().plusHours(4));
+			SessionTeam sessionTeam6 = new SessionTeam();
+			SessionTeam sessionTeam7 = new SessionTeam();
+			sessionRepository.save(session1);
+			sessionTeamRepository.save(sessionTeam6);
+			sessionTeamRepository.save(sessionTeam7);
+			session1.setTeamA(sessionTeam6);
+			session1.setTeamB(sessionTeam7);
+			sessionTeamRepository.save(sessionTeam6);
+			sessionTeamRepository.save(sessionTeam7);
+			sessionRepository.save(session1);
+
+			Session session2 = new Session();
+			session2.setPlayerCount(10);
+			session2.setPrice(8);
+			session2.setType(SessionType.Random);
+			session2.setMatchDate(LocalDate.now().plusDays(3));
+			session2.setMaxPlayers(10);
+			session2.setMatchStartTime(LocalTime.now().plusHours(2));
+			session2.setMatchEndTime(LocalTime.now().plusHours(4));
+			SessionTeam sessionTeam4 = new SessionTeam();
+			SessionTeam sessionTeam5 = new SessionTeam();
+			sessionRepository.save(session2);
+			sessionTeamRepository.save(sessionTeam4);
+			sessionTeamRepository.save(sessionTeam5);
+			session2.setTeamA(sessionTeam4);
+			session2.setTeamB(sessionTeam5);
+			sessionTeamRepository.save(sessionTeam4);
+			sessionTeamRepository.save(sessionTeam5);
+			sessionRepository.save(session2);
+
+			Session session3 = new Session();
+			session3.setPlayerCount(0);
+			session3.setPrice(8);
+			session3.setType(SessionType.Random);
+			session3.setMatchDate(LocalDate.now().plusDays(3));
+			session3.setMaxPlayers(10);
+			session3.setMatchStartTime(LocalTime.now().plusHours(2));
+			session3.setMatchEndTime(LocalTime.now().plusHours(4));
+			SessionTeam sessionTeam2 = new SessionTeam();
+			SessionTeam sessionTeam3 = new SessionTeam();
+			Court court3 = new Court();
+			court3.setCity("Amman");
+			court3.setName("Trax Jo");
+			court3.setHasBathroom(true);
+			court3.setPlaceId("XRGQ+7C Amman");
+			court3.setHasParking(false);
+			court3.setHasCafeteria(true);
+			court3.setHasBathroom(true);
+			sessionRepository.save(session3);
+			sessionTeamRepository.save(sessionTeam2);
+			sessionTeamRepository.save(sessionTeam3);
+			courtRepository.save(court3);
+			session3.setCourt(court3);
+			session3.setTeamA(sessionTeam2);
+			session3.setTeamB(sessionTeam3);
+			courtRepository.save(court3);
+			sessionTeamRepository.save(sessionTeam2);
+			sessionTeamRepository.save(sessionTeam3);
+			sessionRepository.save(session3);
+
+			Session session4 = new Session();
+			session4.setPlayerCount(0);
+			session4.setPrice(8);
+			session4.setType(SessionType.Random);
+			session4.setMatchDate(LocalDate.now().plusDays(3));
+			session4.setMaxPlayers(10);
+			session4.setMatchStartTime(LocalTime.now().plusHours(2));
+			session4.setMatchEndTime(LocalTime.now().plusHours(4));
+			SessionTeam sessionTeam = new SessionTeam();
+			SessionTeam sessionTeam1 = new SessionTeam();
+			Court court4 = new Court();
+			court4.setCity("Amman");
+			court4.setName("Trax Jo");
+			court4.setHasBathroom(true);
+			court4.setPlaceId("XRGQ+7C Amman");
+			court4.setHasParking(false);
+			court4.setHasCafeteria(true);
+			court4.setHasBathroom(true);
+			sessionRepository.save(session4);
+			sessionTeamRepository.save(sessionTeam);
+			sessionTeamRepository.save(sessionTeam1);
+			courtRepository.save(court4);
+			session4.setCourt(court4);
+			session4.setTeamA(sessionTeam);
+			session4.setTeamB(sessionTeam1);
+			courtRepository.save(court4);
+			sessionTeamRepository.save(sessionTeam);
+			sessionTeamRepository.save(sessionTeam1);
+			sessionRepository.save(session4);
+
+			Session session5 = new Session();
+			session5.setPlayerCount(0);
+			session5.setPrice(8);
+			session5.setType(SessionType.Teams);
+			session5.setMatchDate(LocalDate.now().plusDays(2));
+			session5.setMaxPlayers(10);
+			session5.setMatchStartTime(LocalTime.now().plusHours(2));
+			session5.setMatchEndTime(LocalTime.now().plusHours(4));
+			SessionTeam sessionTeam11 = new SessionTeam();
+			SessionTeam sessionTeam12 = new SessionTeam();
+			Court court5 = new Court();
+			court5.setCity("Amman");
+			court5.setName("Trax Jo");
+			court5.setHasBathroom(true);
+			court5.setPlaceId("XRGQ+7C Amman");
+			court5.setHasParking(false);
+			court5.setHasCafeteria(true);
+			court5.setHasBathroom(true);
+			sessionRepository.save(session5);
+			sessionTeamRepository.save(sessionTeam11);
+			sessionTeamRepository.save(sessionTeam12);
+			courtRepository.save(court5);
+			session5.setCourt(court5);
+			session5.setTeamA(sessionTeam11);
+			session5.setTeamB(sessionTeam12);
+			courtRepository.save(court5);
+			sessionTeamRepository.save(sessionTeam11);
+			sessionTeamRepository.save(sessionTeam12);
+			sessionRepository.save(session5);
 
             User adminUser = new User();
             adminUser.setUsername("adminABC");
