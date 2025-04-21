@@ -16,4 +16,7 @@ public class UpdatePlayerDTO {
     private String position;
 
     private String photoUrl;
+
+    @NotBlank(message = "Phone Number Can't be empty")
+    private String phoneNumber;
 }
