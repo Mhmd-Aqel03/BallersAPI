@@ -64,10 +64,6 @@ public class Session {
     @JoinColumn(name = "court_id")
     private Court court;
 
-    @ManyToOne()
-    @JoinColumn(name = "referee_id")
-    private Referee referee;
-
     @OneToOne
     @JoinColumn(name = "SessionTeam_id")
     
