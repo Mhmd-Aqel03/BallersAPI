@@ -18,7 +18,7 @@ public class SessionTeamDTO {
     private Long sessionId;
     public SessionTeamDTO(SessionTeam team) {
         this.id = team.getId();
-        this.sessionId = team.getSession().getId();
+
 
         // Make sure we're mapping ALL players, not just the first one
         if (team.getPlayers() != null) {
