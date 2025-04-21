@@ -5,17 +5,21 @@ import com.ballersApi.ballersApi.exceptions.*;
 import com.ballersApi.ballersApi.models.Player;
 import com.ballersApi.ballersApi.models.Session;
 import com.ballersApi.ballersApi.models.SessionTeam;
+import com.ballersApi.ballersApi.models.Team;
 import com.ballersApi.ballersApi.repositories.PlayerRepository;
 import com.ballersApi.ballersApi.repositories.SessionRepository;
 import com.ballersApi.ballersApi.repositories.SessionTeamRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class SessionTeamService {
@@ -26,120 +30,180 @@ public class SessionTeamService {
     @Autowired
     private PlayerRepository playerRepository;
 
-    public SessionTeam createSession(SessionTeam session) {
-        return sessionTeamRepository.save(session);
-    }
 
     @Transactional
-
     public SessionTeam createTeamSession(Long sessionId) {
-        // Validate session existence
-        Optional<Session> sessionOpt = sessionRepository.findById(sessionId);
-        if (sessionOpt.isEmpty()) {
-            throw new SessionNotFoundException("Session with id " + sessionId + " not found");
+
+            // Validate session existence
+            Optional<Session> sessionOpt = sessionRepository.findById(sessionId);
+            if (sessionOpt.isEmpty()) {
+                throw new SessionNotFoundException("Session with id " + sessionId + " not found");
+            }
+            Session session = sessionOpt.get();
+
+            // Ensure session does not exceed 2 teams
+
+            if (session.getTeamA() != null&&session.getTeamB() != null) {
+                throw new TeamSessionCreationException("This session already has two teams assigned.");
+            }
+
+            SessionTeam teamSession = new SessionTeam();
+        if(session.getTeamA() == null) {
+            session.setTeamA(teamSession);
         }
-        Session session = sessionOpt.get();
-
-        // Ensure session does not exceed 2 teams
-        List<SessionTeam> existingTeams = sessionTeamRepository.findBySession(session);
-        if (existingTeams.size() >= 2) {
-            throw new TeamSessionCreationException("This session already has two teams assigned.");
+        else {
+            session.setTeamB(teamSession);
         }
-
-
-        SessionTeam teamSession = new SessionTeam(session);
-        return sessionTeamRepository.save(teamSession);
+        sessionRepository.save(session);
+            return sessionTeamRepository.save(teamSession);
     }
 
-    public SessionTeam joinTeamSession(Long teamSessionId, Long playerId) {
+    public SessionTeam joinTeamSession(Long sessionId, Long playerId, Team team) {
 
-        // Validate team session existence
-        Optional<SessionTeam> teamSessionOpt = sessionTeamRepository.findById(teamSessionId);
-        if (teamSessionOpt.isEmpty()) {
+            // Validate team session existence
+            Optional<Session> sessionOptional = sessionRepository.findById(sessionId);
+            if (sessionOptional.isEmpty()) {
 
-            throw new TeamSessionNotFoundException("Team Session with id " + teamSessionId + " not found");
+                throw new SessionNotFoundException("Team Session with id " + sessionId + " not found");
+            }
+
+            Session session = sessionOptional.get();
+
+            // Validate player existence
+            Optional<Player> playerOpt = playerRepository.findById(playerId);
+            if (playerOpt.isEmpty()) {
+                throw new PlayerNotFoundException("Player with id " + playerId + " not found");
+            }
+        List<SessionTeam> teamsInSession = new ArrayList<>();
+            teamsInSession.add(session.getTeamA());
+            teamsInSession.add(session.getTeamB());
+
+        boolean isInAnyTeamInSession = false;
+        SessionTeam teamS =null;
+
+        for (SessionTeam team1 : teamsInSession) {
+
+            boolean playerInTeam = team1.getPlayers().stream()
+                    .anyMatch(playerInT -> playerInT.getId().equals(playerId));
+
+            if (playerInTeam) {
+                isInAnyTeamInSession = true;
+                teamS = team1;
+                break;
+            }
         }
-
-        SessionTeam teamSession = teamSessionOpt.get();
-
-        // Validate player existence
-        Optional<Player> playerOpt = playerRepository.findById(playerId);
-        if (playerOpt.isEmpty()) {
-            throw new PlayerNotFoundException("Player with id " + playerId + " not found");
-        }
-        List<SessionTeam> teamsInSession = sessionTeamRepository.findBySessionId(teamSession.getSession().getId());
-        boolean isInAnyTeamInSession = teamsInSession.stream()
-                .anyMatch(team -> team.getPlayers().stream()
-                        .anyMatch(playerInTeam -> playerInTeam.getId().equals(playerId)));
 
 
         Player player = playerOpt.get();
-        if (isInAnyTeamInSession) {
-            throw new PlayerAlreadyInTeamException("Player already joined team  with ID: " + teamSessionId);
+            if (isInAnyTeamInSession) {
+                throw new PlayerAlreadyInTeamException("Player already joined team  with ID: " + teamS.getId());
+            }
+
+        if ( LocalDate.now().isAfter(session.getMatchDate())) {
+            throw new SessionNotFoundException("You cannot join a session that has already finished.");
+        }
+
+        if (LocalTime.now().isAfter(session.getMatchEndTime())&& LocalDate.now().isEqual(session.getMatchDate())) {
+            throw new SessionNotFoundException("You cannot join a session that has already finished.");
         }
 
 
-        // Ensure team does not exceed max players (5)
-        if (!(teamSession.getSession().getPlayerCount() < teamSession.getSession().getMaxPlayers())) {
-            throw new TeamFullException("Team is already full.");
-        }
 
-        // Add player to the team and save
-        teamSession.getPlayers().add(player);
-        player.getSessionTeams().add(teamSession);
-        teamSession.getSession().setPlayerCount(teamSession.getSession().getPlayerCount() + 1);
-        playerRepository.save(player);
+            if (!(session.getPlayerCount() < session.getMaxPlayers())) {
+                throw new TeamFullException("Team is already full.");
+            }
 
-        return sessionTeamRepository.save(teamSession);
+
+                if(team.equals(Team.A)) {
+
+                    session.getTeamA().getPlayers().add(player);
+                    player.getSessionTeams().add(session.getTeamA());
+
+                    session.setPlayerCount(session.getPlayerCount()+1);
+                    playerRepository.save(player);
+                    sessionRepository.save(session);
+                    return sessionTeamRepository.save(session.getTeamA());
+
+                }
+                else {
+                    session.getTeamB().getPlayers().add(player);
+                    player.getSessionTeams().add(session.getTeamB());
+
+                    session.setPlayerCount(session.getPlayerCount()+1);
+                    playerRepository.save(player);
+                    sessionRepository.save(session);
+                    return sessionTeamRepository.save(session.getTeamB());
+                }
 
 
     }
-
-    public void leaveTeam(Long playerId, Long teamId) {
+    public void leaveTeam(Long playerId, Long sessionId, Team team) {
         // Find the player
         Player player = playerRepository.findById(playerId)
-                .orElseThrow(() -> new PlayerNotFoundException("Player " + playerId + " not found "));
+                .orElseThrow(() -> new PlayerNotFoundException("Player "+playerId+" not found "));
 
         // Find the team
-        SessionTeam teamSession = sessionTeamRepository.findById(teamId)
-                .orElseThrow(() -> new TeamSessionNotFoundException("Team " + teamId + " not found"));
+        Session session = sessionRepository.findById(sessionId)
+                .orElseThrow(() -> new SessionNotFoundException("Session "+sessionId+" not found"));
+        SessionTeam sessionTeam ;
+        if(team == Team.A) {
+             sessionTeam = session.getTeamA();
+        }
+        else {
+             sessionTeam = session.getTeamB();
+        }
 
-        // Check if the player is in the team
-        if (!teamSession.getPlayers().contains(player)) {
-            throw new PlayerNotInTeamException("Player id: " + playerId + " is not part of this team");
+        if (!sessionTeam.getPlayers().contains(player)) {
+            throw new PlayerNotInTeamException("Player id: "+ playerId + " is not part of this team");
+        }
+        if ( LocalDate.now().isAfter(session.getMatchDate())) {
+            throw new SessionNotFoundException("You cannot join a session that has already finished.");
+        }
+
+        if (LocalTime.now().isAfter(session.getMatchEndTime())&& LocalDate.now().isEqual(session.getMatchDate())) {
+            throw new SessionNotFoundException("You cannot join a session that has already finished.");
         }
 
         // Remove the player from the team
-        teamSession.getPlayers().remove(player);
-        player.getSessionTeams().remove(teamSession);
-        teamSession.getSession().setPlayerCount(teamSession.getSession().getPlayerCount() - 1);
+        sessionTeam.getPlayers().remove(player);
+
+        player.getSessionTeams().remove(sessionTeam);
+       session.setPlayerCount(session.getPlayerCount()-1);
         playerRepository.save(player);
 
         // Save the updated team
-        sessionTeamRepository.save(teamSession);
+        sessionTeamRepository.save(sessionTeam);
     }
 
-    @Transactional
-    public void deleteAllTeamSessions(long id) {
-        try {
-            sessionTeamRepository.deleteSessionTeamBySessionId(id);
-        } catch(DataAccessException e){
-            throw new DatabaseConnectionErrorException("something went wrong while trying to delete session teams: " + e.getMessage());
-        }
+    public void deleteAllTeamSessions(Long sessionId) {
+        Session session = sessionRepository.findById(sessionId)
+                .orElseThrow(() -> new SessionNotFoundException("Session "+sessionId+" not found"));
+
+            List<SessionTeam> teamsInSession = new ArrayList<>();
+            teamsInSession.add(session.getTeamA());
+            teamsInSession.add(session.getTeamB());
+
+            if (teamsInSession.isEmpty()) {
+                throw new TeamSessionNotFoundException("No teams found for session with ID: " + sessionId);
+            }
+
+            sessionTeamRepository.deleteAll(teamsInSession);
 
     }
-
     public List<SessionTeamDTO> getTeamsBySession(Long sessionId) {
         // Validate session existence
         Optional<Session> sessionOpt = sessionRepository.findById(sessionId);
         if (sessionOpt.isEmpty()) {
             throw new SessionNotFoundException("Session with id " + sessionId + " not found");
         }
-
+            Session session = sessionOpt.get();
         // Get teams for this session
-        List<SessionTeam> teams = sessionTeamRepository.findBySession(sessionOpt.get());
-        for (Player p : teams.get(0).getPlayers()) {
+        List<SessionTeam> teams = new ArrayList<>();
+        teams.add(session.getTeamA());
+        teams.add(session.getTeamB());
+        for(Player p : teams.get(0).getPlayers()) {
             System.out.println(p.getId());
+
         }
         // Map each team to a DTO
         List<SessionTeamDTO> teamDTOs = new ArrayList<>();
@@ -153,6 +217,8 @@ public class SessionTeamService {
 
         return teamDTOs;
     }
+
+
 
 
 }
