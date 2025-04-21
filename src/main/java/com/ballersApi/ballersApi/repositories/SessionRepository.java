@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface SessionRepository extends JpaRepository<Session, Long> {
-    Optional<Session> findById(Long id);
     List<Session> findByMatchDateAfter(LocalDate now);
     List<Session> findByMatchDateBetween(LocalDate startDate, LocalDate endDate);
+    Optional<Session> findById(Long id);
 }
