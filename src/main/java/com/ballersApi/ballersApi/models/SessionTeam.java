@@ -1,6 +1,7 @@
 package com.ballersApi.ballersApi.models;
 
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
@@ -21,10 +22,6 @@ public class SessionTeam {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    public SessionTeam(Session session ) {
-
-        this.session = session;
-    }
 
  //   @NotNull(message = "Players list cannot be null")
     @Size(min = 3, max = 6, message = "Team must have between 1 and 5 players")
@@ -32,12 +29,6 @@ public class SessionTeam {
 
     @ManyToMany(mappedBy = "sessionTeams")
     private List<Player> players;
-    @NotNull(message = "Session cannot be null")
-//  Session relation
-
-    @ManyToOne(cascade =  {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
-    @JoinColumn(name = "session_id")
-    private Session session;
 
 
 
