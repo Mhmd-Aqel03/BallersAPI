@@ -262,7 +262,7 @@ public class PlayerAuthService {
 
         player.setPostion(updatePlayerDTO.getPosition());
         player.setPhotoUrl(updatePlayerDTO.getPhotoUrl());
-
+        player.setPhoneNumber(updatePlayerDTO.getPhoneNumber());
         userService.updateUser(user);
     }
 }
