@@ -79,6 +79,13 @@ public class UserService {
         return userRepository.getUsersByRole(role);
     }
 
+    public User getUserByPlayerId(long playerId){
+        Optional<User> user = userRepository.getUserByPlayerId(playerId);
+
+        return user.orElseThrow(() -> new UserNotFoundException("User with player Id: " + playerId + " not found"));
+    }
+
+
     public ArrayList<User> searchUsers(String username) {
         ArrayList<User> users;
         try {
