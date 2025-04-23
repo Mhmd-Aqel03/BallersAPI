@@ -19,4 +19,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     ArrayList<User> findTop10ByUsernameContainingIgnoreCase(String username);
 
     ArrayList<User> getUsersByRole(Role role);
+
+    Optional<User> getUserByPlayerId(Long playerId);
 }

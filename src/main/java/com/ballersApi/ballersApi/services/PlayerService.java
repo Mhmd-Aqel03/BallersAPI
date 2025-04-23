@@ -3,6 +3,7 @@ package com.ballersApi.ballersApi.services;
 import com.ballersApi.ballersApi.exceptions.DatabaseConnectionErrorException;
 import com.ballersApi.ballersApi.exceptions.PlayerAlreadyEndorsedException;
 import com.ballersApi.ballersApi.models.Player;
+import com.ballersApi.ballersApi.models.User;
 import com.ballersApi.ballersApi.repositories.PlayerRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.dao.DataAccessException;
@@ -76,11 +77,15 @@ public class PlayerService {
         }
     }
 
-    public List<Player> getFavourites(String username) {
+    public List<User> getFavourites(String username) {
         Player player = playerAuthService.getPlayerByUsername(username);
 
-        // Because favourites is a set, we return a list like this
-        return new ArrayList<>(player.getFavorites());
+        List<User> favouriteUsers = new ArrayList<>();
+        for (Player favouritePlayer : player.getFavorites()) {
+            favouriteUsers.add(userService.getUserByPlayerId(favouritePlayer.getId()));
+        }
+
+        return favouriteUsers;
     }
 
     public void removeFavourite(String playerUsername, long favourite_id) {

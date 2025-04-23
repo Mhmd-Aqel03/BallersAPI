@@ -114,7 +114,7 @@ public class PlayerController {
         Map<String, Object> response = new HashMap<>();
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
 
-        List<Player> favourites = playerService.getFavourites(username);
+        List<User> favourites = playerService.getFavourites(username);
 
         response.put("favourites", favourites);
 
