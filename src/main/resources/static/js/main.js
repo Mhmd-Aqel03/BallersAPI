@@ -134,11 +134,11 @@ function getAvatarColor(messageSender) {
 
 function onConnected() {
     if (stompClient && stompClient.connected) {
-        stompClient.unsubscribe('/topic/chat/6');
+        stompClient.unsubscribe('/topic/chat/3');
     }
     //1 here is the session ID
 // the one here should be dynamic based on teh chat the user wants to join the end point is /topic/chat/{sessionID}
-    stompClient.subscribe('/topic/chat/6', onMessageReceived);
+    stompClient.subscribe('/topic/chat/3', onMessageReceived);
 
     // Subscribe to receive previous messages only for the new user
     stompClient.subscribe('/user/queue/history', onPreviousMessagesReceived);
@@ -175,7 +175,7 @@ function sendMessage(event) {
             type: 'CHAT'
         };
         //1 here is session ID
-        stompClient.send("/app/chat/6", {}, JSON.stringify(chatMessage));
+        stompClient.send("/app/chat/3", {}, JSON.stringify(chatMessage));
         messageInput.value = '';
     }
     event.preventDefault();
