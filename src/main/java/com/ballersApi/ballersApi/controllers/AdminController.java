@@ -21,7 +21,12 @@ import java.util.List;
 import java.util.Map;
 
 @AllArgsConstructor
-@CrossOrigin(origins = "http://localhost:5000")
+@CrossOrigin(
+        origins = "http://localhost:5000",
+        methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.OPTIONS},
+        allowedHeaders = {"Authorization", "Content-Type", "Accept"},
+        allowCredentials = "true"
+)
 @RestController
 @RequestMapping("/admin")
 public class AdminController {
@@ -34,6 +39,7 @@ public class AdminController {
     private final RefereeService refereeService;
 
     // Courts
+
     @GetMapping("/getAllCourts")
     public ResponseEntity<Map<String, Object>> getAllCourts() {
         Map<String, Object> response = new HashMap<>();

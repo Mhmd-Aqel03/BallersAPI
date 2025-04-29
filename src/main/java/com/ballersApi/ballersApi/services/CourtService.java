@@ -20,11 +20,12 @@ public class CourtService {
     }
 
     public List<Court> getAllCourts() {
-        List<Court> courts = courtRepository.findAll();
-        if (courts.isEmpty()) {
-            throw new NoCourtsFoundException("No courts found ");
+        try{
+            return courtRepository.findAll();
+        } catch (DataAccessException e){
+            throw new DatabaseConnectionErrorException("Something went wrong while trying to retrieve courts: " + e.getMessage());
         }
-        return courts;
+
     }
 
     public Court getCourtById(Long id) {

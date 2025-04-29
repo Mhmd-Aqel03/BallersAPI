@@ -40,7 +40,7 @@ public class BallersApiApplication {
             User user = new User();
             user.setUsername("username");
             user.setPassword(passwordEncoder.encode("password98!"));
-            user.setRole(Role.ROLE_PLAYER);
+            user.setRole(Role.ROLE_ADMIN);
             user.setEmail("admin@gmail.com");
             Player player = new Player();
             player.setPhoneNumber("23432");
