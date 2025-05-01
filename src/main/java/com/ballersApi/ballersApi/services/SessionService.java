@@ -1,21 +1,23 @@
 package com.ballersApi.ballersApi.services;
 
-
 import com.ballersApi.ballersApi.dataTransferObjects.SessionDTO;
+import com.ballersApi.ballersApi.exceptions.CanNotFetchDataException;
 import com.ballersApi.ballersApi.exceptions.DatabaseConnectionErrorException;
 import com.ballersApi.ballersApi.exceptions.SessionCreationException;
 import com.ballersApi.ballersApi.exceptions.SessionNotFoundException;
-import com.ballersApi.ballersApi.models.Chat;
 import com.ballersApi.ballersApi.models.Court;
 import com.ballersApi.ballersApi.models.Session;
 import com.ballersApi.ballersApi.models.User;
+import com.ballersApi.ballersApi.repositories.PlayerRepository;
 import com.ballersApi.ballersApi.repositories.SessionRepository;
-import jakarta.transaction.Transactional;
+import com.ballersApi.ballersApi.repositories.SessionTeamRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.TextStyle;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -24,29 +26,32 @@ import java.util.stream.Collectors;
 public class SessionService {
     @Autowired
     private SessionRepository sessionRepository;
-
     @Autowired
-    private CourtService courtService;
-
+    private SessionTeamRepository sessionTeamRepository;
     @Autowired
-    private RefereeService refereeService;
-
+    private PlayerRepository playerRepository;
     @Autowired
-    private SessionTeamService sessionTeamService;
+    RefereeService refereeService;
+    @Autowired
+    CourtService courtService;
 
-
-    public List<Session> getAllUpcomingSessions() {
-        try {
-            return sessionRepository.findByMatchDateAfter(LocalDate.now());
-        } catch (Exception e) {
-            throw new DatabaseConnectionErrorException("Error fetching upcoming sessions: " + e.getMessage());
-        }
+        public List<Session> getAllUpcomingSessions () {
+            try{
+        return sessionRepository.findByMatchDateAfter(LocalDate.now());
+    } catch (Exception e){
+                throw new CanNotFetchDataException("Error fetching upcoming sessions");
+            }
     }
-
     public Optional<Session> getSessionById(Long sessionId) {
-        return sessionRepository.findById(sessionId);
-    }
 
+        Session session1 = sessionRepository.findById(sessionId).orElse(null);
+        if (session1==null) {
+            throw new SessionNotFoundException("Session with ID " + sessionId + " not found");
+        }
+        System.out.println("A "+session1.getTeamA().getId());
+        System.out.println("B "+session1.getTeamB().getId());
+        return Optional.ofNullable(session1);
+    }
     public Map<String, List<Session>> getSessionsForWeek(LocalDate startDate) {
         LocalDate endDate = startDate.plusDays(6);
         List<Session> sessions = sessionRepository.findByMatchDateBetween(startDate, endDate);
@@ -70,46 +75,29 @@ public class SessionService {
                 ));
     }
 
-    @Transactional
-    public void createSession(SessionDTO sessionDTO) {
-        Session session = new Session();
-        session.setMatchDate(sessionDTO.getMatchDate());
-        session.setMatchStartTime(sessionDTO.getMatchStartTime());
-        session.setMatchEndTime(sessionDTO.getMatchEndTime());
-        session.setMaxPlayers(sessionDTO.getMaxPlayers());
-        session.setPrice(sessionDTO.getPrice());
-        session.setType(sessionDTO.getType());
+    //For the Admin
 
-        if (sessionDTO.getCourtId() != -1) {
-            Court court = courtService.getCourtById(sessionDTO.getCourtId());
-            session.setCourt(court);
-        }
-        // Create chat for session
-        Chat chat = new Chat();
-        chat.setSession(session);
-        session.setChat(chat);
+    public Session createSession(Session session) {
 
-        if (sessionDTO.getRefereeId() != -1) {
-            User referee = refereeService.getRefereeById(sessionDTO.getRefereeId());
-            session.setReferee(referee);
-        }
 
         try {
-            sessionRepository.save(session);
-        } catch (DataAccessException e) {
-            throw new DatabaseConnectionErrorException("Error saving session: " + e.getMessage());
+            if (session == null) {
+                throw new SessionCreationException("Session data is missing");
+            }
+
+
+            return sessionRepository.save(session);
+        } catch (Exception e) {
+            throw new SessionCreationException("Error creating session: " + e.getMessage());
         }
 
-        sessionTeamService.createTeamSession(session.getId());
-        sessionTeamService.createTeamSession(session.getId());
     }
 
     public void deleteSession(Long sessionId) {
-        sessionTeamService.deleteAllTeamSessions(sessionId);
 
         try {
-            Session session1 = sessionRepository.findById(sessionId).orElse(null);
-            if (session1 == null) {
+           Session session1 = sessionRepository.findById(sessionId).orElse(null);
+            if (session1==null) {
                 throw new SessionNotFoundException("Session with ID " + sessionId + " not found");
             }
             sessionRepository.deleteById(sessionId);
@@ -117,8 +105,6 @@ public class SessionService {
             throw new SessionCreationException("Error deleting session: " + e.getMessage());
         }
     }
-
-
     public void updateSession(Long id, SessionDTO newSession) {
         Session session = sessionRepository.findById(id).orElseThrow(() -> new SessionNotFoundException("Session with ID " + id + " not found"));
 
@@ -145,7 +131,7 @@ public class SessionService {
             throw new DatabaseConnectionErrorException("Error saving session: " + e.getMessage());
         }
     }
-}
+    }
 
 
 
