@@ -1,16 +1,18 @@
 package com.ballersApi.ballersApi.services;
 
-import com.ballersApi.ballersApi.exceptions.DatabaseConnectionErrorException;
-import com.ballersApi.ballersApi.exceptions.PlayerAlreadyEndorsedException;
+import com.ballersApi.ballersApi.dataTransferObjects.PlayerHistoryDTO;
+import com.ballersApi.ballersApi.exceptions.*;
 import com.ballersApi.ballersApi.models.Player;
-import com.ballersApi.ballersApi.models.User;
+import com.ballersApi.ballersApi.models.Session;
 import com.ballersApi.ballersApi.repositories.PlayerRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @AllArgsConstructor
 @Service
@@ -77,15 +79,11 @@ public class PlayerService {
         }
     }
 
-    public List<User> getFavourites(String username) {
+    public List<Player> getFavourites(String username) {
         Player player = playerAuthService.getPlayerByUsername(username);
 
-        List<User> favouriteUsers = new ArrayList<>();
-        for (Player favouritePlayer : player.getFavorites()) {
-            favouriteUsers.add(userService.getUserByPlayerId(favouritePlayer.getId()));
-        }
-
-        return favouriteUsers;
+        // Because favourites is a set, we return a list like this
+        return new ArrayList<>(player.getFavorites());
     }
 
     public void removeFavourite(String playerUsername, long favourite_id) {
@@ -120,6 +118,26 @@ public class PlayerService {
                 }
                 break;
         }
+    }
+
+    public List<PlayerHistoryDTO> getPlayerSessionHistory(Long playerId) {
+        Player player = playerRepository.findById(playerId)
+                .orElseThrow(() -> new PlayerNotFoundException("Player not found"));
+
+        if (player.getPastSessions() == null || player.getPastSessions().isEmpty()) {
+            // Return a custom message with the empty result
+            throw new PlayerHistoryException("no past session history.");
+        }
+
+        List<PlayerHistoryDTO> historyDTOs = new ArrayList<>();
+        for (Map.Entry<Session, Boolean> entry : player.getPastSessions().entrySet()) {
+            Session session = entry.getKey();
+            Boolean won = entry.getValue();
+
+            // Add session details and "won" or "lost" result
+            historyDTOs.add(new PlayerHistoryDTO(session, won));
+        }
+        return historyDTOs;
     }
 
 }
