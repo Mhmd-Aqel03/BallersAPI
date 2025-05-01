@@ -22,11 +22,7 @@ public class SessionTeam {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-
- //   @NotNull(message = "Players list cannot be null")
     @Size(min = 3, max = 6, message = "Team must have between 1 and 5 players")
-//  Player relation
-
     @ManyToMany(mappedBy = "sessionTeams")
     private List<Player> players;
 
