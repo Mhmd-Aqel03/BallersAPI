@@ -1,7 +1,9 @@
 package com.ballersApi.ballersApi.controllers;
 
+import com.ballersApi.ballersApi.dataTransferObjects.PlayerHistoryDTO;
 import com.ballersApi.ballersApi.dataTransferObjects.PlayerIdDTO;
 import com.ballersApi.ballersApi.dataTransferObjects.UpdatePlayerDTO;
+import com.ballersApi.ballersApi.exceptions.PlayerNotFoundException;
 import com.ballersApi.ballersApi.models.Player;
 import com.ballersApi.ballersApi.models.User;
 import com.ballersApi.ballersApi.services.PlayerAuthService;
@@ -28,6 +30,8 @@ public class PlayerController {
     private final PlayerService playerService;
 
     private final UserService userService;
+
+
 
     @GetMapping("/getUser")
     public ResponseEntity<Map<String, Object>> getPlayer() {
@@ -114,7 +118,7 @@ public class PlayerController {
         Map<String, Object> response = new HashMap<>();
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
 
-        List<User> favourites = playerService.getFavourites(username);
+        List<Player> favourites = playerService.getFavourites(username);
 
         response.put("favourites", favourites);
 
@@ -143,5 +147,11 @@ public class PlayerController {
         response.put("msg", "Player updated successfully");
 
         return ResponseEntity.ok(response);
+    }
+    @GetMapping("/history")
+    public ResponseEntity<List<PlayerHistoryDTO>> getPlayerSessionHistory() {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        Long playerId = userService.getUserByUsername(username).getId();
+        return ResponseEntity.ok(playerService.getPlayerSessionHistory(playerId));
     }
 }
