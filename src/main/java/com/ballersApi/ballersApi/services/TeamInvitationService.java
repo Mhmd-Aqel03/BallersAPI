@@ -30,22 +30,27 @@ public class TeamInvitationService {
 
     List<Player> pl= new ArrayList<>();
     @Transactional
-    public void invitePlayersToTeam(Long sessionId,Long teamId, Long playerId, List<Long> receiverId) {
+    public void invitePlayersToTeam(Long sessionId,Team team, Long playerId, List<Long> receiverId) {
         Session session = sessionRepository.findById(sessionId)
                 .orElseThrow(() -> new SessionNotFoundException("Session " + sessionId + " not found "));
 
         Player player = playerRepository.findById(playerId)
                 .orElseThrow(() -> new PlayerNotFoundException("Player " + playerId + " not found "));
 
-        SessionTeam sessionTeam = sessionTeamRepository.findById(teamId)
-                .orElseThrow(()-> new TeamSessionNotFoundException("Team " + teamId + " not found "));
+        SessionTeam sessionTeam ;
+        if(team==Team.A){
+            sessionTeam=session.getTeamA();
+        }
+        else{
+            sessionTeam=session.getTeamB();
+        }
 
         if (receiverId.size() < 4) {
             throw new NotEnoughPlayersException("You must invite at least 4 players to form a team");
         }
 
         boolean isInSession = player.getSessionTeams().stream()
-                .anyMatch(team -> team.getSession().getId().equals(sessionId));
+                .anyMatch(team1 -> session.getId().equals(sessionId));
 
         if (!isInSession) {
             throw new PlayerNotFoundException("Player "+ playerId + " is not in session");
@@ -53,6 +58,15 @@ public class TeamInvitationService {
         if(!session.getType().equals(SessionType.Teams)){
             throw new WrongInvitationTypeException("Session type doesn't match Invitation type");
         }
+        SessionTeam inviterTeam = player.getSessionTeams().stream()
+                .filter(t -> t.getId().equals(sessionTeam.getId()))
+                .findFirst()
+                .orElseThrow(() -> new PlayerNotFoundException("You are not a member of this team"));
+
+        if (!inviterTeam.getId().equals(sessionTeam.getId())) {
+            throw new InvitationNotFoundException("You can only invite players to your own team");
+        }
+
         List<Player> receivers = new ArrayList<>();
         for (Long rId : receiverId) {
             Player receiver = playerRepository.findById(rId)
@@ -69,7 +83,7 @@ public class TeamInvitationService {
             invite.setPlayer(player);
             invite.setReceivers(receivers);
             invite.setReceiver(receiver);
-            invite.getTeam().setSession(session);
+            invite.setSession(session);
             invite.setStatus(InviteStatus.PENDING);
             invite.setCreatedAt(time);
             teamInvitationRepository.save(invite);
@@ -101,31 +115,34 @@ public class TeamInvitationService {
                 throw new PlayerAlreadyInTeamException("You are already in the team.");
             }
             pl.add(invite.getReceiver());
-            checkAndConfirmTeam( invite.getTeam(),pl);
+            checkAndConfirmTeam( invite.getSession(),invite.getTeam(),pl);
         }
         if(status == InviteStatus.DECLINED){
             invite.setStatus(InviteStatus.DECLINED);
         }
     }
     @Transactional
-    public void checkAndConfirmTeam(SessionTeam team, List<Player> receivers) {
+    public void checkAndConfirmTeam(Session session,SessionTeam team, List<Player> receivers) {
         List<TeamInvitation> acceptedInvites = teamInvitationRepository.findByTeamAndStatus(team, InviteStatus.ACCEPTED);
 
         if (acceptedInvites.size() >= 4) {
             // First, fetch the team to ensure it's loaded
-            SessionTeam managedTeam = sessionTeamRepository.findById(team.getId())
-                    .orElseThrow(() -> new TeamSessionNotFoundException("Team not found"));
+
+
+
 
             for (Player p : receivers) {
                 // Get managed version of player
                 Player managedPlayer = playerRepository.findById(p.getId())
                         .orElseThrow(() -> new PlayerNotFoundException("Player not found"));
 
+
                 // Add player to team (if not already there)
-                if (!managedTeam.getPlayers().contains(managedPlayer)) {
-                    managedTeam.getPlayers().add(managedPlayer);
+                if (!team.getPlayers().contains(managedPlayer)) {
+                    team.getPlayers().add(managedPlayer);
                 }
-                managedPlayer.getSessionTeams().add(managedTeam);
+                managedPlayer.getSessionTeams().add(team);
+
 
                 // Add team to player using JPA merge to avoid lazy init issues
                 // This avoids directly accessing the sessionTeams collection
@@ -134,16 +151,16 @@ public class TeamInvitationService {
             }
 
             // Update session's player count
-            managedTeam.getSession().setPlayerCount(managedTeam.getPlayers().size());
-            for(Player p : managedTeam.getPlayers()) {
+            session.setPlayerCount(team.getPlayers().size());
+            for(Player p : team.getPlayers()) {
                 System.out.println(p.getId());
             }
 
             // Save the team
-            sessionTeamRepository.save(managedTeam);
+            sessionTeamRepository.save(team);
 
             // Save the session
-            sessionRepository.save(managedTeam.getSession());
+            sessionRepository.save(session);
         }
     }
 }
