@@ -56,24 +56,28 @@ public class SessionService {
         LocalDate endDate = startDate.plusDays(6);
         List<Session> sessions = sessionRepository.findByMatchDateBetween(startDate, endDate);
 
-        // Temporary map grouped by date
+        // Group by date
         Map<LocalDate, List<Session>> groupedByDate = sessions.stream()
                 .collect(Collectors.groupingBy(Session::getMatchDate));
 
-        // Sort by day of week (Sunday to Saturday)
+        // Sort the outer map by LocalDate (natural order), and the inner lists by matchStartTime
         return groupedByDate.entrySet().stream()
-                .sorted(Comparator.comparing(entry -> entry.getKey().getDayOfWeek()))
+                .sorted(Map.Entry.comparingByKey()) // ensures Saturday comes before Sunday, etc.
                 .collect(Collectors.toMap(
                         entry -> {
                             LocalDate date = entry.getKey();
                             String dayOfWeek = date.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.ENGLISH);
-                            return dayOfWeek + " " + date; // e.g., "Monday 2025-04-01"
+                            return dayOfWeek + " " + date;
                         },
-                        Map.Entry::getValue,
+                        entry -> entry.getValue().stream()
+                                .sorted(Comparator.comparing(Session::getMatchStartTime))
+                                .collect(Collectors.toList()),
                         (v1, v2) -> v1,
-                        LinkedHashMap::new // Keeps order
+                        LinkedHashMap::new
                 ));
     }
+
+
 
     //For the Admin
 
