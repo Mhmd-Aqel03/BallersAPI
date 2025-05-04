@@ -296,5 +296,11 @@ public class GlobalExceptionHandler {
         response.put("message", "Something went wrong with the player: " + ex.getMessage());
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
+    @ExceptionHandler(MvpSelectionException.class)
+    public ResponseEntity<Map<String, Object>> handleMvpSelectionException(MvpSelectionException ex) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "Something went wrong with the mvp: " + ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
 
 }
