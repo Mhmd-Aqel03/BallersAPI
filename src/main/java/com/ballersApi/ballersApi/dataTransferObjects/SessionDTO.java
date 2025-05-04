@@ -43,6 +43,7 @@ public class SessionDTO {
     private long refereeId = -1;
 
     private Player mvp;
+
     private Team winningTeam;
 
     private SessionTeam teamA;
