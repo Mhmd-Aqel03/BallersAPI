@@ -1,5 +1,6 @@
 package com.ballersApi.ballersApi.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -99,6 +100,7 @@ public class Player {
     )
     private Set<Player> favorites = new HashSet<>();
     @JsonIgnore
+    @JsonBackReference
     @ElementCollection
-    private Map<Session, Boolean> pastSessions = new HashMap<>();
+    private Map<Long, Boolean> pastSessions = new HashMap<>();
 }
