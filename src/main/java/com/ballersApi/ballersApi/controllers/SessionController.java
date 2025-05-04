@@ -3,7 +3,6 @@ package com.ballersApi.ballersApi.controllers;
 import com.ballersApi.ballersApi.dataTransferObjects.SessionDTO;
 import com.ballersApi.ballersApi.dataTransferObjects.SessionTeamDTO;
 import com.ballersApi.ballersApi.models.Session;
-import com.ballersApi.ballersApi.models.SessionTeam;
 import com.ballersApi.ballersApi.models.Team;
 import com.ballersApi.ballersApi.services.SessionService;
 import com.ballersApi.ballersApi.services.SessionTeamService;
