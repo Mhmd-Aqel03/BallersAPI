@@ -1,9 +1,6 @@
 package com.ballersApi.ballersApi.services;
 
-import com.ballersApi.ballersApi.exceptions.InvitationNotFoundException;
-import com.ballersApi.ballersApi.exceptions.PlayerNotFoundException;
-import com.ballersApi.ballersApi.exceptions.TeamSessionNotFoundException;
-import com.ballersApi.ballersApi.exceptions.WrongInvitationTypeException;
+import com.ballersApi.ballersApi.exceptions.*;
 import com.ballersApi.ballersApi.models.Invitation;
 import com.ballersApi.ballersApi.models.Player;
 import com.ballersApi.ballersApi.models.Session;
@@ -60,7 +57,9 @@ public class InvitationService {
     public Session respondToInvite(Long inviteId, boolean status) {
         Invitation invite = invitationRepository.findById(inviteId)
                 .orElseThrow(() -> new InvitationNotFoundException("Invitation with id " + inviteId + " not found"));
-
+        if (invite.getSession().getWinningTeam() != null) {
+            throw new SessionFinalizedException("This session has already been finalized.");
+        }
 
 
         invite.setStatus(status);
