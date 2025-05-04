@@ -102,6 +102,9 @@ public class TeamInvitationService {
         if (invite.getStatus() != InviteStatus.PENDING) {
             throw new RespondedToInviteException("You have already responded to this invite.");
         }
+        if (invite.getSession().getWinningTeam() != null) {
+            throw new SessionFinalizedException("This session has already been finalized.");
+        }
 
 
         invite.setStatus(status);
