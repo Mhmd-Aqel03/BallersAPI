@@ -1,9 +1,6 @@
 package com.ballersApi.ballersApi.models;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
@@ -67,8 +64,8 @@ public class Session {
     @ManyToOne()
     @JoinColumn(name = "referee_id")
     private User referee;
-
     @ManyToOne
+
     private Player mvp;
 
     private Team winningTeam;
