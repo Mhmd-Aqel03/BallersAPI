@@ -1,17 +1,16 @@
 package com.ballersApi.ballersApi.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.antlr.v4.runtime.misc.NotNull;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Data
@@ -20,6 +19,7 @@ public class Player {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+
 
     @NotBlank(message = "Position Can't be empty")
     private String postion;
@@ -65,7 +65,6 @@ public class Player {
     private Set<Long> positiveAttitudeEndorsements = new HashSet<>();
 
     @JsonIgnore
-//  Session Team relationship
     @ManyToMany
     @JoinTable(
             name = "player_sessionTeam",
@@ -79,7 +78,6 @@ public class Player {
     private List<SessionTeam> sessionTeams;
 
     @JsonIgnore
-//  Player and Chat relationship
     @ManyToMany
     @JoinTable(
             name = "player_chat",
@@ -101,4 +99,8 @@ public class Player {
             inverseJoinColumns = @JoinColumn(name = "favorite_id")
     )
     private Set<Player> favorites = new HashSet<>();
+    @JsonIgnore
+    @JsonBackReference
+    @ElementCollection
+    private Map<Long, Boolean> pastSessions = new HashMap<>();
 }

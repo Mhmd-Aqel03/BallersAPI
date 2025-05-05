@@ -284,5 +284,23 @@ public class GlobalExceptionHandler {
         error.put("error", ex.getMessage());
         return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
     }
+    @ExceptionHandler(SessionFinalizedException.class)
+    public ResponseEntity<Map<String, Object>> handleSessionFinalizedException(SessionFinalizedException ex) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "Something went wrong with the session: " + ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+    @ExceptionHandler(PlayerHistoryException.class)
+    public ResponseEntity<Map<String, Object>> handlePlayerHistoryException(PlayerHistoryException ex) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "Something went wrong with the player: " + ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+    @ExceptionHandler(MvpSelectionException.class)
+    public ResponseEntity<Map<String, Object>> handleMvpSelectionException(MvpSelectionException ex) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "Something went wrong with the mvp: " + ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
 
 }
