@@ -35,9 +35,7 @@ public class InvitationService {
         boolean isInSession = player.getSessionTeams().stream()
                 .anyMatch(team1 -> session.getId().equals(sessionId));
 
-        if (!isInSession) {
-            throw new PlayerNotFoundException("Player "+ playerId + " is not in session");
-        }
+       
         if(!session.getType().equals(SessionType.Random)){
             throw new WrongInvitationTypeException("Session type doesn't match Invitation type");
         }
