@@ -17,7 +17,6 @@ public class Chat {
 
     @OneToOne
     @JoinColumn(name = "sessionId")
-
     @JsonBackReference //added becasue of infinte json recursion
     private Session session;
 

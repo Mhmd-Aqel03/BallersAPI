@@ -92,12 +92,12 @@ public class AdminController {
     }
 
     //Court Images
-    @GetMapping("/courtImage/{courtId}")
+    @GetMapping("/getImage/{courtId}")
     public List<CourtImage> getImagesByCourtId(@PathVariable Long courtId) {
         return courtImageService.getImagesByCourtId(courtId);
     }
 
-    @PostMapping("/courtImage/addImage/{courtId}")
+    @PostMapping("addImage/{courtId}")
     public ResponseEntity<Map<String, Object>> addImage(@PathVariable Long courtId, @RequestBody CourtImage courtImage) {
         Map<String, Object> response = new HashMap<>();
 
@@ -108,7 +108,7 @@ public class AdminController {
         return ResponseEntity.ok(response);
     }
 
-    @DeleteMapping("/courtImage/deleteImage/{id}")
+    @DeleteMapping("/deleteImage/{id}")
     public ResponseEntity<Map<String, Object>> deleteImage(@PathVariable Long id) {
         Map<String, Object> response = new HashMap<>();
 
@@ -120,16 +120,18 @@ public class AdminController {
     }
 
     // Sessions
-    @GetMapping("/session/getSessions")
+    @GetMapping("/getAllSessions")
     public ResponseEntity<Map<String, Object>> getAllUpcomingSessions() {
         Map<String, Object> response = new HashMap<>();
+
+
 
         response.put("sessions", sessionService.getAllUpcomingSessions());
 
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/session/getSession/{id}")
+    @GetMapping("/getSession/{id}")
     public ResponseEntity<Session> getSessionById(@PathVariable long id) {
         return sessionService.getSessionById(id)
                 .map(ResponseEntity::ok)
@@ -137,7 +139,7 @@ public class AdminController {
 
     }
 
-    @PostMapping("/session/createSession")
+    @PostMapping("/createSession")
     public ResponseEntity<Map<String, Object>> createSession(@Valid @RequestBody SessionDTO sessionDTO) {
         Map<String, Object> response = new HashMap<>();
 
@@ -148,7 +150,7 @@ public class AdminController {
         return ResponseEntity.ok(response);
     }
 
-    @DeleteMapping("/session/deleteSession/{id}")
+    @DeleteMapping("/deleteSession/{id}")
     public ResponseEntity<Map<String, Object>> deleteSession(@PathVariable Long id) {
         Map<String, Object> response = new HashMap<>();
 
@@ -159,7 +161,7 @@ public class AdminController {
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping("/session/updateSession/{id}")
+    @PutMapping("/updateSession/{id}")
     public ResponseEntity<Map<String, Object>> updateSession(@PathVariable Long id, @RequestBody @Valid SessionDTO sessionDTO) {
         Map<String, Object> response = new HashMap<>();
 
@@ -171,7 +173,7 @@ public class AdminController {
     }
 
     // Referee
-    @PostMapping("/referee/createReferee")
+    @PostMapping("/createReferee")
     public ResponseEntity<Map<String, Object>> createReferee(@Valid @RequestBody RefereeDTO refereeDTO) {
         Map<String, Object> response = new HashMap<>();
 
@@ -181,7 +183,7 @@ public class AdminController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/referee/getAllReferees")
+    @GetMapping("/getAllReferees")
     public ResponseEntity<Map<String, Object>> getAllReferees() {
         Map<String, Object> response = new HashMap<>();
 
@@ -191,7 +193,7 @@ public class AdminController {
         return ResponseEntity.ok(response);
     }
 
-    @DeleteMapping("/referee/deleteReferee/{id}")
+    @DeleteMapping("/deleteReferee/{id}")
     public ResponseEntity<Map<String, Object>> deleteReferee(@PathVariable Long id) {
         Map<String, Object> response = new HashMap<>();
 

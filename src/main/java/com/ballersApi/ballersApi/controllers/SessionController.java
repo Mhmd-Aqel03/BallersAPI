@@ -54,35 +54,6 @@ public class SessionController {
         return ResponseEntity.ok(response);
     }
 
-
-
-
-    @PostMapping("createSession")
-    public Session createSession(@Valid @RequestBody SessionDTO request) {
-        Session session = new Session();
-        session.setType(request.getType());
-        session.setMatchDate(request.getMatchDate());
-        session.setMatchStartTime(request.getMatchStartTime());
-        session.setMatchEndTime(request.getMatchEndTime());
-        session.setMaxPlayers(request.getMaxPlayers());
-        session.setPrice(request.getPrice());
-        session.setPlayerCount(0);
-
-
-        sessionService.createSession(session);
-        sessionTeamService.createTeamSession(session.getId());
-        sessionTeamService.createTeamSession(session.getId());
-        return session;
-
-    }
-    @DeleteMapping("deleteSession/{id}")
-
-    public ResponseEntity<Void> deleteSession(@PathVariable  Long id){
-
-        sessionTeamService.deleteAllTeamSessions(id);
-        sessionService.deleteSession(id);
-        return ResponseEntity.ok().build();
-    }
     @PostMapping("joinSessionTeam/{sessionId}/{team}")
     public ResponseEntity<SessionTeamDTO> joinTeamSession(@PathVariable Long sessionId, @PathVariable Team team) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
