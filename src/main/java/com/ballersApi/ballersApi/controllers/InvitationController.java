@@ -3,6 +3,7 @@ package com.ballersApi.ballersApi.controllers;
 import com.ballersApi.ballersApi.models.Invitation;
 import com.ballersApi.ballersApi.models.InviteStatus;
 import com.ballersApi.ballersApi.models.Session;
+import com.ballersApi.ballersApi.models.Team;
 import com.ballersApi.ballersApi.services.InvitationService;
 import com.ballersApi.ballersApi.services.PlayerAuthService;
 import com.ballersApi.ballersApi.services.TeamInvitationService;
@@ -26,7 +27,7 @@ public class InvitationController {
 
 
     // Send an Invitation to a player
-    @PostMapping("/send/{receiverId}/{sessionId}")
+    @PostMapping("/Invite/{receiverId}/{sessionId}")
     public ResponseEntity<Invitation> sendInvite(
 
             @PathVariable Long receiverId,
@@ -56,13 +57,13 @@ public class InvitationController {
 
 
     }
-    @PostMapping("/TeamInvite/{sessionId}/{teamId}")
+    @PostMapping("/TeamInvite/{sessionId}/{team}")
     public ResponseEntity<String> invitePlayersToTeam(@PathVariable Long sessionId,
-                                                @PathVariable Long teamId,
+                                                @PathVariable Team team,
                                                 @RequestBody List<Long> receiverIds) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         Long playerId = userService.getUserByUsername(username).getId();
-        teamInvitationService.invitePlayersToTeam(sessionId ,teamId,playerId, receiverIds);
+        teamInvitationService.invitePlayersToTeam(sessionId ,team,playerId, receiverIds);
         return ResponseEntity.ok("Team invites sent successfully");
     }
     @PostMapping("/TeamRespond/{inviteId}/")

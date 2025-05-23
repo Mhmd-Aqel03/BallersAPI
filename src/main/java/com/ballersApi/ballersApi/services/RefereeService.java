@@ -1,19 +1,32 @@
 package com.ballersApi.ballersApi.services;
 
 import com.ballersApi.ballersApi.dataTransferObjects.RefereeDTO;
-import com.ballersApi.ballersApi.exceptions.UserNotFoundException;
-import com.ballersApi.ballersApi.models.Role;
-import com.ballersApi.ballersApi.models.User;
+import com.ballersApi.ballersApi.dataTransferObjects.SessionDTO;
+import com.ballersApi.ballersApi.exceptions.*;
+import com.ballersApi.ballersApi.models.*;
+import com.ballersApi.ballersApi.repositories.PlayerRepository;
+import com.ballersApi.ballersApi.repositories.SessionRepository;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @Service
 public class RefereeService {
-
+    @Autowired
     private UserService userService;
+    @Autowired
+    private SessionRepository sessionRepository;
+
+    @Autowired
+    private PlayerRepository playerRepository;
 
     public User getRefereeById(long id) {
         User user = userService.getUserById(id);
@@ -47,4 +60,130 @@ public class RefereeService {
     public void deleteReferee(long id){
         userService.deleteUser(id);
     }
+    @Transactional
+    public void finalizeSessionResult(Long sessionId, Team team) {
+        // Fetch the session by ID
+        Session session = sessionRepository.findById(sessionId)
+                .orElseThrow(() -> new SessionNotFoundException("Session not found"));
+
+        // Check if the session has already been finalized
+        if (session.getWinningTeam() != null) {
+            throw new SessionFinalizedException("This session has already been finalized.");
+        }
+
+        List<Player> teamAPlayers = session.getTeamA().getPlayers();
+        List<Player> teamBPlayers = session.getTeamB().getPlayers();
+
+        // Set winning team in the session
+        if (team.equals(Team.A)) {
+            session.setWinningTeam(team);
+            sessionRepository.save(session);
+
+            for (Player player : teamAPlayers) {
+                player.setSessionsPlayed(player.getSessionsPlayed() + 1);
+                player.setSessionsWon(player.getSessionsWon() + 1);
+
+                // Store only the session ID and the result (true for win)
+                player.getPastSessions().put(session.getId(), true);
+
+                playerRepository.save(player);
+            }
+
+            for (Player player : teamBPlayers) {
+                player.setSessionsPlayed(player.getSessionsPlayed() + 1);
+                player.setSessionsLost(player.getSessionsLost() + 1);
+
+                // Store only the session ID and the result (false for loss)
+                player.getPastSessions().put(session.getId(), false);
+
+                playerRepository.save(player);
+            }
+
+        } else {
+            session.setWinningTeam(team);
+            sessionRepository.save(session);
+
+            for (Player player : teamAPlayers) {
+                player.setSessionsPlayed(player.getSessionsPlayed() + 1);
+                player.setSessionsLost(player.getSessionsLost() + 1);
+
+                // Store only the session ID and the result (false for loss)
+                player.getPastSessions().put(session.getId(), false);
+
+                playerRepository.save(player);
+            }
+
+            for (Player player : teamBPlayers) {
+                player.setSessionsPlayed(player.getSessionsPlayed() + 1);
+                player.setSessionsWon(player.getSessionsWon() + 1);
+
+                // Store only the session ID and the result (true for win)
+                player.getPastSessions().put(session.getId(), true);
+
+                playerRepository.save(player);
+            }
+        }
+    }
+
+    public List<SessionDTO> getSessionsByRefereeId(long refereeId) {
+        // Fetch the referee by ID
+        User referee = userService.getUserById(refereeId);
+
+        // Validate if the user is indeed a referee
+        if (referee.getRole() != Role.ROLE_REFEREE) {
+            throw new UserNotFoundException("User with ID " + refereeId + " is not a referee.");
+        }
+
+        // Fetch all sessions where this referee is assigned
+        List<Session> sessions = sessionRepository.findByReferee(referee);
+
+        // If no sessions found for this referee
+        if (sessions.isEmpty()) {
+            throw new SessionNotFoundException("No sessions found for referee with ID " + refereeId);
+        }
+
+        // Sort sessions by matchDate then matchStartTime
+        sessions.sort(Comparator
+                .comparing(Session::getMatchDate)
+                .thenComparing(Session::getMatchStartTime));
+
+        // Convert to DTOs
+        return sessions.stream()
+                .map(SessionDTO::new)
+                .collect(Collectors.toList());
+    }
+    public void chooseMvp(Long sessionId, Long playerId) {
+
+        Session session = sessionRepository.findById(sessionId)
+                .orElseThrow(() -> new SessionNotFoundException("Session not found with ID: " + sessionId));
+
+        // Check if session has been finalized
+        if (session.getWinningTeam() == null) {
+            throw new SessionFinalizedException("Cannot choose MVP. The session has not been finalized yet. Please finalize the session first.");
+        }
+        // Check if MVP has already been chosen
+        if (session.getMvp() != null) {
+            throw new MvpSelectionException("MVP has already been chosen for this session.");
+        }
+        Player player = playerRepository.findById(playerId)
+                .orElseThrow(() -> new PlayerNotFoundException("Player not found with ID: " + playerId));
+
+        // Ensure the player participated in the session
+        boolean isInTeamA = session.getTeamA() != null && session.getTeamA().getPlayers().contains(player);
+        boolean isInTeamB = session.getTeamB() != null && session.getTeamB().getPlayers().contains(player);
+
+        if (!isInTeamA && !isInTeamB) {
+            throw new PlayerNotFoundException("Player did not participate in this session");
+        }
+
+        // Set MVP
+        session.setMvp(player);
+        sessionRepository.save(session);
+
+        // Increment MVP count
+        player.setMVPs(player.getMVPs() + 1);
+        playerRepository.save(player);
+    }
+
+
 }
