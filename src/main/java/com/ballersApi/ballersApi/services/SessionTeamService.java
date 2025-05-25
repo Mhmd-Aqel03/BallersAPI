@@ -2,10 +2,7 @@ package com.ballersApi.ballersApi.services;
 
 import com.ballersApi.ballersApi.dataTransferObjects.SessionTeamDTO;
 import com.ballersApi.ballersApi.exceptions.*;
-import com.ballersApi.ballersApi.models.Player;
-import com.ballersApi.ballersApi.models.Session;
-import com.ballersApi.ballersApi.models.SessionTeam;
-import com.ballersApi.ballersApi.models.Team;
+import com.ballersApi.ballersApi.models.*;
 import com.ballersApi.ballersApi.repositories.PlayerRepository;
 import com.ballersApi.ballersApi.repositories.SessionRepository;
 import com.ballersApi.ballersApi.repositories.SessionTeamRepository;
@@ -97,10 +94,17 @@ public class SessionTeamService {
 
 
         Player player = playerOpt.get();
-            if (isInAnyTeamInSession) {
-                throw new PlayerAlreadyInTeamException("Player already joined team  with ID: " + teamS.getId());
+        if (isInAnyTeamInSession) {
+            String teamLabel = "";
+
+            if (session.getTeamA() != null && session.getTeamA().getId().equals(teamS.getId())) {
+                teamLabel = "A";
+            } else if (session.getTeamB() != null && session.getTeamB().getId().equals(teamS.getId())) {
+                teamLabel = "B";
             }
 
+            throw new PlayerAlreadyInTeamException("Player already joined team " + teamLabel);
+        }
         if ( LocalDate.now().isAfter(session.getMatchDate())) {
             throw new SessionNotFoundException("You cannot join a session that has already finished.");
         }
@@ -114,7 +118,12 @@ public class SessionTeamService {
             if (!(session.getPlayerCount() < session.getMaxPlayers())) {
                 throw new TeamFullException("Team is already full.");
             }
-
+        if (session.getType() == SessionType.Teams) {
+            SessionTeam targetTeam = (team == Team.A) ? session.getTeamA() : session.getTeamB();
+            if (!targetTeam.getPlayers().isEmpty()) {
+                throw new UnauthorizedJoinException("Only the first player can join directly. Other players must join via invite.");
+            }
+        }
 
                 if(team.equals(Team.A)) {
 
