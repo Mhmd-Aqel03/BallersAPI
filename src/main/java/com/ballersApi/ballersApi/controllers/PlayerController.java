@@ -1,5 +1,6 @@
 package com.ballersApi.ballersApi.controllers;
 
+import com.ballersApi.ballersApi.dataTransferObjects.FavouriteListDTO;
 import com.ballersApi.ballersApi.dataTransferObjects.PlayerHistoryDTO;
 import com.ballersApi.ballersApi.dataTransferObjects.PlayerIdDTO;
 import com.ballersApi.ballersApi.dataTransferObjects.UpdatePlayerDTO;
@@ -118,7 +119,7 @@ public class PlayerController {
         Map<String, Object> response = new HashMap<>();
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
 
-        List<User> favourites = playerService.getFavourites(username);
+        List<FavouriteListDTO> favourites = playerService.getFavourites(username);
 
         response.put("favourites", favourites);
 
