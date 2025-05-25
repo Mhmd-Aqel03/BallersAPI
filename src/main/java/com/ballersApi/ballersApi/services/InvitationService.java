@@ -1,5 +1,6 @@
 package com.ballersApi.ballersApi.services;
 
+import com.ballersApi.ballersApi.dataTransferObjects.InvitationDTO;
 import com.ballersApi.ballersApi.exceptions.*;
 import com.ballersApi.ballersApi.models.Invitation;
 import com.ballersApi.ballersApi.models.Player;
@@ -13,6 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +27,9 @@ public class InvitationService {
     @Autowired
     private final SessionRepository sessionRepository;
 
+    @Autowired
+    private final UserService userService;
+
     public Invitation sendInvite(Long playerId, Long receiverId, Long sessionId) {
         Player player = playerRepository.findById(playerId)
                 .orElseThrow(() -> new PlayerNotFoundException("Player with id " + playerId + " not found"));
@@ -32,12 +38,9 @@ public class InvitationService {
         Session session = sessionRepository.findById(sessionId)
                 .orElseThrow(() -> new TeamSessionNotFoundException("Team session with id " + sessionId + " not found"));
 
-        boolean isInSession = player.getSessionTeams().stream()
-                .anyMatch(team1 -> session.getId().equals(sessionId));
 
-        if (!isInSession) {
-            throw new PlayerNotFoundException("Player "+ playerId + " is not in session");
-        }
+
+
         if(!session.getType().equals(SessionType.Random)){
             throw new WrongInvitationTypeException("Session type doesn't match Invitation type");
         }
@@ -71,6 +74,46 @@ public class InvitationService {
         else {
             return null;
         }
+    }
+
+
+    public List<InvitationDTO> getIncomingInvitesForReceiver(Long receiverId) {
+        List<Invitation> invites = invitationRepository.findByReceiverId(receiverId);
+        if (invites.isEmpty()) {
+            throw new NoInvitationsFoundException("No invites found for this player.");
+        }
+
+        return invites.stream().map(invite -> {
+            Player sender = invite.getPlayer();
+            String senderUsername = userService.getUserByPlayerId(sender.getId()).getUsername();
+
+            return new InvitationDTO(
+                    invite.getId(),
+                    invite.getSession().getId(),
+                    invite.getSession().getMatchDate(),
+                    senderUsername,
+                    invite.isStatus(),
+                    invite.getCreatedAt()
+            );
+        }).collect(Collectors.toList());
+    }
+
+
+    public InvitationDTO getInviteById(Long inviteId) {
+        Invitation invite = invitationRepository.findById(inviteId)
+                .orElseThrow(() -> new InvitationNotFoundException("Invitation with id " + inviteId + " not found"));
+
+        Player sender = invite.getPlayer();
+        String senderUsername = userService.getUserByPlayerId(sender.getId()).getUsername();
+
+        return new InvitationDTO(
+                invite.getId(),
+                invite.getSession().getId(),
+                invite.getSession().getMatchDate(),
+                senderUsername,
+                invite.isStatus(),
+                invite.getCreatedAt()
+        );
     }
 
 }
