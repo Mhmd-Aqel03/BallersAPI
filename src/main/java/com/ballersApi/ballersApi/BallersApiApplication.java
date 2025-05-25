@@ -34,7 +34,10 @@ public class BallersApiApplication {
             SessionRepository sessionRepository,
             CourtRepository courtRepository,
             PasswordEncoder passwordEncoder,
+	    	InvitationRepository invitationRepository,
+		PlayerRepository playerRepository,
         SessionTeamRepository sessionTeamRepository
+	    
 
     ) {
         return args -> {
@@ -75,7 +78,7 @@ public class BallersApiApplication {
 
 
 			Session session1 = new Session();
-			session1.setPlayerCount(5);
+			session1.setPlayerCount(0);
 			session1.setPrice(8);
 			session1.setType(SessionType.Random);
 			session1.setMatchDate(LocalDate.now().plusDays(1));
@@ -89,6 +92,8 @@ public class BallersApiApplication {
 			sessionTeamRepository.save(sessionTeam7);
 			session1.setTeamA(sessionTeam6);
 			session1.setTeamB(sessionTeam7);
+			player.getSessionTeams().add(sessionTeam7);
+			sessionTeamRepository.save(sessionTeam7);
 			sessionTeamRepository.save(sessionTeam6);
 			sessionTeamRepository.save(sessionTeam7);
 			sessionRepository.save(session1);
@@ -112,36 +117,7 @@ public class BallersApiApplication {
 			sessionTeamRepository.save(sessionTeam5);
 			sessionRepository.save(session2);
 
-			Session session3 = new Session();
-			session3.setPlayerCount(0);
-			session3.setPrice(8);
-			session3.setType(SessionType.Random);
-			session3.setMatchDate(LocalDate.now().plusDays(3));
-			session3.setMaxPlayers(10);
-			session3.setMatchStartTime(LocalTime.now().plusHours(2));
-			session3.setMatchEndTime(LocalTime.now().plusHours(4));
-			SessionTeam sessionTeam2 = new SessionTeam();
-			SessionTeam sessionTeam3 = new SessionTeam();
-			Court court3 = new Court();
-			court3.setCity("Amman");
-			court3.setName("Trax Jo");
-			court3.setHasBathroom(true);
-			court3.setPlaceId("XRGQ+7C Amman");
-			court3.setHasParking(false);
-			court3.setHasCafeteria(true);
-			court3.setHasBathroom(true);
-			sessionRepository.save(session3);
-			sessionTeamRepository.save(sessionTeam2);
-			sessionTeamRepository.save(sessionTeam3);
-			courtRepository.save(court3);
-			session3.setCourt(court3);
-			session3.setTeamA(sessionTeam2);
-			session3.setTeamB(sessionTeam3);
-			courtRepository.save(court3);
-			sessionTeamRepository.save(sessionTeam2);
-			sessionTeamRepository.save(sessionTeam3);
-			sessionRepository.save(session3);
-
+			
 
 
 
@@ -241,8 +217,48 @@ public class BallersApiApplication {
 
 			userRepository.save(user5);
 
+
+
+		
+
+			
+			Session session3 = new Session();
+			session3.setPlayerCount(1);
+			session3.setPrice(8);
+			session3.setType(SessionType.Random);
+			session3.setMatchDate(LocalDate.now().plusDays(3));
+			session3.setMaxPlayers(10);
+			session3.setMatchStartTime(LocalTime.now().plusHours(2));
+			session3.setMatchEndTime(LocalTime.now().plusHours(4));
+			SessionTeam sessionTeam2 = new SessionTeam();
+			SessionTeam sessionTeam3 = new SessionTeam();
+			player.getSessionTeams().add(sessionTeam2);
+			sessionTeamRepository.save(sessionTeam2);
+
+			Court court3 = new Court();
+			court3.setCity("Amman");
+			court3.setName("Trax Jo");
+			court3.setHasBathroom(true);
+			court3.setPlaceId("XRGQ+7C Amman");
+			court3.setHasParking(false);
+			court3.setHasCafeteria(true);
+			court3.setHasBathroom(true);
+			sessionRepository.save(session3);
+			sessionTeamRepository.save(sessionTeam2);
+			sessionTeamRepository.save(sessionTeam3);
+			courtRepository.save(court3);
+			session3.setCourt(court3);
+			session3.setTeamA(sessionTeam2);
+			session3.setTeamB(sessionTeam3);
+			courtRepository.save(court3);
+			sessionTeamRepository.save(sessionTeam2);
+			sessionTeamRepository.save(sessionTeam3);
+			sessionRepository.save(session3);
+
+
+
 			Session session5 = new Session();
-			session5.setPlayerCount(0);
+			session5.setPlayerCount(5);
 			session5.setPrice(8);
 			session5.setType(SessionType.Teams);
 			session5.setReferee(user4);
@@ -252,6 +268,15 @@ public class BallersApiApplication {
 			session5.setMatchEndTime(LocalTime.now().plusHours(4));
 			SessionTeam sessionTeam11 = new SessionTeam();
 			SessionTeam sessionTeam12 = new SessionTeam();
+
+			player2.getSessionTeams().add(sessionTeam11);
+			sessionTeamRepository.save(sessionTeam11);
+			player3.getSessionTeams().add(sessionTeam11);
+			sessionTeamRepository.save(sessionTeam11);
+			player4.getSessionTeams().add(sessionTeam11);
+			sessionTeamRepository.save(sessionTeam11);
+			player1.getSessionTeams().add(sessionTeam12);
+			sessionTeamRepository.save(sessionTeam12);
 			Court court5 = new Court();
 			court5.setCity("Amman");
 			court5.setName("Trax Jo");
@@ -273,7 +298,7 @@ public class BallersApiApplication {
 			sessionRepository.save(session5);
 
 			Session session4 = new Session();
-			session4.setPlayerCount(0);
+			session4.setPlayerCount(5);
 			session4.setPrice(8);
 			session4.setReferee(user4);
 			session4.setType(SessionType.Random);
@@ -283,6 +308,22 @@ public class BallersApiApplication {
 			session4.setMatchEndTime(LocalTime.now().plusHours(4));
 			SessionTeam sessionTeam = new SessionTeam();
 			SessionTeam sessionTeam1 = new SessionTeam();
+			player.getSessionTeams().add(sessionTeam);
+			sessionTeamRepository.save(sessionTeam);
+			player2.getSessionTeams().add(sessionTeam);
+			sessionTeamRepository.save(sessionTeam);
+			player3.getSessionTeams().add(sessionTeam);
+			sessionTeamRepository.save(sessionTeam);
+			player4.getSessionTeams().add(sessionTeam);
+			sessionTeamRepository.save(sessionTeam);
+			player1.getSessionTeams().add(sessionTeam);
+			playerRepository.save(player);
+			playerRepository.save(player1);
+			playerRepository.save(player2);
+			playerRepository.save(player3);
+			playerRepository.save(player4);
+
+
 			Court court4 = new Court();
 			court4.setCity("Amman");
 			court4.setName("Trax Jo");
@@ -302,6 +343,37 @@ public class BallersApiApplication {
 			sessionTeamRepository.save(sessionTeam);
 			sessionTeamRepository.save(sessionTeam1);
 			sessionRepository.save(session4);
+
+
+			Invitation invite = new Invitation();
+			invite.setPlayer(player1);
+			invite.setReceiver(player);
+			invite.setSession(session);
+			invite.setCreatedAt(LocalDateTime.now());
+			invite.setStatus(false); // pending
+
+			invitationRepository.save(invite);
+
+			Invitation invite2 = new Invitation();
+			invite2.setPlayer(player2);
+			invite2.setReceiver(player);
+			invite2.setSession(session);
+			invite2.setCreatedAt(LocalDateTime.now());
+			invite2.setStatus(false); // pending
+
+			invitationRepository.save(invite2);
+
+
+			Invitation invite3 = new Invitation();
+			invite3.setPlayer(player1);
+			invite3.setReceiver(player);
+			invite3.setSession(session1);
+			invite3.setCreatedAt(LocalDateTime.now());
+			invite3.setStatus(false); // pending
+
+			invitationRepository.save(invite3);
+		
+
 
             System.out.println("Server running on port " + serverPort);
         };
