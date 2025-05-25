@@ -1,5 +1,6 @@
 package com.ballersApi.ballersApi.services;
 
+import com.ballersApi.ballersApi.dataTransferObjects.FavouriteListDTO;
 import com.ballersApi.ballersApi.dataTransferObjects.PlayerHistoryDTO;
 import com.ballersApi.ballersApi.dataTransferObjects.SessionDTO;
 import com.ballersApi.ballersApi.exceptions.*;
@@ -86,14 +87,21 @@ public class PlayerService {
         }
     }
 
-    public List<User> getFavourites(String username) {
+    public List<FavouriteListDTO> getFavourites(String username) {
         Player player = playerAuthService.getPlayerByUsername(username);
 
-        List<Player> favouritePlayers = new ArrayList<Player>(player.getFavorites());
-        List<User> favouriteUsers = new ArrayList<>();
+        List<Player> favouritePlayers = new ArrayList<>(player.getFavorites());
+        List<FavouriteListDTO> favouriteUsers = new ArrayList<>();
 
         for(Player p: favouritePlayers){
-            favouriteUsers.add(userService.getUserByPlayerId(p.getId()));
+            User user = userService.getUserById(p.getId());
+            FavouriteListDTO favourite = new FavouriteListDTO();
+
+            favourite.setUsername(user.getUsername());
+            favourite.setUserId(user.getId());
+            favourite.setPlayerId(p.getId());
+
+            favouriteUsers.add(favourite);
         }
 
         return favouriteUsers;
