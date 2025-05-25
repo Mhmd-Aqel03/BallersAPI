@@ -73,11 +73,11 @@ public class Session {
     @OneToOne
     @JoinColumn(name = "teamA_id")
 
-    private SessionTeam teamA = new SessionTeam();
+    private SessionTeam teamA;
 
     @OneToOne
     @JoinColumn(name = "teamB_id")
 
-    private SessionTeam teamB  = new SessionTeam();
+    private SessionTeam teamB;
 
 }
