@@ -125,6 +125,7 @@ public class SessionDTO {
         public long getRefereeId() {
            return refereeId;
         }
+        
         public void setRefereeeId(long refereeId) {
            this.refereeId = refereeId;
         }
