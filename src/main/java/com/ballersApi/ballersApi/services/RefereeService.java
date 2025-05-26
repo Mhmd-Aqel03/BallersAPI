@@ -149,7 +149,7 @@ public class RefereeService {
 
         // Convert to DTOs
         return sessions.stream()
-                .map(SessionDTO::new)
+                .map(session -> new SessionDTO(session, userService))
                 .collect(Collectors.toList());
     }
     public void chooseMvp(Long sessionId, Long playerId) {
