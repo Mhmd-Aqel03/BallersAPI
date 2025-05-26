@@ -19,6 +19,7 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 
@@ -32,11 +33,12 @@ public class SessionController {
     @Autowired
     private UserService userService;
     @GetMapping("getAllSessions")
-
-    public List<Session> getAllUpcomingSessions(){
-        return sessionService.getAllUpcomingSessions();
+    public List<SessionDTO> getAllUpcomingSessions() {
+        return sessionService.getAllUpcomingSessions()
+                .stream()
+                .map(session -> new SessionDTO(session, userService))  // inject userService here
+                .collect(Collectors.toList());
     }
-
     @GetMapping("getSession/{id}")
     public ResponseEntity<Session> getSessionById(@PathVariable long id){
         return sessionService.getSessionById(id)
