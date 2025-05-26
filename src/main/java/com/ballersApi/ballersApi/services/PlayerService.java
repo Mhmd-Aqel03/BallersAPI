@@ -160,7 +160,7 @@ public class PlayerService {
                     .orElseThrow(() -> new SessionNotFoundException("Session not found with ID: " + sessionId));
 
             // Create SessionDTO from the fetched session
-            SessionDTO sessionDTO = new SessionDTO(session);
+            SessionDTO sessionDTO = new SessionDTO(session, userService);
 
             // Create PlayerHistoryDTO and add to the list
             historyDTOs.add(new PlayerHistoryDTO(sessionDTO, won));
