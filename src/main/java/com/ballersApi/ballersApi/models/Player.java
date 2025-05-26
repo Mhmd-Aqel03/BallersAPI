@@ -2,6 +2,7 @@ package com.ballersApi.ballersApi.models;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -15,6 +16,7 @@ import java.util.*;
 @Entity
 @Data
 @NoArgsConstructor
+
 public class Player {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -75,7 +77,8 @@ public class Player {
                     @JoinColumn(name = "player_id")
             }
     )
-    private List<SessionTeam> sessionTeams;
+    private List<SessionTeam> sessionTeams =  new ArrayList<>();
+
 
     @JsonIgnore
     @ManyToMany
@@ -91,7 +94,7 @@ public class Player {
     private List<Chat> chats;
 
     // Player favourite list(We forgor lol)
-    @JsonIgnore
+  @JsonIgnore
     @ManyToMany
     @JoinTable(
             name = "player_favorites",
@@ -103,4 +106,6 @@ public class Player {
     @JsonBackReference
     @ElementCollection
     private Map<Long, Boolean> pastSessions = new HashMap<>();
+
+
 }

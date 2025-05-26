@@ -84,37 +84,20 @@ public class SessionService {
     }
 
 
-    @Transactional
-    public void createSession(SessionDTO sessionDTO) {
-        Session session = new Session();
-        session.setMatchDate(sessionDTO.getMatchDate());
-        session.setMatchStartTime(sessionDTO.getMatchStartTime());
-        session.setMatchEndTime(sessionDTO.getMatchEndTime());
-        session.setMaxPlayers(sessionDTO.getMaxPlayers());
-        session.setPrice(sessionDTO.getPrice());
-        session.setType(sessionDTO.getType());
+    public Session createSession(Session session) {
 
-        if (sessionDTO.getCourtId() != -1) {
-            Court court = courtService.getCourtById(sessionDTO.getCourtId());
-            session.setCourt(court);
-        }
-        // Create chat for session
-        Chat chat = new Chat();
-        chat.setSession(session);
-
-        if (sessionDTO.getRefereeId() != -1) {
-            User referee = refereeService.getRefereeById(sessionDTO.getRefereeId());
-            session.setReferee(referee);
-        }
 
         try {
-            sessionRepository.save(session);
-        } catch (DataAccessException e) {
-            throw new DatabaseConnectionErrorException("Error saving session: " + e.getMessage());
+            if (session == null) {
+                throw new SessionCreationException("Session data is missing");
+            }
+
+
+            return sessionRepository.save(session);
+        } catch (Exception e) {
+            throw new SessionCreationException("Error creating session: " + e.getMessage());
         }
 
-        sessionTeamService.createTeamSession(session.getId());
-        sessionTeamService.createTeamSession(session.getId());
     }
 
     public void deleteSession(Long sessionId) {

@@ -1,5 +1,6 @@
 package com.ballersApi.ballersApi.controllers;
 
+import com.ballersApi.ballersApi.dataTransferObjects.InvitationDTO;
 import com.ballersApi.ballersApi.models.Invitation;
 import com.ballersApi.ballersApi.models.InviteStatus;
 import com.ballersApi.ballersApi.models.Session;
@@ -74,5 +75,17 @@ public class InvitationController {
 //        Long playerId = userService.getUserByUsername(username).getId();
         teamInvitationService.respondToInvite(inviteId ,status);
         return ResponseEntity.ok("Invite response updated");
+    }
+    @GetMapping("/received/")
+    public ResponseEntity<List<InvitationDTO>> getIncomingInvites() {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        Long receiverId = userService.getUserByUsername(username).getId();
+        List<InvitationDTO> invitations = invitationService.getIncomingInvitesForReceiver(receiverId);
+        return ResponseEntity.ok(invitations);
+    }
+    @GetMapping("/invite/{id}")
+    public ResponseEntity<InvitationDTO> getInviteById(@PathVariable Long id) {
+        InvitationDTO dto = invitationService.getInviteById(id);
+        return ResponseEntity.ok(dto);
     }
 }

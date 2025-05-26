@@ -34,7 +34,7 @@ public class SessionTeamDTO {
             this.players = new ArrayList<>();
             for (Player player : team.getPlayers()) {
                 String username = userService.getUserByPlayerId(player.getId()).getUsername();  // Fetch username from UserService
-                this.players.add(new PlayerWithUsernameDTO(player, username));  // Create and add PlayerWithUsernameDTO
+                this.players.add(new PlayerWithUsernameDTO(player, username, userService));  // Create and add PlayerWithUsernameDTO
             }
         } else {
             this.players = new ArrayList<>();
@@ -64,7 +64,7 @@ public class SessionTeamDTO {
         private int sessionsWon = 0;
 
         private int sessionsLost = 0;
-
+        private List<FavouriteListDTO> favorites = new ArrayList<>();
         private int MVPs = 0;
 
         // A better solution here is to create an "Endorsement" entity, but this works for now.
@@ -80,7 +80,8 @@ public class SessionTeamDTO {
         private Set<Long> positiveAttitudeEndorsements = new HashSet<>();
 
 
-        public PlayerWithUsernameDTO(Player player, String username) {
+
+        public PlayerWithUsernameDTO(Player player, String username, UserService userService ) {
             this.playerId = player.getId();
             this.username = username;
             this.postion= player.getPostion();
@@ -93,8 +94,17 @@ public class SessionTeamDTO {
             this.sessionsWon = player.getSessionsWon();
             this.sessionsLost = player.getSessionsLost();
             this.MVPs = player.getMVPs();
-
+            if (player.getFavorites() != null) {
+                for (Player favorite : player.getFavorites()) {
+                    FavouriteListDTO favDTO = new FavouriteListDTO();
+                    favDTO.setPlayerId(favorite.getId());
+                    favDTO.setUsername(userService.getUserByPlayerId(favorite.getId()).getUsername());
+                    favDTO.setUserId(userService.getUserByPlayerId(favorite.getId()).getId()); // assuming User has an id
+                    this.favorites.add(favDTO);
+                }
+            }
+        }
 
         }
     }
-}
+

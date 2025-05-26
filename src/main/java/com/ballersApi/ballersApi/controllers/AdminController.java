@@ -140,11 +140,18 @@ public class AdminController {
     }
 
     @PostMapping("/createSession")
-    public ResponseEntity<Map<String, Object>> createSession(@Valid @RequestBody SessionDTO sessionDTO) {
+    public ResponseEntity<Map<String, Object>> createSession(@Valid @RequestBody SessionDTO request) {
         Map<String, Object> response = new HashMap<>();
 
-        sessionService.createSession(sessionDTO);
-
+        Session session = new Session();
+        session.setType(request.getType());
+        session.setMatchDate(request.getMatchDate());
+        session.setMatchStartTime(request.getMatchStartTime());
+        session.setMatchEndTime(request.getMatchEndTime());
+        session.setMaxPlayers(request.getMaxPlayers());
+        session.setPrice(request.getPrice());
+        session.setPlayerCount(0);
+        sessionService.createSession(session);
         response.put("msg", "Session created successfully");
 
         return ResponseEntity.ok(response);

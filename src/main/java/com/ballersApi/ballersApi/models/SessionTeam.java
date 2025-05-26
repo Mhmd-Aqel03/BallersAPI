@@ -11,6 +11,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -22,10 +23,8 @@ public class SessionTeam {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Size(min = 3, max = 6, message = "Team must have between 1 and 5 players")
+    @Size(max = 6, message = "Team must have at most 6 players")
     @ManyToMany(mappedBy = "sessionTeams")
-    private List<Player> players;
-
-
+    private List<Player> players = new ArrayList<>() ;
 
 }
