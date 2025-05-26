@@ -303,4 +303,17 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
+     @ExceptionHandler(NoInvitationsFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleNoInvitationsFoundException(NoInvitationsFoundException ex) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "No invitations found: " + ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+    }
+    @ExceptionHandler(UnauthorizedJoinException.class)
+    public ResponseEntity<Map<String, Object>> handleUnauthorizedJoinException(UnauthorizedJoinException ex) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "Unauthorized join: " + ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
 }
