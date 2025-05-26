@@ -1,6 +1,7 @@
 package com.ballersApi.ballersApi.dataTransferObjects;
 
 import com.ballersApi.ballersApi.models.*;
+import com.ballersApi.ballersApi.services.UserService;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -45,13 +46,10 @@ public class SessionDTO {
     private Player mvp;
 
     private Team winningTeam;
+    private SessionTeamDTO teamA;
+    private SessionTeamDTO teamB;
 
-    private SessionTeam teamA;
-
-
-    private SessionTeam teamB;
-
-    public SessionDTO(Session session) {
+    public SessionDTO(Session session, UserService userService) {
         this.type = session.getType();
         this.matchDate = session.getMatchDate();
         this.matchStartTime = session.getMatchStartTime();
@@ -60,8 +58,10 @@ public class SessionDTO {
         this.price = session.getPrice();
         this.playerCount = session.getPlayerCount();
         this.winningTeam = session.getWinningTeam();
-        this.teamA = session.getTeamA();
-        this.teamB = session.getTeamB();
+
+        this.teamA = new SessionTeamDTO(session.getTeamA(), Team.A, userService);
+        this.teamB = new SessionTeamDTO(session.getTeamB(), Team.B, userService);
+
         this.mvp = session.getMvp();
     }
 
