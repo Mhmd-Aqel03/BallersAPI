@@ -202,7 +202,7 @@ public class BallersApiApplication {
 
             User user4 = new User();
             user4.setUsername("referee");
-            user4.setPassword("mohammagoat123!");
+            user4.setPassword(passwordEncoder.encode("mohammagoat123!"));
             user4.setRole(Role.ROLE_REFEREE);
             user4.setEmail("referee@gmail.com");
 
