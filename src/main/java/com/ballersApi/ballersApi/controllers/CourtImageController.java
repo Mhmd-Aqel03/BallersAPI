@@ -16,11 +16,6 @@ public class CourtImageController {
         this.courtImageService = courtImageService;
     }
 
-    @GetMapping
-    public List<CourtImage> getAllImages() {
-        return courtImageService.getAllImages();
-    }
-
     @GetMapping("/court/{courtId}")
     public List<CourtImage> getImagesByCourtId(@PathVariable Long courtId) {
         return courtImageService.getImagesByCourtId(courtId);

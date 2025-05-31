@@ -1,5 +1,6 @@
 package com.ballersApi.ballersApi.services;
 
+import com.ballersApi.ballersApi.dataTransferObjects.CourtImageDTO;
 import com.ballersApi.ballersApi.exceptions.CourtIdNotFoundException;
 import com.ballersApi.ballersApi.exceptions.CourtImageIdNotFoundException;
 import com.ballersApi.ballersApi.exceptions.DatabaseConnectionErrorException;
@@ -11,6 +12,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class CourtImageService {
@@ -22,8 +24,13 @@ public class CourtImageService {
         this.courtRepository = courtRepository;
     }
 
-    public List<CourtImage> getAllImages() {
-        return courtImageRepository.findAll();
+    public List<CourtImageDTO> getAllImages() {
+        List<CourtImage> courtImages =  courtImageRepository.findAll();
+        List<CourtImageDTO> courtImageDTOs = courtImages.stream()
+                .map(courtImage -> new CourtImageDTO(courtImage.getId(), courtImage.getPhotoUrl(),courtImage.getCourt().getId()))
+                .collect(Collectors.toList());
+
+        return courtImageDTOs;
     }
 
     public List<CourtImage> getImagesByCourtId(Long courtId) {
