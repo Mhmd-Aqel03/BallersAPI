@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @AllArgsConstructor
@@ -92,12 +91,16 @@ public class AdminController {
     }
 
     //Court Images
-    @GetMapping("/getImage/{courtId}")
-    public List<CourtImage> getImagesByCourtId(@PathVariable Long courtId) {
-        return courtImageService.getImagesByCourtId(courtId);
+    @GetMapping("/getAllCourtImages")
+    public ResponseEntity<Map<String, Object>> getAllImages() {
+        Map<String, Object> response = new HashMap<>();
+
+        response.put("courtImages", courtImageService.getAllImages());
+
+        return ResponseEntity.ok(response);
     }
 
-    @PostMapping("addImage/{courtId}")
+    @PostMapping("/createCourtImage/{courtId}")
     public ResponseEntity<Map<String, Object>> addImage(@PathVariable Long courtId, @RequestBody CourtImage courtImage) {
         Map<String, Object> response = new HashMap<>();
 
@@ -108,7 +111,7 @@ public class AdminController {
         return ResponseEntity.ok(response);
     }
 
-    @DeleteMapping("/deleteImage/{id}")
+    @DeleteMapping("/deleteCourtImage/{id}")
     public ResponseEntity<Map<String, Object>> deleteImage(@PathVariable Long id) {
         Map<String, Object> response = new HashMap<>();
 
@@ -123,7 +126,6 @@ public class AdminController {
     @GetMapping("/getAllSessions")
     public ResponseEntity<Map<String, Object>> getAllUpcomingSessions() {
         Map<String, Object> response = new HashMap<>();
-
 
 
         response.put("sessions", sessionService.getAllUpcomingSessions());

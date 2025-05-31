@@ -47,7 +47,9 @@ public class UserController {
 
     // Fun fact! it took mohamma 6 hours that this decorator is all what you needed to allow Cross Origin Requests
     // Caramella getting the belt tonight.
-    @CrossOrigin(origins = "http://localhost:5000")
+    @CrossOrigin(origins = {
+            "http://192.168.1.150:5000",
+            "http://localhost:5000"})
     @PostMapping("/login")
     public ResponseEntity<Map<String, Object>> loginUser(@Valid @RequestBody LoginDTO loginDTO) {
         // The Jwt token that will be returned(Inshallah).
@@ -143,7 +145,7 @@ public class UserController {
     }
 
     @PostMapping("/changePassword")
-    public ResponseEntity<Map<String,Object>> changePassword(@Valid @RequestBody ChangePasswordDTO changePasswordDTO){
+    public ResponseEntity<Map<String, Object>> changePassword(@Valid @RequestBody ChangePasswordDTO changePasswordDTO) {
         Map<String, Object> response = new HashMap<>();
 
         playerAuthService.changePassword(changePasswordDTO);
