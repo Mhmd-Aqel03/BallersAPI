@@ -8,7 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/Referee")
@@ -22,10 +24,13 @@ public class RefereeController {
         return ResponseEntity.ok("Session " + id + " finalized. Winning team: " + winner);
     }
     @GetMapping("/sessions/{refereeId}")
-    public ResponseEntity<List<SessionDTO>> getSessionsByReferee(@PathVariable Long refereeId) {
+    public ResponseEntity<Map<String, Object>> getSessionsByReferee(@PathVariable Long refereeId) {
+        Map<String, List<SessionDTO>> groupedSessions = refereeService.getSessionsByRefereeId(refereeId);
 
-        List<SessionDTO> sessions = refereeService.getSessionsByRefereeId(refereeId);
-        return ResponseEntity.ok(sessions);
+        Map<String, Object> response = new HashMap<>();
+        response.put("data", groupedSessions);
+
+        return ResponseEntity.ok(response);
     }
     @PostMapping("/mvp/{sessionId}/{playerId}")
     public ResponseEntity<String> chooseMvp(
