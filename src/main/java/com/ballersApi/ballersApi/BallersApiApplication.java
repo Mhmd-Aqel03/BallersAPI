@@ -91,30 +91,10 @@ public class BallersApiApplication {
             sessionTeamRepository.save(sessionTeam7);
             session1.setTeamA(sessionTeam6);
             session1.setTeamB(sessionTeam7);
-            player.getSessionTeams().add(sessionTeam7);
-            sessionTeamRepository.save(sessionTeam7);
+
             sessionTeamRepository.save(sessionTeam6);
             sessionTeamRepository.save(sessionTeam7);
             sessionRepository.save(session1);
-
-            Session session2 = new Session();
-            session2.setPlayerCount(0);
-            session2.setPrice(8);
-            session2.setType(SessionType.Random);
-            session2.setMatchDate(LocalDate.now().plusDays(3));
-            session2.setMaxPlayers(10);
-            session2.setMatchStartTime(LocalTime.now().plusHours(2));
-            session2.setMatchEndTime(LocalTime.now().plusHours(4));
-            SessionTeam sessionTeam4 = new SessionTeam();
-            SessionTeam sessionTeam5 = new SessionTeam();
-            sessionRepository.save(session2);
-            sessionTeamRepository.save(sessionTeam4);
-            sessionTeamRepository.save(sessionTeam5);
-            session2.setTeamA(sessionTeam4);
-            session2.setTeamB(sessionTeam5);
-            sessionTeamRepository.save(sessionTeam4);
-            sessionTeamRepository.save(sessionTeam5);
-            sessionRepository.save(session2);
 
 
             User adminUser = new User();
@@ -126,7 +106,7 @@ public class BallersApiApplication {
             userRepository.save(adminUser);
 
             User user1 = new User();
-            user1.setUsername("ahmedKhalid");
+            user1.setUsername("waleeeeeeed");
             user1.setPassword("mohammagoat123!");
             user1.setRole(Role.ROLE_PLAYER);
             user1.setEmail("admin4@gmail.com");
@@ -139,7 +119,7 @@ public class BallersApiApplication {
             userRepository.save(user1);
 
             User user2 = new User();
-            user2.setUsername("ahmed123");
+            user2.setUsername("Issaaaaaaaaa");
             user2.setPassword("mohammagoat123!");
             user2.setRole(Role.ROLE_PLAYER);
             user2.setEmail("admin1@gmail.com");
@@ -151,14 +131,99 @@ public class BallersApiApplication {
 
             userRepository.save(user2);
 
+
+
+            User user6 = new User();
+            user6.setUsername("Loaiiiiii");
+            user6.setPassword("mohammagoat123!");
+            user6.setRole(Role.ROLE_PLAYER);
+            user6.setEmail("admin19@gmail.com");
+            Player player5 = new Player();
+            player5.setPhoneNumber("234362");
+            player5.setPostion("PG");
+
+            user6.setPlayer(player5);
+
+            userRepository.save(user6);
+
+            User user7 = new User();
+            user7.setUsername("Zaaaaaaaaaaaid");
+            user7.setPassword("mohammagoat123!");
+            user7.setRole(Role.ROLE_PLAYER);
+            user7.setEmail("admin6@gmail.com");
+            Player player6 = new Player();
+            player6.setPhoneNumber("23432");
+            player6.setPostion("SG");
+
+            user7.setPlayer(player6);
+
+            userRepository.save(user7);
+
+            User user8 = new User();
+            user8.setUsername("Amrooooo");
+            user8.setPassword("mohammagoat123!");
+            user8.setRole(Role.ROLE_PLAYER);
+            user8.setEmail("admin7@gmail.com");
+            Player player7 = new Player();
+            player7.setPhoneNumber("23432");
+            player7.setPostion("SF");
+
+            user8.setPlayer(player7);
+
+            userRepository.save(user8);
+
+            User user9 = new User();
+            user9.setUsername("Omaaaaaaaaar");
+            user9.setPassword("mohammagoat123!");
+            user9.setRole(Role.ROLE_PLAYER);
+            user9.setEmail("admin8@gmail.com");
+            Player player8 = new Player();
+            player8.setPhoneNumber("23432");
+            player8.setPostion("PF");
+
+            user9.setPlayer(player8);
+
+            userRepository.save(user9);
+
+
+            User user10 = new User();
+            user10.setUsername("Aliiiiiiiiii");
+            user10.setPassword("mohammagoat123!");
+            user10.setRole(Role.ROLE_PLAYER);
+            user10.setEmail("admin9@gmail.com");
+            Player player9 = new Player();
+            player9.setPhoneNumber("23432");
+            player9.setPostion("CT");
+
+            user10.setPlayer(player9);
+
+            userRepository.save(user10);
+
+            User user11 = new User();
+            user11.setUsername("Murtadaaaaaaaaaa");
+            user11.setPassword("mohammagoat123!");
+            user11.setRole(Role.ROLE_PLAYER);
+            user11.setEmail("admin10@gmail.com");
+            Player player10 = new Player();
+            player10.setPhoneNumber("23432");
+            player10.setPostion("C");
+
+            user11.setPlayer(player10);
+
+            userRepository.save(user11);
+
+
+
             User user3 = new User();
-            user3.setUsername("123ahmed");
+            user3.setUsername("farisssssss");
             user3.setPassword("mohammagoat123!");
             user3.setRole(Role.ROLE_PLAYER);
             user3.setEmail("admin2@gmail.com");
             Player player3 = new Player();
             player3.setPhoneNumber("23432");
             player3.setPostion("CT");
+
+            player3.getFavorites().add(player10);
 
             user3.setPlayer(player3);
 
@@ -213,6 +278,89 @@ public class BallersApiApplication {
             userRepository.save(user5);
 
 
+
+
+
+            Session session2 = new Session();
+            session2.setPlayerCount(10);
+            session2.setPrice(8);
+            session2.setType(SessionType.Random);
+            session2.setMatchDate(LocalDate.now().plusDays(3));
+            session2.setMaxPlayers(10);
+            session2.setReferee(user4);
+
+            session2.setMatchStartTime(LocalTime.now().plusHours(2));
+            session2.setMatchEndTime(LocalTime.now().plusHours(4));
+            SessionTeam sessionTeam4 = new SessionTeam();
+            SessionTeam sessionTeam5 = new SessionTeam();
+            sessionRepository.save(session2);
+            sessionTeamRepository.save(sessionTeam4);
+            sessionTeamRepository.save(sessionTeam5);
+            session2.setTeamA(sessionTeam4);
+            session2.setTeamB(sessionTeam5);
+
+            player10.getSessionTeams().add(sessionTeam4);
+            sessionTeamRepository.save(sessionTeam4);
+
+            player8.getSessionTeams().add(sessionTeam4);
+            sessionTeamRepository.save(sessionTeam4);
+
+            player9.getSessionTeams().add(sessionTeam4);
+            sessionTeamRepository.save(sessionTeam4);
+
+            player1.getSessionTeams().add(sessionTeam4);
+            sessionTeamRepository.save(sessionTeam4);
+
+            player2.getSessionTeams().add(sessionTeam4);
+            sessionTeamRepository.save(sessionTeam4);
+
+            player3.getSessionTeams().add(sessionTeam5);
+            sessionTeamRepository.save(sessionTeam5);
+
+            player4.getSessionTeams().add(sessionTeam5);
+            sessionTeamRepository.save(sessionTeam5);
+
+            player5.getSessionTeams().add(sessionTeam5);
+            sessionTeamRepository.save(sessionTeam5);
+
+            player6.getSessionTeams().add(sessionTeam5);
+            sessionTeamRepository.save(sessionTeam5);
+
+            player7.getSessionTeams().add(sessionTeam5);
+            sessionTeamRepository.save(sessionTeam5);
+
+
+            sessionTeamRepository.save(sessionTeam4);
+            sessionTeamRepository.save(sessionTeam5);
+            sessionRepository.save(session2);
+            Court court6 = new Court();
+            court6.setCity("Amman");
+            court6.setName("Orthodox Club");
+            court6.setHasBathroom(true);
+            court6.setPlaceId("WVWW+XH Amman");
+            court6.setHasParking(true);
+            court6.setHasCafeteria(false);
+            court6.setHasBathroom(true);
+            sessionRepository.save(session2);
+            sessionTeamRepository.save(sessionTeam4);
+            sessionTeamRepository.save(sessionTeam5);
+            courtRepository.save(court6);
+            session2.setCourt(court6);
+            session2.setTeamA(sessionTeam4);
+            session2.setTeamB(sessionTeam5);
+            courtRepository.save(court6);
+            sessionTeamRepository.save(sessionTeam4);
+            sessionTeamRepository.save(sessionTeam5);
+            sessionRepository.save(session2);
+
+
+
+
+
+
+
+
+
             Session session3 = new Session();
             session3.setPlayerCount(1);
             session3.setPrice(8);
@@ -223,7 +371,7 @@ public class BallersApiApplication {
             session3.setMatchEndTime(LocalTime.now().plusHours(4));
             SessionTeam sessionTeam2 = new SessionTeam();
             SessionTeam sessionTeam3 = new SessionTeam();
-            player.getSessionTeams().add(sessionTeam2);
+            player8.getSessionTeams().add(sessionTeam2);
             sessionTeamRepository.save(sessionTeam2);
 
             Court court3 = new Court();
@@ -252,6 +400,7 @@ public class BallersApiApplication {
             session5.setPrice(8);
             session5.setType(SessionType.Teams);
             session5.setReferee(user4);
+
             session5.setMatchDate(LocalDate.now().plusDays(2));
             session5.setMaxPlayers(10);
             session5.setMatchStartTime(LocalTime.now().plusHours(2));
@@ -259,14 +408,13 @@ public class BallersApiApplication {
             SessionTeam sessionTeam11 = new SessionTeam();
             SessionTeam sessionTeam12 = new SessionTeam();
 
-            player2.getSessionTeams().add(sessionTeam11);
+            player10.getSessionTeams().add(sessionTeam11);
             sessionTeamRepository.save(sessionTeam11);
             player3.getSessionTeams().add(sessionTeam11);
             sessionTeamRepository.save(sessionTeam11);
             player4.getSessionTeams().add(sessionTeam11);
             sessionTeamRepository.save(sessionTeam11);
-            player1.getSessionTeams().add(sessionTeam12);
-            sessionTeamRepository.save(sessionTeam12);
+
             Court court5 = new Court();
             court5.setCity("Amman");
             court5.setName("Trax Jo");
@@ -298,18 +446,25 @@ public class BallersApiApplication {
             session4.setMatchEndTime(LocalTime.now().plusHours(4));
             SessionTeam sessionTeam = new SessionTeam();
             SessionTeam sessionTeam1 = new SessionTeam();
-            player.getSessionTeams().add(sessionTeam);
+            player8.getSessionTeams().add(sessionTeam);
             sessionTeamRepository.save(sessionTeam);
-            player2.getSessionTeams().add(sessionTeam);
+
+            player10.getSessionTeams().add(sessionTeam);
             sessionTeamRepository.save(sessionTeam);
             player3.getSessionTeams().add(sessionTeam);
             sessionTeamRepository.save(sessionTeam);
             player4.getSessionTeams().add(sessionTeam);
             sessionTeamRepository.save(sessionTeam);
             player1.getSessionTeams().add(sessionTeam);
-            playerRepository.save(player);
+
             playerRepository.save(player1);
             playerRepository.save(player2);
+            playerRepository.save(player5);
+            playerRepository.save(player6);
+            playerRepository.save(player7);
+            playerRepository.save(player8);
+            playerRepository.save(player9);
+            playerRepository.save(player10);
             playerRepository.save(player3);
             playerRepository.save(player4);
 
@@ -345,7 +500,7 @@ public class BallersApiApplication {
             invitationRepository.save(invite);
 
             Invitation invite2 = new Invitation();
-            invite2.setPlayer(player2);
+            invite2.setPlayer(player10);
             invite2.setReceiver(player);
             invite2.setSession(session);
             invite2.setCreatedAt(LocalDateTime.now());
@@ -362,6 +517,7 @@ public class BallersApiApplication {
             invite3.setStatus(false); // pending
 
             invitationRepository.save(invite3);
+
 
             playerRepository.save(player);
 
