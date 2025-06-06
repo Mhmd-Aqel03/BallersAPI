@@ -110,7 +110,6 @@ public class PlayerService {
     public void removeFavourite(String playerUsername, long favourite_id) {
         Player ourPlayer = playerAuthService.getPlayerByUsername(playerUsername);
         Player favouritePlayer = userService.getUserByPlayerId(favourite_id).getPlayer();
-
         ourPlayer.getFavorites().remove(favouritePlayer);
         try {
             playerRepository.save(ourPlayer);
