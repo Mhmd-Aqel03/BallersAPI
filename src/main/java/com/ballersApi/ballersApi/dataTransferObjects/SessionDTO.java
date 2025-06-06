@@ -13,7 +13,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 @Data
 public class SessionDTO {
-
+                 private Long id;
         @NotNull(message = "Session type can't be empty")
         private SessionType type;
 
@@ -50,6 +50,7 @@ public class SessionDTO {
     private SessionTeamDTO teamB;
 
     public SessionDTO(Session session, UserService userService) {
+        this.id = session.getId();
         this.type = session.getType();
         this.matchDate = session.getMatchDate();
         this.matchStartTime = session.getMatchStartTime();
