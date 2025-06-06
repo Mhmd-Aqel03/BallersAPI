@@ -29,18 +29,17 @@ public class InvitationController {
 
     // Send an Invitation to a player
     @PostMapping("/Invite/{receiverId}/{sessionId}")
-    public ResponseEntity<Invitation> sendInvite(
-
+    public ResponseEntity<String> sendInvite(
             @PathVariable Long receiverId,
             @PathVariable Long sessionId) {
+
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         Long playerId = userService.getUserByUsername(username).getId();
 
-        // Call the service to send the invite
-        Invitation invite = invitationService.sendInvite(playerId, receiverId, sessionId);
-        return ResponseEntity.ok(invite); // Return the invite details
+        // Call the service to send the invite and get success message
+        String successMessage = invitationService.sendInvite(playerId, receiverId, sessionId);
+        return ResponseEntity.ok(successMessage);
     }
-
     @PostMapping("/respond/{inviteId}/{status}")
     public ResponseEntity<Session> respondToInvite(
             @PathVariable Long inviteId,
@@ -76,7 +75,7 @@ public class InvitationController {
         teamInvitationService.respondToInvite(inviteId ,status);
         return ResponseEntity.ok("Invite response updated");
     }
-    @GetMapping("/received/")
+    @GetMapping("/received")
     public ResponseEntity<List<InvitationDTO>> getIncomingInvites() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         Long receiverId = userService.getUserByUsername(username).getId();
