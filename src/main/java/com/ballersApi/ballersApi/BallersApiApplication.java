@@ -160,8 +160,6 @@ public class BallersApiApplication {
             player3.setPhoneNumber("23432");
             player3.setPostion("CT");
 
-            player3.getFavorites().add(player2);
-
             user3.setPlayer(player3);
 
 
@@ -364,11 +362,6 @@ public class BallersApiApplication {
             invite3.setStatus(false); // pending
 
             invitationRepository.save(invite3);
-
-
-            player.getFavorites().add(player2);
-            player.getFavorites().add(player4);
-            player.getFavorites().add(player3);
 
             playerRepository.save(player);
 
