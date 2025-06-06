@@ -12,8 +12,8 @@ import java.util.Optional;
 
 public interface SessionRepository extends JpaRepository<Session, Long> {
     Optional<Session> findById(Long id);
-    List<Session> findByMatchDateAfter(LocalDate now);
-    List<Session> findByMatchDateBetween(LocalDate startDate, LocalDate endDate);
+    List<Session> findByMatchDateAfterAndIsDoneFalse(LocalDate now);
+    List<Session> findByMatchDateBetweenAndIsDoneFalse(LocalDate startDate, LocalDate endDate);
     void deleteAllByCourt(Court court);
-    List<Session> findByReferee(User referee);
+    List<Session> findByRefereeAndIsDoneFalse(User referee);
 }
