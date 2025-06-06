@@ -12,9 +12,9 @@ import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @AllArgsConstructor
@@ -77,6 +77,7 @@ public class RefereeService {
         // Set winning team in the session
         if (team.equals(Team.A)) {
             session.setWinningTeam(team);
+            session.setDone(true);
             sessionRepository.save(session);
 
             for (Player player : teamAPlayers) {
@@ -101,6 +102,7 @@ public class RefereeService {
 
         } else {
             session.setWinningTeam(team);
+            session.setDone(true);
             sessionRepository.save(session);
 
             for (Player player : teamAPlayers) {
@@ -125,32 +127,43 @@ public class RefereeService {
         }
     }
 
-    public List<SessionDTO> getSessionsByRefereeId(long refereeId) {
-        // Fetch the referee by ID
+    public Map<String, List<SessionDTO>> getSessionsByRefereeId(long refereeId) {
         User referee = userService.getUserById(refereeId);
 
-        // Validate if the user is indeed a referee
         if (referee.getRole() != Role.ROLE_REFEREE) {
             throw new UserNotFoundException("User with ID " + refereeId + " is not a referee.");
         }
 
-        // Fetch all sessions where this referee is assigned
-        List<Session> sessions = sessionRepository.findByReferee(referee);
+        List<Session> sessions = sessionRepository.findByRefereeAndIsDoneFalse(referee);
 
-        // If no sessions found for this referee
         if (sessions.isEmpty()) {
             throw new SessionNotFoundException("No sessions found for referee with ID " + refereeId);
         }
 
-        // Sort sessions by matchDate then matchStartTime
+        // Sort sessions by date then time
         sessions.sort(Comparator
                 .comparing(Session::getMatchDate)
                 .thenComparing(Session::getMatchStartTime));
 
-        // Convert to DTOs
-        return sessions.stream()
+        // Map<LocalDate, List<SessionDTO>>
+        Map<LocalDate, List<SessionDTO>> groupedByDate = sessions.stream()
                 .map(session -> new SessionDTO(session, userService))
-                .collect(Collectors.toList());
+                .collect(Collectors.groupingBy(
+                        SessionDTO::getMatchDate,
+                        TreeMap::new,  // Automatically sorts by LocalDate
+                        Collectors.toList()
+                ));
+
+        // Convert to Map<String, List<SessionDTO>> with "Sunday 2025-06-01" as key
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEEE yyyy-MM-dd", Locale.ENGLISH);
+
+        Map<String, List<SessionDTO>> formattedMap = new LinkedHashMap<>();
+        groupedByDate.forEach((date, dtoList) -> {
+            String key = date.format(formatter);
+            formattedMap.put(key, dtoList);
+        });
+
+        return formattedMap;
     }
     public void chooseMvp(Long sessionId, Long playerId) {
 
