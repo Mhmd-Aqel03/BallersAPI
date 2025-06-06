@@ -2,14 +2,10 @@ package com.ballersApi.ballersApi.models;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.antlr.v4.runtime.misc.NotNull;
 
 import java.util.*;
 
@@ -21,7 +17,6 @@ public class Player {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-
 
     @NotBlank(message = "Position Can't be empty")
     private String postion;
@@ -77,7 +72,7 @@ public class Player {
                     @JoinColumn(name = "player_id")
             }
     )
-    private List<SessionTeam> sessionTeams =  new ArrayList<>();
+    private List<SessionTeam> sessionTeams = new ArrayList<>();
 
 
     @JsonIgnore
@@ -94,14 +89,15 @@ public class Player {
     private List<Chat> chats;
 
     // Player favourite list(We forgor lol)
-  @JsonIgnore
-    @ManyToMany
+    @JsonIgnore
+    @ManyToMany()
     @JoinTable(
             name = "player_favorites",
             joinColumns = @JoinColumn(name = "player_id"),
             inverseJoinColumns = @JoinColumn(name = "favorite_id")
     )
     private Set<Player> favorites = new HashSet<>();
+
     @JsonIgnore
     @JsonBackReference
     @ElementCollection

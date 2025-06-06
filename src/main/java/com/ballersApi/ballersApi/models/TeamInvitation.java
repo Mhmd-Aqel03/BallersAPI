@@ -47,6 +47,4 @@ public class TeamInvitation {
     @JoinColumn(name = "session_id")
     private Session session;
 
-
-
 }
