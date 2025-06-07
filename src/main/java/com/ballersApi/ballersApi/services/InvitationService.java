@@ -79,7 +79,13 @@ public class InvitationService {
             throw new NoInvitationsFoundException("No invites found for this player.");
         }
 
-        return invites.stream().map(invite -> {
+        boolean allAccepted = invites.stream().allMatch(Invitation::isStatus);
+        if (allAccepted) {
+            throw new NoInvitationsFoundException("No invites found for this player.");
+        }
+
+        return invites.stream().filter(invite -> !invite.isStatus())
+                .map(invite -> {
             Player sender = invite.getPlayer();
             String senderUsername = userService.getUserByPlayerId(sender.getId()).getUsername();
 
