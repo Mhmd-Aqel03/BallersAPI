@@ -41,7 +41,7 @@ public class SessionService {
 
     public List<Session> getAllUpcomingSessions() {
         try {
-            return sessionRepository.findByMatchDateAfter(LocalDate.now());
+            return sessionRepository.findByMatchDateAfterAndIsDoneFalse(LocalDate.now());
         } catch (Exception e) {
             throw new CanNotFetchDataException("Error fetching upcoming sessions");
         }
@@ -60,7 +60,12 @@ public class SessionService {
 
     public Map<String, List<Session>> getSessionsForWeek(LocalDate startDate) {
         LocalDate endDate = startDate.plusDays(6);
-        List<Session> sessions = sessionRepository.findByMatchDateBetween(startDate, endDate);
+        List<Session> sessions = sessionRepository.findByMatchDateBetweenAndIsDoneFalse(startDate, endDate);
+
+        if(sessions.isEmpty()){
+            throw new SessionNotFoundException("there are no sessions available for this week");
+        }
+
 
         // Group by date
         Map<LocalDate, List<Session>> groupedByDate = sessions.stream()

@@ -80,4 +80,6 @@ public class Session {
 
     private SessionTeam teamB;
 
+    private boolean isDone = false;
+
 }

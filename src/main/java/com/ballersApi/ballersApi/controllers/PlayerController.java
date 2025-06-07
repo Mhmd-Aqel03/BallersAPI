@@ -59,8 +59,12 @@ public class PlayerController {
 
     @GetMapping("/searchUsers/{username}")
     public ResponseEntity<Map<String, Object>> searchUsers(@PathVariable String username) {
+
+        String name = SecurityContextHolder.getContext().getAuthentication().getName();
+        Long playerId = userService.getUserByUsername(name).getId();
+
         Map<String, Object> response = new HashMap<>();
-        ArrayList<User> users = userService.searchUsers(username);
+        ArrayList<User> users = userService.searchUsers(username, playerId);
 
         response.put("users", users);
 

@@ -1,7 +1,9 @@
 package com.ballersApi.ballersApi.controllers;
 
+import com.ballersApi.ballersApi.dataTransferObjects.AllPlayersDTO;
 import com.ballersApi.ballersApi.dataTransferObjects.SessionDTO;
 import com.ballersApi.ballersApi.dataTransferObjects.SessionTeamDTO;
+import com.ballersApi.ballersApi.models.Player;
 import com.ballersApi.ballersApi.models.Session;
 import com.ballersApi.ballersApi.models.Team;
 import com.ballersApi.ballersApi.services.SessionService;
@@ -22,8 +24,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
-
-
 @RequestMapping("/Session")
 public class SessionController {
     @Autowired
@@ -44,21 +44,15 @@ public class SessionController {
         return sessionService.getSessionById(id)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
-
     }
     @GetMapping("/getSessionsForWeek")
     public ResponseEntity<Map<String, Object>> getSessionsForWeek(
             @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
-
         Map<String, List<Session>> sessions = sessionService.getSessionsForWeek(date);
         Map<String, Object> response = new HashMap<>();
         response.put("data", sessions);
         return ResponseEntity.ok(response);
     }
-
-
-
-
     @PostMapping("createSession")
     public Session createSession(@Valid @RequestBody SessionDTO request) {
         Session session = new Session();
@@ -69,18 +63,13 @@ public class SessionController {
         session.setMaxPlayers(request.getMaxPlayers());
         session.setPrice(request.getPrice());
         session.setPlayerCount(0);
-
-
         sessionService.createSession(session);
         sessionTeamService.createTeamSession(session.getId());
         sessionTeamService.createTeamSession(session.getId());
         return session;
-
     }
     @DeleteMapping("deleteSession/{id}")
-
     public ResponseEntity<Void> deleteSession(@PathVariable  Long id){
-
         sessionTeamService.deleteAllTeamSessions(id);
         sessionService.deleteSession(id);
         return ResponseEntity.ok().build();
@@ -90,7 +79,6 @@ public class SessionController {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         Long playerId = userService.getUserByUsername(username).getId();
         SessionTeamDTO teamSession = sessionTeamService.joinTeamSession(sessionId, playerId, team);
-
         if (teamSession != null) {
             return ResponseEntity.ok(teamSession);
         }
@@ -103,13 +91,16 @@ public class SessionController {
         sessionTeamService.leaveTeam(playerId, sessionId, team);
         return ResponseEntity.ok("Player removed from the team successfully");
     }
-    
     @GetMapping("/getTeam/{sessionId}")
     public ResponseEntity<List<SessionTeamDTO>> getTeamsBySession(@PathVariable Long sessionId) {
         return ResponseEntity.ok(sessionTeamService.getTeamsBySession(sessionId));
     }
-
-
-
+    @GetMapping("/getPlayers/{sessionId}")
+    public ResponseEntity<Map<String, Object>> getPlayersInSession(@PathVariable Long sessionId) {
+        List<AllPlayersDTO> players = sessionTeamService.getAllPlayersInSession(sessionId);
+        Map<String, Object> response = new HashMap<>();
+        response.put("data", players);
+        return ResponseEntity.ok(response);
+    }
 
 }

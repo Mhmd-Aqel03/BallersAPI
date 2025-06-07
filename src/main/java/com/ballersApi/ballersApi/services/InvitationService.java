@@ -29,8 +29,7 @@ public class InvitationService {
 
     @Autowired
     private final UserService userService;
-
-    public Invitation sendInvite(Long playerId, Long receiverId, Long sessionId) {
+    public String sendInvite(Long playerId, Long receiverId, Long sessionId) {
         Player player = playerRepository.findById(playerId)
                 .orElseThrow(() -> new PlayerNotFoundException("Player with id " + playerId + " not found"));
         Player receiver = playerRepository.findById(receiverId)
@@ -38,25 +37,22 @@ public class InvitationService {
         Session session = sessionRepository.findById(sessionId)
                 .orElseThrow(() -> new TeamSessionNotFoundException("Team session with id " + sessionId + " not found"));
 
-
-
-
-        if(!session.getType().equals(SessionType.Random)){
+        if (!session.getType().equals(SessionType.Random)) {
             throw new WrongInvitationTypeException("Session type doesn't match Invitation type");
         }
 
-
-
         Invitation invite = new Invitation();
-        LocalDateTime time = LocalDateTime.now();
         invite.setPlayer(player);
         invite.setReceiver(receiver);
         invite.setSession(session);
-        invite.setCreatedAt(time);
+        invite.setCreatedAt(LocalDateTime.now());
         invite.setStatus(false); // New invite is pending
 
-        return invitationRepository.save(invite);
+        invitationRepository.save(invite);
+
+        return "Invitation sent successfully to " + userService.getUserById(receiver.getId()).getUsername();
     }
+
     public Session respondToInvite(Long inviteId, boolean status) {
         Invitation invite = invitationRepository.findById(inviteId)
                 .orElseThrow(() -> new InvitationNotFoundException("Invitation with id " + inviteId + " not found"));
@@ -83,7 +79,13 @@ public class InvitationService {
             throw new NoInvitationsFoundException("No invites found for this player.");
         }
 
-        return invites.stream().map(invite -> {
+        boolean allAccepted = invites.stream().allMatch(Invitation::isStatus);
+        if (allAccepted) {
+            throw new NoInvitationsFoundException("No invites found for this player.");
+        }
+
+        return invites.stream().filter(invite -> !invite.isStatus())
+                .map(invite -> {
             Player sender = invite.getPlayer();
             String senderUsername = userService.getUserByPlayerId(sender.getId()).getUsername();
 

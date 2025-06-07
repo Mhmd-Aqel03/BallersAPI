@@ -1,5 +1,6 @@
 package com.ballersApi.ballersApi.services;
 
+import com.ballersApi.ballersApi.dataTransferObjects.AllPlayersDTO;
 import com.ballersApi.ballersApi.dataTransferObjects.SessionTeamDTO;
 import com.ballersApi.ballersApi.exceptions.*;
 import com.ballersApi.ballersApi.models.*;
@@ -240,7 +241,29 @@ public class SessionTeamService {
 
         return teamDTOs;
     }
+    public List<AllPlayersDTO> getAllPlayersInSession(Long sessionId) {
+        Optional<Session> sessionOpt = sessionRepository.findById(sessionId);
+        if (sessionOpt.isEmpty()) {
+            throw new SessionNotFoundException("Session with id " + sessionId + " not found");
+        }
+        Session session = sessionOpt.get();
 
+        List<AllPlayersDTO> players = new ArrayList<>();
+
+        if (session.getTeamA() != null) {
+            for (Player player : session.getTeamA().getPlayers()) {
+                players.add(new AllPlayersDTO(player, userService));
+            }
+        }
+
+        if (session.getTeamB() != null) {
+            for (Player player : session.getTeamB().getPlayers()) {
+                players.add(new AllPlayersDTO(player, userService));
+            }
+        }
+
+        return players;
+    }
 
 
 
