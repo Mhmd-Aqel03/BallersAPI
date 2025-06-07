@@ -94,7 +94,7 @@ public class PlayerService {
         List<FavouriteListDTO> favouriteUsers = new ArrayList<>();
 
         for(Player p: favouritePlayers){
-            User user = userService.getUserById(p.getId());
+            User user = userService.getUserByPlayerId(p.getId());
             FavouriteListDTO favourite = new FavouriteListDTO();
 
             favourite.setUsername(user.getUsername());
