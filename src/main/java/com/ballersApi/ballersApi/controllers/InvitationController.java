@@ -75,7 +75,7 @@ public class InvitationController {
         teamInvitationService.respondToInvite(inviteId ,status);
         return ResponseEntity.ok("Invite response updated");
     }
-    @GetMapping("/received")
+    @GetMapping("/received/")
     public ResponseEntity<List<InvitationDTO>> getIncomingInvites() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         Long receiverId = userService.getUserByUsername(username).getId();
