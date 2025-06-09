@@ -107,13 +107,14 @@ public class BallersApiApplication {
 
             User user1 = new User();
             user1.setUsername("waleeeeeeed");
-            user1.setPassword("mohammagoat123!");
+            user1.setPassword(passwordEncoder.encode("mohammagoat123!"));
             user1.setRole(Role.ROLE_PLAYER);
             user1.setEmail("admin4@gmail.com");
             Player player1 = new Player();
             player1.setPhoneNumber("23432");
             player1.setPostion("CT");
-
+            player1.setVerified(true);
+            player1.setVerified(true);
             user1.setPlayer(player1);
 
             userRepository.save(user1);
