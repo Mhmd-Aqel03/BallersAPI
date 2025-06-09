@@ -34,7 +34,7 @@ public class InvitationController {
             @PathVariable Long sessionId) {
 
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        Long playerId = userService.getUserByUsername(username).getId();
+        Long playerId = userService.getUserByUsername(username).getPlayer().getId();
 
         // Call the service to send the invite and get success message
         String successMessage = invitationService.sendInvite(playerId, receiverId, sessionId);
@@ -62,7 +62,7 @@ public class InvitationController {
                                                 @PathVariable Team team,
                                                 @RequestBody List<Long> receiverIds) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        Long playerId = userService.getUserByUsername(username).getId();
+        Long playerId = userService.getUserByUsername(username).getPlayer().getId();
         teamInvitationService.invitePlayersToTeam(sessionId ,team,playerId, receiverIds);
         return ResponseEntity.ok("Team invites sent successfully");
     }
@@ -70,15 +70,13 @@ public class InvitationController {
     public ResponseEntity<String> respondToInvite(@PathVariable Long inviteId,
 
                                                   @RequestParam InviteStatus status) {
-//        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-//        Long playerId = userService.getUserByUsername(username).getId();
         teamInvitationService.respondToInvite(inviteId ,status);
         return ResponseEntity.ok("Invite response updated");
     }
     @GetMapping("/received/")
     public ResponseEntity<List<InvitationDTO>> getIncomingInvites() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        Long receiverId = userService.getUserByUsername(username).getId();
+        Long receiverId = userService.getUserByUsername(username).getPlayer().getId();
         List<InvitationDTO> invitations = invitationService.getIncomingInvitesForReceiver(receiverId);
         return ResponseEntity.ok(invitations);
     }
