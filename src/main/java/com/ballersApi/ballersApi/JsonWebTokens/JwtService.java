@@ -2,11 +2,14 @@ package com.ballersApi.ballersApi.JsonWebTokens;
 
 import com.ballersApi.ballersApi.exceptions.JwtTokenValidationException;
 import com.ballersApi.ballersApi.services.AppUserDetailsService;
+import com.ballersApi.ballersApi.services.UserService;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -25,6 +28,12 @@ public class JwtService {
     private String secret;
     private final Long accessExpiration = 1000L * 60 * 60 * 24 * 7; // 7 Days
     private final Long refreshExpiration = 1000L * 60 * 60 * 24 * 180; // 180 Days (6 months)
+    private UserService userService;
+
+    @Autowired
+    public void setUserService(@Lazy UserService userService) {
+        this.userService =  userService;
+    }
 
     // This a setter injection
     @Value("${JWT.secret}")
@@ -45,6 +54,12 @@ public class JwtService {
                 .orElse(null)); // So this is never supposed to be null because the UserService should throw a not found exception.(HopeFully)
 
         claims.put("type", "access");
+
+        if(claims.get("role").equals("ROLE_PLAYER")){
+            long playerId = userService.getUserByUsername(userDetails.getUsername()).getPlayer().getId();
+
+            claims.put("playerId", playerId);
+        }
 
         return createToken(claims, id.toString(), accessExpiration);
     }
@@ -76,9 +91,6 @@ public class JwtService {
 
     // extract type
     public String extractType(String token) {return  extractClaim(token,claims -> claims.get("type", String.class));}
-
-    //
-
 
     // Validate the token against user details and expiration
     public Boolean validateToken(String token, UserDetails userDetails) {

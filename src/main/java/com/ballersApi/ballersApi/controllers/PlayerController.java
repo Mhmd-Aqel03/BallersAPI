@@ -4,8 +4,6 @@ import com.ballersApi.ballersApi.dataTransferObjects.FavouriteListDTO;
 import com.ballersApi.ballersApi.dataTransferObjects.PlayerHistoryDTO;
 import com.ballersApi.ballersApi.dataTransferObjects.PlayerIdDTO;
 import com.ballersApi.ballersApi.dataTransferObjects.UpdatePlayerDTO;
-import com.ballersApi.ballersApi.exceptions.PlayerNotFoundException;
-import com.ballersApi.ballersApi.models.Player;
 import com.ballersApi.ballersApi.models.User;
 import com.ballersApi.ballersApi.services.PlayerAuthService;
 import com.ballersApi.ballersApi.services.PlayerService;
@@ -31,8 +29,6 @@ public class PlayerController {
     private final PlayerService playerService;
 
     private final UserService userService;
-
-
 
     @GetMapping("/getUser")
     public ResponseEntity<Map<String, Object>> getPlayer() {
@@ -64,13 +60,11 @@ public class PlayerController {
         Long playerId = userService.getUserByUsername(name).getId();
 
         Map<String, Object> response = new HashMap<>();
-        ArrayList<User> users = userService.searchUsers(username, playerId);
+        ArrayList<User> users = userService.searchUsers(username);
 
         response.put("users", users);
 
         return ResponseEntity.ok(response);
-
-
     }
 
     @PostMapping("/endorseGoodLeader")
@@ -153,6 +147,7 @@ public class PlayerController {
 
         return ResponseEntity.ok(response);
     }
+
     @GetMapping("/history")
     public ResponseEntity<List<PlayerHistoryDTO>> getPlayerSessionHistory() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
