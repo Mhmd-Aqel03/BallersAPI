@@ -87,7 +87,7 @@ public class SessionController {
     @PostMapping("leaveSessionTeam/{sessionId}/{team}")
     public ResponseEntity<String> leaveTeam(@PathVariable Long sessionId,@PathVariable Team team) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        Long playerId = userService.getUserByUsername(username).getId();
+        Long playerId = userService.getUserByUsername(username).getPlayer().getId();
         sessionTeamService.leaveTeam(playerId, sessionId, team);
         return ResponseEntity.ok("Player removed from the team successfully");
     }
