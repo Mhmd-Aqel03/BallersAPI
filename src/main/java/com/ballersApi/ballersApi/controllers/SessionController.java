@@ -77,7 +77,7 @@ public class SessionController {
     @PostMapping("joinSessionTeam/{sessionId}/{team}")
     public ResponseEntity<SessionTeamDTO> joinTeamSession(@PathVariable Long sessionId, @PathVariable Team team) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        Long playerId = userService.getUserByUsername(username).getId();
+        Long playerId = userService.getUserByUsername(username).getPlayer().getId();
         SessionTeamDTO teamSession = sessionTeamService.joinTeamSession(sessionId, playerId, team);
         if (teamSession != null) {
             return ResponseEntity.ok(teamSession);

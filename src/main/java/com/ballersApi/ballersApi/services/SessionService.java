@@ -90,8 +90,6 @@ public class SessionService {
 
 
     public Session createSession(Session session) {
-
-
         try {
             if (session == null) {
                 throw new SessionCreationException("Session data is missing");
