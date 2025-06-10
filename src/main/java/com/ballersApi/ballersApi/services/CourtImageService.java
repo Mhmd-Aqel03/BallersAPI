@@ -35,7 +35,7 @@ public class CourtImageService {
 
     public List<CourtImage> getImagesByCourtId(Long courtId) {
         if (!courtRepository.existsById(courtId)) {
-            throw new CourtIdNotFoundException("Cant get images forz Court with Id " + courtId + " Not Found");
+            throw new CourtIdNotFoundException("Cant get images for Court with Id " + courtId + " Not Found");
         }
         return courtImageRepository.findByCourtId(courtId);
     }

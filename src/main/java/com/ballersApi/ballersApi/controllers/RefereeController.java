@@ -1,7 +1,6 @@
 package com.ballersApi.ballersApi.controllers;
 
 import com.ballersApi.ballersApi.dataTransferObjects.SessionDTO;
-import com.ballersApi.ballersApi.models.Session;
 import com.ballersApi.ballersApi.models.Team;
 import com.ballersApi.ballersApi.services.RefereeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,13 +15,14 @@ import java.util.Map;
 @RequestMapping("/Referee")
 public class RefereeController {
     @Autowired
-    private  RefereeService refereeService;
+    private RefereeService refereeService;
 
     @PostMapping("/finalize/{id}/{winner}")
     public ResponseEntity<String> finalizeSession(@PathVariable Long id, @PathVariable Team winner) {
         refereeService.finalizeSessionResult(id, winner);
         return ResponseEntity.ok("Session " + id + " finalized. Winning team: " + winner);
     }
+
     @GetMapping("/sessions/{refereeId}")
     public ResponseEntity<Map<String, Object>> getSessionsByReferee(@PathVariable Long refereeId) {
         Map<String, List<SessionDTO>> groupedSessions = refereeService.getSessionsByRefereeId(refereeId);
@@ -32,6 +32,7 @@ public class RefereeController {
 
         return ResponseEntity.ok(response);
     }
+
     @PostMapping("/mvp/{sessionId}/{playerId}")
     public ResponseEntity<String> chooseMvp(
             @PathVariable Long sessionId,

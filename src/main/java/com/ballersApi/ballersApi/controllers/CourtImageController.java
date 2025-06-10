@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/court-images")
+@RequestMapping("/courtImages")
 public class CourtImageController {
     private final CourtImageService courtImageService;
 
@@ -16,7 +16,7 @@ public class CourtImageController {
         this.courtImageService = courtImageService;
     }
 
-    @GetMapping("/court/{courtId}")
+    @GetMapping("/getCourtImages    /{courtId}")
     public List<CourtImage> getImagesByCourtId(@PathVariable Long courtId) {
         return courtImageService.getImagesByCourtId(courtId);
     }

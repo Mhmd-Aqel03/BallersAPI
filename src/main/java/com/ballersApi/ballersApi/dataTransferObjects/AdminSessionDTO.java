@@ -22,6 +22,6 @@ public class AdminSessionDTO {
     private String matchEndTime;
     private int maxPlayers;
     private double price;
-    private long courtId;
-    private long refereeId;
+    private String courtId = "-1";
+    private String refereeId = "-1";
 }

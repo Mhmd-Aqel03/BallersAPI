@@ -165,8 +165,8 @@ public class RefereeService {
 
         return formattedMap;
     }
-    public void chooseMvp(Long sessionId, Long playerId) {
 
+    public void chooseMvp(Long sessionId, Long playerId) {
         Session session = sessionRepository.findById(sessionId)
                 .orElseThrow(() -> new SessionNotFoundException("Session not found with ID: " + sessionId));
 

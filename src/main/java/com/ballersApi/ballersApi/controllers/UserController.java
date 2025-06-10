@@ -49,7 +49,9 @@ public class UserController {
     // Caramella getting the belt tonight.
     @CrossOrigin(origins = {
             "http://192.168.1.150:5000",
-            "http://localhost:5000"})
+            "http://localhost:5000",
+            "http://192.168.1.19:8000"
+    })
     @PostMapping("/login")
     public ResponseEntity<Map<String, Object>> loginUser(@Valid @RequestBody LoginDTO loginDTO) {
         // The Jwt token that will be returned(Inshallah).

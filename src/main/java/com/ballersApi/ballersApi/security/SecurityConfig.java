@@ -52,6 +52,7 @@ public class SecurityConfig {
                         .requestMatchers("/player/**").hasAuthority("ROLE_PLAYER")
                         .requestMatchers("/court/**").hasAuthority("ROLE_PLAYER")
                         .requestMatchers("/session/**").hasAuthority("ROLE_PLAYER")
+                        .requestMatchers("court-images/**").hasAuthority("ROLE_PLAYER")
                         .requestMatchers("/admin/**").hasAuthority("ROLE_ADMIN")
                         .anyRequest().authenticated() // Protect all other endpoints
                 )
@@ -86,7 +87,7 @@ public class SecurityConfig {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:5000", "http://192.168.1.150:5000"));
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:5000", "http://192.168.1.150:5000", "http://192.168.1.19:8000"));
         configuration.setAllowedMethods(Arrays.asList("*"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
