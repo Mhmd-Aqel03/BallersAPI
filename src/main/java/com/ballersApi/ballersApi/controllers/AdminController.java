@@ -1,5 +1,6 @@
 package com.ballersApi.ballersApi.controllers;
 
+import com.ballersApi.ballersApi.dataTransferObjects.AdminSessionDTO;
 import com.ballersApi.ballersApi.dataTransferObjects.RefereeDTO;
 import com.ballersApi.ballersApi.dataTransferObjects.SessionDTO;
 import com.ballersApi.ballersApi.models.Court;
@@ -15,6 +16,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -127,8 +130,7 @@ public class AdminController {
     public ResponseEntity<Map<String, Object>> getAllUpcomingSessions() {
         Map<String, Object> response = new HashMap<>();
 
-
-        response.put("sessions", sessionService.getAllUpcomingSessions());
+        response.put("sessions", sessionService.getAllSessions());
 
         return ResponseEntity.ok(response);
     }
@@ -142,18 +144,21 @@ public class AdminController {
     }
 
     @PostMapping("/createSession")
-    public ResponseEntity<Map<String, Object>> createSession(@Valid @RequestBody SessionDTO request) {
+    public ResponseEntity<Map<String, Object>> createSession(@Valid @RequestBody AdminSessionDTO adminSessionDTO) {
         Map<String, Object> response = new HashMap<>();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("hh:mm a");
 
         Session session = new Session();
-        session.setType(request.getType());
-        session.setMatchDate(request.getMatchDate());
-        session.setMatchStartTime(request.getMatchStartTime());
-        session.setMatchEndTime(request.getMatchEndTime());
-        session.setMaxPlayers(request.getMaxPlayers());
-        session.setPrice(request.getPrice());
+        session.setType(adminSessionDTO.getType());
+        session.setMatchDate(adminSessionDTO.getMatchDate());
+        session.setMatchStartTime(LocalTime.parse(adminSessionDTO.getMatchStartTime(), formatter));
+        session.setMatchEndTime(LocalTime.parse(adminSessionDTO.getMatchEndTime(), formatter));
+        session.setMaxPlayers(adminSessionDTO.getMaxPlayers());
+        session.setPrice(adminSessionDTO.getPrice());
         session.setPlayerCount(0);
+
         sessionService.createSession(session);
+
         response.put("msg", "Session created successfully");
 
         return ResponseEntity.ok(response);
@@ -171,10 +176,10 @@ public class AdminController {
     }
 
     @PutMapping("/updateSession/{id}")
-    public ResponseEntity<Map<String, Object>> updateSession(@PathVariable Long id, @RequestBody @Valid SessionDTO sessionDTO) {
+    public ResponseEntity<Map<String, Object>> updateSession(@PathVariable Long id, @RequestBody @Valid AdminSessionDTO adminSessionDTO) {
         Map<String, Object> response = new HashMap<>();
 
-        sessionService.updateSession(id, sessionDTO);
+        sessionService.updateSession(id, adminSessionDTO);
 
         response.put("msg", "Session updated successfully");
 

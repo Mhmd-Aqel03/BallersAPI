@@ -6,19 +6,18 @@ import com.ballersApi.ballersApi.exceptions.CanNotFetchDataException;
 import com.ballersApi.ballersApi.exceptions.DatabaseConnectionErrorException;
 import com.ballersApi.ballersApi.exceptions.SessionCreationException;
 import com.ballersApi.ballersApi.exceptions.SessionNotFoundException;
-import com.ballersApi.ballersApi.models.Chat;
 import com.ballersApi.ballersApi.models.Court;
 import com.ballersApi.ballersApi.models.Session;
 import com.ballersApi.ballersApi.models.User;
 import com.ballersApi.ballersApi.repositories.PlayerRepository;
 import com.ballersApi.ballersApi.repositories.SessionRepository;
 import com.ballersApi.ballersApi.repositories.SessionTeamRepository;
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
 import java.util.*;
@@ -62,7 +61,7 @@ public class SessionService {
         LocalDate endDate = startDate.plusDays(6);
         List<Session> sessions = sessionRepository.findByMatchDateBetweenAndIsDoneFalse(startDate, endDate);
 
-        if(sessions.isEmpty()){
+        if (sessions.isEmpty()) {
             throw new SessionNotFoundException("there are no sessions available for this week");
         }
 
@@ -95,7 +94,6 @@ public class SessionService {
                 throw new SessionCreationException("Session data is missing");
             }
 
-
             return sessionRepository.save(session);
         } catch (Exception e) {
             throw new SessionCreationException("Error creating session: " + e.getMessage());
@@ -118,23 +116,25 @@ public class SessionService {
     }
 
 
-    public void updateSession(Long id, SessionDTO newSession) {
+    public void updateSession(Long id, AdminSessionDTO adminSessionDTO) {
         Session session = sessionRepository.findById(id).orElseThrow(() -> new SessionNotFoundException("Session with ID " + id + " not found"));
 
-        session.setMatchDate(newSession.getMatchDate());
-        session.setMatchStartTime(newSession.getMatchStartTime());
-        session.setMatchEndTime(newSession.getMatchEndTime());
-        session.setMaxPlayers(newSession.getMaxPlayers());
-        session.setPrice(newSession.getPrice());
-        session.setType(newSession.getType());
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("hh:mm a");
 
-        if (newSession.getCourtId() != -1) {
-            Court court = courtService.getCourtById(newSession.getCourtId());
+        session.setType(adminSessionDTO.getType());
+        session.setMatchDate(adminSessionDTO.getMatchDate());
+        session.setMatchStartTime(LocalTime.parse(adminSessionDTO.getMatchStartTime(), formatter));
+        session.setMatchEndTime(LocalTime.parse(adminSessionDTO.getMatchEndTime(), formatter));
+        session.setMaxPlayers(adminSessionDTO.getMaxPlayers());
+        session.setPrice(adminSessionDTO.getPrice());
+
+        if (!adminSessionDTO.getCourtId().equals("-1")) {
+            Court court = courtService.getCourtById(Long.parseLong(adminSessionDTO.getCourtId()));
             session.setCourt(court);
         }
 
-        if (newSession.getRefereeId() != -1) {
-            User referee = refereeService.getRefereeById(newSession.getRefereeId());
+        if (!adminSessionDTO.getRefereeId().equals("-1")) {
+            User referee = refereeService.getRefereeById(Long.parseLong(adminSessionDTO.getRefereeId()));
             session.setReferee(referee);
         }
 
@@ -156,7 +156,7 @@ public class SessionService {
             throw new DatabaseConnectionErrorException("Error fetching upcoming sessions: " + e.getMessage());
         }
 
-        for(Session session : sessions) {
+        for (Session session : sessions) {
             AdminSessionDTO adminSessionDTO = new AdminSessionDTO();
 
             adminSessionDTO.setId(session.getId());
@@ -166,10 +166,10 @@ public class SessionService {
             adminSessionDTO.setMatchEndTime(session.getMatchEndTime().format(dtf));
             adminSessionDTO.setMaxPlayers(session.getMaxPlayers());
             adminSessionDTO.setPrice(session.getPrice());
-            if(session.getCourt() != null)
-                adminSessionDTO.setCourtId(session.getCourt().getId());
-            if(session.getReferee() != null)
-                adminSessionDTO.setRefereeId(session.getReferee().getId());
+
+            adminSessionDTO.setCourtId(session.getCourt() != null ? session.getCourt().getId().toString() : "None");
+
+            adminSessionDTO.setRefereeId(session.getReferee() != null ? session.getReferee().getId().toString() : "None");
 
             adminSessions.add(adminSessionDTO);
         }
