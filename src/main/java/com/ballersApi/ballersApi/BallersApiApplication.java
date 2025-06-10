@@ -354,14 +354,6 @@ public class BallersApiApplication {
             sessionTeamRepository.save(sessionTeam5);
             sessionRepository.save(session2);
 
-
-
-
-
-
-
-
-
             Session session3 = new Session();
             session3.setPlayerCount(1);
             session3.setPrice(8);
@@ -489,7 +481,6 @@ public class BallersApiApplication {
             sessionTeamRepository.save(sessionTeam);
             sessionTeamRepository.save(sessionTeam1);
             sessionRepository.save(session4);
-
 
             Invitation invite = new Invitation();
             invite.setPlayer(player1);
