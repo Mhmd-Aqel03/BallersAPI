@@ -151,7 +151,7 @@ public class PlayerController {
     @GetMapping("/history")
     public ResponseEntity<List<PlayerHistoryDTO>> getPlayerSessionHistory() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        Long playerId = userService.getUserByUsername(username).getId();
+        Long playerId = userService.getUserByUsername(username).getPlayer().getId();
         return ResponseEntity.ok(playerService.getPlayerSessionHistory(playerId));
     }
 }
