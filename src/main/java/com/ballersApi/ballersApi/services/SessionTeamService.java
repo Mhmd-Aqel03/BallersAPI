@@ -116,9 +116,12 @@ public class SessionTeamService {
 
 
 
-            if (!(session.getPlayerCount() < session.getMaxPlayers())) {
-                throw new TeamFullException("Team is already full.");
+            if (team==Team.A&&!(session.getTeamA().getPlayers().size() < session.getMaxPlayers()/2)) {
+                throw new TeamFullException("Team A is already full.");
             }
+        if (team==Team.B&&!(session.getTeamB().getPlayers().size() < session.getMaxPlayers()/2)) {
+            throw new TeamFullException("Team B is already full.");
+        }
         if (session.getType() == SessionType.Teams) {
             SessionTeam targetTeam = (team == Team.A) ? session.getTeamA() : session.getTeamB();
             if (!targetTeam.getPlayers().isEmpty()) {
