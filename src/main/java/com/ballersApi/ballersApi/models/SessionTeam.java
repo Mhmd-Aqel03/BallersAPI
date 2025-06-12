@@ -23,7 +23,7 @@ public class SessionTeam {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Size(max = 6, message = "Team must have at most 6 players")
+    @Size(max = 4, message = "Team must have at most 6 players")
     @ManyToMany(mappedBy = "sessionTeams")
     private List<Player> players = new ArrayList<>() ;
 
