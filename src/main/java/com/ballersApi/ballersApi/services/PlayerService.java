@@ -158,11 +158,17 @@ public class PlayerService {
             Session session = sessionRepository.findById(sessionId)
                     .orElseThrow(() -> new SessionNotFoundException("Session not found with ID: " + sessionId));
 
-            // Create SessionDTO from the fetched session
-            SessionDTO sessionDTO = new SessionDTO(session, userService);
+
+          //  SessionDTO sessionDTO = new SessionDTO(session, userService);
+//           String name= userService.getUserByPlayerId(playerId).getUsername();
+            String mvpUsername = null;
+            if (session.getMvp() != null) {
+                mvpUsername = userService.getUserByPlayerId(session.getMvp().getId()).getUsername();
+            }
+
 
             // Create PlayerHistoryDTO and add to the list
-            historyDTOs.add(new PlayerHistoryDTO(sessionDTO, won));
+            historyDTOs.add(new PlayerHistoryDTO(session, won, mvpUsername));
         }
         return historyDTOs;
     }
