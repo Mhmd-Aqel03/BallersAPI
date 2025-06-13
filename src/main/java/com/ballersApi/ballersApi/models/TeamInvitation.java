@@ -17,23 +17,12 @@ public class TeamInvitation {
 
 
     private InviteStatus status;
-
+    private Team teamName;
     private LocalDateTime createdAt;
 
     @ManyToOne
     @JoinColumn(name = "player_id")
     private Player player;
-    @ManyToMany
-    @JoinTable(
-            name = "receiver_invitation",
-            joinColumns = {
-                    @JoinColumn(name = "invitation_id")
-            },
-            inverseJoinColumns = {
-                    @JoinColumn(name = "receiver_id")
-            }
-    )
-    private List<Player> receivers;
 
     @ManyToOne
     @JoinColumn(name = "receiver_id")

@@ -102,5 +102,12 @@ public class SessionController {
         response.put("data", players);
         return ResponseEntity.ok(response);
     }
+    @GetMapping("/getNumberOfPlayers/{sessionId}/{team}")
+    public ResponseEntity<Integer> getNumberOfPlayers(
+            @PathVariable Long sessionId,
+            @PathVariable Team team) {
+        int count = sessionService.getNumberOfPlayers(sessionId, team);
+        return ResponseEntity.ok(count);
+    }
 
 }

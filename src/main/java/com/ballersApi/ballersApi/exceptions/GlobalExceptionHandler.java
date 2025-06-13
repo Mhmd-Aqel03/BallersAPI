@@ -315,5 +315,11 @@ public class GlobalExceptionHandler {
         response.put("message", "Unauthorized join: " + ex.getMessage());
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
+    @ExceptionHandler(InvitationSentException.class)
+    public ResponseEntity<Map<String, Object>> handleInvitationSentException(InvitationSentException ex) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "Invitation sent: " + ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
 
 }

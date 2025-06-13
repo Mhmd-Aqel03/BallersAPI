@@ -1,10 +1,8 @@
 package com.ballersApi.ballersApi.controllers;
 
+import com.ballersApi.ballersApi.dataTransferObjects.AllPlayersDTO;
 import com.ballersApi.ballersApi.dataTransferObjects.InvitationDTO;
-import com.ballersApi.ballersApi.models.Invitation;
-import com.ballersApi.ballersApi.models.InviteStatus;
-import com.ballersApi.ballersApi.models.Session;
-import com.ballersApi.ballersApi.models.Team;
+import com.ballersApi.ballersApi.models.*;
 import com.ballersApi.ballersApi.services.InvitationService;
 import com.ballersApi.ballersApi.services.PlayerAuthService;
 import com.ballersApi.ballersApi.services.TeamInvitationService;
@@ -15,6 +13,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/Invitation")
@@ -57,13 +56,13 @@ public class InvitationController {
 
 
     }
-    @PostMapping("/TeamInvite/{sessionId}/{team}")
+    @PostMapping("/TeamInvite/{sessionId}/{team}/{receiverId}")
     public ResponseEntity<String> invitePlayersToTeam(@PathVariable Long sessionId,
                                                 @PathVariable Team team,
-                                                @RequestBody List<Long> receiverIds) {
+                                                      @PathVariable Long receiverId) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         Long playerId = userService.getUserByUsername(username).getPlayer().getId();
-        teamInvitationService.invitePlayersToTeam(sessionId ,team,playerId, receiverIds);
+        teamInvitationService.invitePlayersToTeam(sessionId ,team,playerId, receiverId);
         return ResponseEntity.ok("Team invites sent successfully");
     }
     @PostMapping("/TeamRespond/{inviteId}/")
@@ -85,4 +84,25 @@ public class InvitationController {
         InvitationDTO dto = invitationService.getInviteById(id);
         return ResponseEntity.ok(dto);
     }
+    @GetMapping("/TeamInvite/{id}")
+    public ResponseEntity<InvitationDTO> getTeamInviteById(@PathVariable Long id) {
+        InvitationDTO invitationDTO = teamInvitationService.getTeamInviteById(id);
+        return ResponseEntity.ok(invitationDTO);
+    }
+    @GetMapping("/confirmed-players/{sessionId}/{team}")
+    public ResponseEntity<List<AllPlayersDTO>> getConfirmedTeamPlayers(
+            @PathVariable Long sessionId,
+            @PathVariable Team team) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        Long playerId = userService.getUserByUsername(username).getPlayer().getId();
+        List<Player> players = teamInvitationService.getConfirmedTeamPlayers(sessionId, team,playerId );
+
+        List<AllPlayersDTO> playerDTOs = players.stream()
+                .map(player -> new AllPlayersDTO(player, userService))
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(playerDTOs);
+    }
+
+
 }
