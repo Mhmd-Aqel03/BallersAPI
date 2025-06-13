@@ -34,7 +34,8 @@ public class BallersApiApplication {
             PasswordEncoder passwordEncoder,
             InvitationRepository invitationRepository,
             PlayerRepository playerRepository,
-            SessionTeamRepository sessionTeamRepository
+            SessionTeamRepository sessionTeamRepository,
+            TeamInvitationRepository teamInvitationRepository
 
     ) {
         return args -> {
@@ -509,6 +510,18 @@ public class BallersApiApplication {
             invite3.setStatus(false); // pending
 
             invitationRepository.save(invite3);
+            TeamInvitation invite4 = new TeamInvitation();
+            LocalDateTime time = LocalDateTime.now();
+            invite4.setCreatedAt(time);
+            invite4.setPlayer(player1);
+
+            invite4.setReceiver(player);
+            invite4.setSession(session5);
+            invite4.setTeamName(Team.A);
+            invite4.setCreatedAt(LocalDateTime.now());
+            invite4.setStatus(InviteStatus.PENDING); // pending
+
+            teamInvitationRepository.save(invite4);
 
 
             playerRepository.save(player);
