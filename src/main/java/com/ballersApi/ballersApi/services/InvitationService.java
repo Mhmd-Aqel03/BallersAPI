@@ -2,19 +2,19 @@ package com.ballersApi.ballersApi.services;
 
 import com.ballersApi.ballersApi.dataTransferObjects.InvitationDTO;
 import com.ballersApi.ballersApi.exceptions.*;
-import com.ballersApi.ballersApi.models.Invitation;
-import com.ballersApi.ballersApi.models.Player;
-import com.ballersApi.ballersApi.models.Session;
-import com.ballersApi.ballersApi.models.SessionType;
+import com.ballersApi.ballersApi.models.*;
 import com.ballersApi.ballersApi.repositories.InvitationRepository;
 import com.ballersApi.ballersApi.repositories.PlayerRepository;
 import com.ballersApi.ballersApi.repositories.SessionRepository;
+import com.ballersApi.ballersApi.repositories.TeamInvitationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,9 +26,11 @@ public class InvitationService {
     private final PlayerRepository playerRepository;
     @Autowired
     private final SessionRepository sessionRepository;
-
+    @Autowired
+    private TeamInvitationRepository teamInvitationRepository;
     @Autowired
     private final UserService userService;
+
     public String sendInvite(Long playerId, Long receiverId, Long sessionId) {
         Player player = playerRepository.findById(playerId)
                 .orElseThrow(() -> new PlayerNotFoundException("Player with id " + playerId + " not found"));
@@ -75,29 +77,55 @@ public class InvitationService {
 
     public List<InvitationDTO> getIncomingInvitesForReceiver(Long receiverId) {
         List<Invitation> invites = invitationRepository.findByReceiverId(receiverId);
-        if (invites.isEmpty()) {
-            throw new NoInvitationsFoundException("No invites found for this player.");
-        }
+        List<TeamInvitation> teamInvites = teamInvitationRepository.findByReceiverId(receiverId);
 
-        boolean allAccepted = invites.stream().allMatch(Invitation::isStatus);
-        if (allAccepted) {
-            throw new NoInvitationsFoundException("No invites found for this player.");
-        }
-
-        return invites.stream().filter(invite -> !invite.isStatus())
+        // Filter: normal invites that are not accepted (status == false)
+        List<InvitationDTO> normalDTOs = invites.stream()
+                .filter(invite -> !invite.isStatus())
                 .map(invite -> {
-            Player sender = invite.getPlayer();
-            String senderUsername = userService.getUserByPlayerId(sender.getId()).getUsername();
+                    Player sender = invite.getPlayer();
+                    String senderUsername = userService.getUserByPlayerId(sender.getId()).getUsername();
 
-            return new InvitationDTO(
-                    invite.getId(),
-                    invite.getSession().getId(),
-                    invite.getSession().getMatchDate(),
-                    senderUsername,
-                    invite.isStatus(),
-                    invite.getCreatedAt()
-            );
-        }).collect(Collectors.toList());
+                    return new InvitationDTO(
+                            invite.getId(),
+                            invite.getSession().getId(),
+                            invite.getSession().getMatchDate(),
+
+                            senderUsername,
+                            false,
+                            invite.getCreatedAt(),
+                            invite.getSession().getType()
+                    );
+                }).collect(Collectors.toList());
+
+        // Filter: team invites that are still pending
+        List<InvitationDTO> teamDTOs = teamInvites.stream()
+                .filter(invite -> invite.getStatus() == InviteStatus.PENDING)
+                .map(invite -> {
+                    Player sender = invite.getPlayer();
+                    String senderUsername = userService.getUserByPlayerId(sender.getId()).getUsername();
+
+                    return new InvitationDTO(
+                            invite.getId(),
+                            invite.getSession().getId(),
+                            invite.getSession().getMatchDate(),
+                            senderUsername,
+                            false, // since it's still pending
+                            invite.getCreatedAt(),
+                            invite.getSession().getType()
+                    );
+                }).collect(Collectors.toList());
+
+        // Combine both types of invites
+        List<InvitationDTO> allInvites = new ArrayList<>();
+        allInvites.addAll(normalDTOs);
+        allInvites.addAll(teamDTOs);
+
+        if (allInvites.isEmpty()) {
+            throw new NoInvitationsFoundException("No invites found for this player.");
+        }
+
+        return allInvites;
     }
 
 
@@ -114,8 +142,10 @@ public class InvitationService {
                 invite.getSession().getMatchDate(),
                 senderUsername,
                 invite.isStatus(),
-                invite.getCreatedAt()
+                invite.getCreatedAt(),
+                invite.getSession().getType()
         );
     }
+
 
 }
