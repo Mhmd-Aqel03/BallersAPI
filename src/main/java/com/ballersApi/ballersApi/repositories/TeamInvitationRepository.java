@@ -10,8 +10,10 @@ import java.util.Optional;
 
 public interface TeamInvitationRepository extends JpaRepository<TeamInvitation, Long> {
 
-    Optional<TeamInvitation> findBySessionAndReceiver(Session session, Player receiver);
+    Optional<TeamInvitation> findBySessionAndReceiverAndStatus(Session session, Player receiver, InviteStatus status);
     List<TeamInvitation> findByTeamAndStatus(SessionTeam team, InviteStatus status);
+    List<TeamInvitation> findBySessionAndTeamAndPlayerAndStatus(Session session, SessionTeam team, Player player, InviteStatus status);
+    List<TeamInvitation> findByReceiverId(Long receiverId);
 
 
 
