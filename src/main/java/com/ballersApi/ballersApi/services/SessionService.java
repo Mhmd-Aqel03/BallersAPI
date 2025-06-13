@@ -8,6 +8,7 @@ import com.ballersApi.ballersApi.exceptions.SessionCreationException;
 import com.ballersApi.ballersApi.exceptions.SessionNotFoundException;
 import com.ballersApi.ballersApi.models.Court;
 import com.ballersApi.ballersApi.models.Session;
+import com.ballersApi.ballersApi.models.Team;
 import com.ballersApi.ballersApi.models.User;
 import com.ballersApi.ballersApi.repositories.PlayerRepository;
 import com.ballersApi.ballersApi.repositories.SessionRepository;
@@ -175,6 +176,17 @@ public class SessionService {
         }
 
         return adminSessions;
+    }
+    public int getNumberOfPlayers(Long sessionId, Team team) {
+        Session session = sessionRepository.findById(sessionId).orElseThrow(()
+                -> new SessionNotFoundException("Session with ID " + sessionId + " not found"));
+        if (team == Team.A) {
+            return session.getTeamA().getPlayers().size();
+        }
+        else{
+            return session.getTeamB().getPlayers().size();
+        }
+
     }
 }
 
